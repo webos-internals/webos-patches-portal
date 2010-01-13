@@ -1,0 +1,419 @@
+<?php
+
+/* COPYRIGHT 2009-2010 Daniel Beames and WebOS-Internals                        */
+/* Redistribute only with explicit permission in writing from original author.  */
+
+if(!defined('IN_SCRIPT')) {
+  die("Hacking attempt!!");
+}
+
+// GLOBAL VARIABLES
+$categories = array(	"Select...",
+			"App Catalog",
+			"App Launcher",
+			"Browser",
+			"Calculator",
+			"Calendar",
+			"Camera",
+			"Clock",
+			"Contacts",
+			"Dangerous",
+			"Email",
+			"Messaging",
+			"Misc",
+			"Mojo",
+			"Music Player",
+			"Notifications",
+			"Pandora",
+			"PDF Viewer",
+			"Phone",
+			"Screen Lock",
+			"Sounds and Alerts",
+			"SprintNav",
+			"Tasks",
+			"Top Bar",
+			"Universal Search",
+			"Video Player",
+			"YouTube",
+			"Other"
+		);
+
+$webos_versions_array = array("1.3.1","1.3.5");
+
+$icon_array = array(	"App Catalog"		=>"http://www.webos-internals.org/images/0/03/Icon_WebOSInternals_Patches_Findapps.png",
+			"App Launcher"		=>"http://www.webos-internals.org/images/b/b1/Icon_WebOSInternals_Patches_Applauncher.png",
+			"Browser"		=>"http://www.webos-internals.org/images/4/4a/Icon_WebOSInternals_Patches_Browser.png",
+			"Calculator"		=>"http://www.webos-internals.org/images/2/20/Icon_WebOSInternals_Patches_Calculator.png",
+			"Calendar"		=>"http://www.webos-internals.org/images/d/d4/Icon_WebOSInternals_Patches_Calendar.png",
+			"Camera"		=>"http://www.webos-internals.org/images/c/c5/Icon_WebOSInternals_Patches_Camera.png",
+			"Clock"			=>"http://www.webos-internals.org/images/8/8d/Icon_WebOSInternals_Patches_Clock.png",
+			"Contacts"		=>"http://www.webos-internals.org/images/c/ca/Icon_WebOSInternals_Patches_Contacts.png",
+			"Dangerous"		=>"http://www.webos-internals.org/images/c/c6/Icon_Patch_Dangerous.png",
+			"Email"			=>"http://www.webos-internals.org/images/2/29/Icon_WebOSInternals_Patches_Email.png",
+			"Messaging"		=>"http://www.webos-internals.org/images/2/24/Icon_WebOSInternals_Patches_Messaging.png",
+			"Misc"			=>"http://www.webos-internals.org/images/f/f9/Icon_WebOSInternals_Patch.png",
+			"Mojo"			=>"http://www.webos-internals.org/images/f/f9/Icon_WebOSInternals_Patch.png",
+			"Music Player"		=>"http://www.webos-internals.org/images/d/df/Icon_WebOSInternals_Patches_Musicplayer.png",
+			"Notifications"		=>"http://www.webos-internals.org/images/f/f9/Icon_WebOSInternals_Patch.png",
+			"Pandora"		=>"http://www.webos-internals.org/images/d/d1/Icon_WebOSInternals_Patches_Pandora.png",
+			"PDF Viewer"		=>"http://www.webos-internals.org/images/7/71/Icon_WebOSInternals_Patches_Pdfviewer.png",
+			"Phone"			=>"http://www.webos-internals.org/images/2/2c/Icon_WebOSInternals_Patches_Phone.png",
+			"Screen Lock"		=>"http://www.webos-internals.org/images/f/fa/Icon_WebOSInternals_Patches_Screenlock.png",
+			"Sounds and Alerts"	=>"http://www.webos-internals.org/images/f/ff/Icon_WebOSInternals_Patches_Soundsandalerts.png",
+			"SprintNav"		=>"http://www.webos-internals.org/images/c/c3/Icon_WebOSInternals_Patches_SprintNav.png",
+			"Tasks"			=>"http://www.webos-internals.org/images/8/83/Icon_WebOSInternals_Patches_Tasks.png",
+			"Top Bar"		=>"http://www.webos-internals.org/images/f/f9/Icon_WebOSInternals_Patch.png",
+			"Universal Search"	=>"http://www.webos-internals.org/images/f/f9/Icon_WebOSInternals_Patch.png",
+			"Video Player"		=>"http://www.webos-internals.org/images/f/ff/Icon_WebOSInternals_Patches_Videoplayer.png",
+			"YouTube"		=>"http://www.webos-internals.org/images/8/8b/Icon_WebOSInternals_Patches_Youtube.png",
+			"Other"			=>"http://www.webos-internals.org/images/f/f9/Icon_WebOSInternals_Patch.png"
+		);
+
+function GetPatch($pid) {
+	global $DB;
+	$getpatch = $DB->query_first("SELECT title,category,patch_file FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
+	$title = strtolower($getpatch['title']);
+	$title = str_replace(" ", "-", $title);
+	$title = str_replace("_", "-", $title);
+	$title = str_replace("/", "-", $title);
+	$title = str_replace("\\", "-", $title);
+	$category = strtolower($getpatch['category']);
+	$category = str_replace(" ", "-", $category);
+	$name = $category.'-'.$title.'.patch';
+	header('Content-type: application/octet-stream');
+	header('Content-Disposition: attachment; filename="'.$name.'"');
+	echo $getpatch['patch_file'];
+}
+
+function GetImage($pid, $ss) {
+	global $DB;
+
+	switch($ss) {
+		case '1':
+			$sstype = 'screenshot_1_type';
+			$ssblob = 'screenshot_1_blob';
+			break;
+		case '2':
+			$sstype = 'screenshot_2_type';
+			$ssblob = 'screenshot_2_blob';
+			break;
+		case '3':
+			$sstype = 'screenshot_3_type';
+			$ssblob = 'screenshot_3_blob';
+			break;
+	}
+
+	$getpatch = $DB->query_first("SELECT title,category,".$ssblob.",".$sstype." FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
+	$title = strtolower($getpatch['title']);
+	$title = str_replace(" ", "-", $title);
+	$title = str_replace("_", "-", $title);
+	$title = str_replace("/", "-", $title);
+	$title = str_replace("\\", "-", $title);
+	$category = strtolower($getpatch['category']);
+	$category = str_replace(" ", "-", $category);
+	$known_image_types = array(
+	                         'image/pjpeg' => 'jpg',
+	                         'image/jpeg'  => 'jpg',
+	                         'image/bmp'   => 'bmp',
+	                         'image/x-png' => 'png',
+							 'image/png'   => 'png'
+	                       );
+	$image_type = $getpatch[$sstype];
+	$ext = $known_image_types[$image_type];
+	$name = $category.'-'.$title.'-'.$ss.'.'.$ext;
+	header('Content-type: '.$getpatch[$sstype]);
+	header('Content-Disposition: attachment; filename="'.$name.'"');
+	echo $getpatch[$ssblob];
+}
+
+function GetChangelog($pid) {
+	global $DB;
+	$getpatch = $DB->query_first("SELECT title, category, changelog FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
+	echo '<tr>
+			<td align="center"><b>'.$getpatch[category].':</b> '.$getpatch[title].' - Changelog</td>
+		</tr>
+		<tr>
+			<td>'.$getpatch[changelog].'</td>
+		</tr>';
+}
+
+global $rootpath;
+
+function FormatForForm($input) {
+	$return = htmlspecialchars(stripslashes(br2nl($input)));
+	return $return;
+}
+
+function br2nl($string){
+  $return=eregi_replace('<br[[:space:]]*/?'.
+    '[[:space:]]*>',chr(13).chr(10),$string);
+  return $return;
+}
+
+function mynl2br($string) {
+   return strtr($string, array("\r\n" => '<br/>', "\r" => '<br/>', "\n" => '<br/>'));
+}
+
+function SpamCheck($ip) {
+	$logfile = "../webospatches.log";
+	$log = fopen($logfile, "r");
+	while (($data = fgetcsv($log, 8000, ",")) !== FALSE) {
+		$logdata[][$data[0]] = $data[1];
+	}
+	fclose($log);
+	$orignum = count($logdata);
+	for($i=0;$i<$orignum;$i++) {
+		if($logdata[$i][$ip]) {
+			if(time() < ($logdata[$i][$ip]+(5*60))) {
+				return 1;
+			} else {
+				unset($logdata[$i]);
+				$unset=1;
+			}
+		}
+	}
+
+	if($unset) {
+		$logdata = array_values($logdata);
+		$num = count($logdata);
+		for($j=0;$j<$num;$j++) {
+			foreach($logdata[$j] as $key => $value) {
+				if(strlen($value > '1')) {
+					$newcsvdata .= $key.",".$value."\n";
+				}
+			}
+		}
+
+		$log = fopen($logfile, "w+");
+		fwrite($log, $newcsvdata);
+		fclose($log);
+	}
+	return 0;
+}
+
+function GetRemoteAddress() {
+	$remote_address = $_SERVER['REMOTE_ADDR'];
+
+	// If HTTP_X_FORWARDED_FOR is set, we try to grab the first non-LAN IP
+	if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
+	{
+		if (preg_match_all('/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/', $_SERVER['HTTP_X_FORWARDED_FOR'], $address_list))
+		{
+			$lan_ips = array('/^0\./', '/^127\.0\.0\.1/', '/^192\.168\..*/', '/^172\.((1[6-9])|(2[0-9])|(3[0-1]))\..*/', '/^10\..*/', '/^224\..*/', '/^240\..*/');
+			$address_list = preg_replace($lan_ips, null, $address_list[0]);
+
+			while (list(, $cur_address) = each($address_list))
+			{
+				if ($cur_address)
+				{
+					$remote_address = $cur_address;
+					break;
+				}
+			}
+		}
+	}
+
+	return $remote_address;
+}
+
+function validateUrlSyntax( $urladdr, $options="" ) {
+    // Force Options parameter to be lower case
+    // DISABLED PERMAMENTLY - OK to remove from code
+    //    $options = strtolower($options);
+
+    // Check Options Parameter
+    if (!ereg( '^([sHSEFuPaIpfqr][+?-])*$', $options ))
+    {
+        trigger_error("Options attribute malformed", E_USER_ERROR);
+    }
+
+    // Set Options Array, set defaults if options are not specified
+    // Scheme
+    if (strpos( $options, 's') === false) $aOptions['s'] = '?';
+    else $aOptions['s'] = substr( $options, strpos( $options, 's') + 1, 1);
+    // http://
+    if (strpos( $options, 'H') === false) $aOptions['H'] = '?';
+    else $aOptions['H'] = substr( $options, strpos( $options, 'H') + 1, 1);
+    // https:// (SSL)
+    if (strpos( $options, 'S') === false) $aOptions['S'] = '?';
+    else $aOptions['S'] = substr( $options, strpos( $options, 'S') + 1, 1);
+    // mailto: (email)
+    if (strpos( $options, 'E') === false) $aOptions['E'] = '-';
+    else $aOptions['E'] = substr( $options, strpos( $options, 'E') + 1, 1);
+    // ftp://
+    if (strpos( $options, 'F') === false) $aOptions['F'] = '-';
+    else $aOptions['F'] = substr( $options, strpos( $options, 'F') + 1, 1);
+    // User section
+    if (strpos( $options, 'u') === false) $aOptions['u'] = '?';
+    else $aOptions['u'] = substr( $options, strpos( $options, 'u') + 1, 1);
+    // Password in user section
+    if (strpos( $options, 'P') === false) $aOptions['P'] = '?';
+    else $aOptions['P'] = substr( $options, strpos( $options, 'P') + 1, 1);
+    // Address Section
+    if (strpos( $options, 'a') === false) $aOptions['a'] = '+';
+    else $aOptions['a'] = substr( $options, strpos( $options, 'a') + 1, 1);
+    // IP Address in address section
+    if (strpos( $options, 'I') === false) $aOptions['I'] = '?';
+    else $aOptions['I'] = substr( $options, strpos( $options, 'I') + 1, 1);
+    // Port number
+    if (strpos( $options, 'p') === false) $aOptions['p'] = '?';
+    else $aOptions['p'] = substr( $options, strpos( $options, 'p') + 1, 1);
+    // File Path
+    if (strpos( $options, 'f') === false) $aOptions['f'] = '?';
+    else $aOptions['f'] = substr( $options, strpos( $options, 'f') + 1, 1);
+    // Query Section
+    if (strpos( $options, 'q') === false) $aOptions['q'] = '?';
+    else $aOptions['q'] = substr( $options, strpos( $options, 'q') + 1, 1);
+    // Fragment (Anchor)
+    if (strpos( $options, 'r') === false) $aOptions['r'] = '?';
+    else $aOptions['r'] = substr( $options, strpos( $options, 'r') + 1, 1);
+
+
+    // Loop through options array, to search for and replace "-" to "{0}" and "+" to ""
+    foreach($aOptions as $key => $value)
+    {
+        if ($value == '-')
+        {
+            $aOptions[$key] = '{0}';
+        }
+        if ($value == '+')
+        {
+            $aOptions[$key] = '';
+        }
+    }
+
+    // DEBUGGING - Unescape following line to display to screen current option values
+    // echo '<pre>'; print_r($aOptions); echo '</pre>';
+
+
+    // Preset Allowed Characters
+    $alphanum    = '[a-zA-Z0-9]';  // Alpha Numeric
+    $unreserved  = '[a-zA-Z0-9_.!~*' . '\'' . '()-]';
+    $escaped     = '(%[0-9a-fA-F]{2})'; // Escape sequence - In Hex - %6d would be a 'm'
+    $reserved    = '[;/?:@&=+$,]'; // Special characters in the URI
+
+    // Beginning Regular Expression
+                       // Scheme - Allows for 'http://', 'https://', 'mailto:', or 'ftp://'
+    $scheme            = '(';
+    if     ($aOptions['H'] === '') { $scheme .= 'http://'; }
+    elseif ($aOptions['S'] === '') { $scheme .= 'https://'; }
+    elseif ($aOptions['E'] === '') { $scheme .= 'mailto:'; }
+    elseif ($aOptions['F'] === '') { $scheme .= 'ftp://'; }
+    else
+    {
+        if ($aOptions['H'] === '?') { $scheme .= '|(http://)'; }
+        if ($aOptions['S'] === '?') { $scheme .= '|(https://)'; }
+        if ($aOptions['E'] === '?') { $scheme .= '|(mailto:)'; }
+        if ($aOptions['F'] === '?') { $scheme .= '|(ftp://)'; }
+        $scheme = str_replace('(|', '(', $scheme); // fix first pipe
+    }
+    $scheme            .= ')' . $aOptions['s'];
+    // End setting scheme
+
+                       // User Info - Allows for 'username@' or 'username:password@'. Note: contrary to rfc, I removed ':' from username section, allowing it only in password.
+                       //   /---------------- Username -----------------------\  /-------------------------------- Password ------------------------------\
+    $userinfo          = '((' . $unreserved . '|' . $escaped . '|[;&=+$,]' . ')+(:(' . $unreserved . '|' . $escaped . '|[;:&=+$,]' . ')+)' . $aOptions['P'] . '@)' . $aOptions['u'];
+
+                       // IP ADDRESS - Allows 0.0.0.0 to 255.255.255.255
+    $ipaddress         = '((((2(([0-4][0-9])|(5[0-5])))|([01]?[0-9]?[0-9]))\.){3}((2(([0-4][0-9])|(5[0-5])))|([01]?[0-9]?[0-9])))';
+
+                       // Tertiary Domain(s) - Optional - Multi - Although some sites may use other characters, the RFC says tertiary domains have the same naming restrictions as second level domains
+    $domain_tertiary   = '(' . $alphanum . '(([a-zA-Z0-9-]{0,62})' . $alphanum . ')?\.)*';
+
+                       // Second Level Domain - Required - First and last characters must be Alpha-numeric. Hyphens are allowed inside.
+    $domain_secondary  = '(' . $alphanum . '(([a-zA-Z0-9-]{0,62})' . $alphanum . ')?\.)';
+
+    /* // This regex is disabled on purpose in favour of the more exact version below
+                       // Top Level Domain - First character must be Alpha. Last character must be AlphaNumeric. Hyphens are allowed inside.
+    $domain_toplevel   = '([a-zA-Z](([a-zA-Z0-9-]*)[a-zA-Z0-9])?)';
+    */
+
+                       // Top Level Domain - Required - Domain List Current As Of December 2004. Use above escaped line to be forgiving of possible future TLD's
+    $domain_toplevel   = '(aero|biz|com|coop|edu|gov|info|int|jobs|mil|mobi|museum|name|net|org|post|pro|travel|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|az|ax|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|sl|sm|sn|so|sr|st|sv|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|um|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw)';
+
+
+                       // Address can be IP address or Domain
+    if ($aOptions['I'] === '{0}') {       // IP Address Not Allowed
+        $address       = '(' . $domain_tertiary . $domain_secondary . $domain_toplevel . ')';
+    } elseif ($aOptions['I'] === '') {  // IP Address Required
+        $address       = '(' . $ipaddress . ')';
+    } else {                            // IP Address Optional
+        $address       = '((' . $ipaddress . ')|(' . $domain_tertiary . $domain_secondary . $domain_toplevel . '))';
+    }
+    $address = $address . $aOptions['a'];
+
+                       // Port Number - :80 or :8080 or :65534 Allows range of :0 to :65535
+                       //    (0-59999)         |(60000-64999)   |(65000-65499)    |(65500-65529)  |(65530-65535)
+    $port_number       = '(:(([0-5]?[0-9]{1,4})|(6[0-4][0-9]{3})|(65[0-4][0-9]{2})|(655[0-2][0-9])|(6553[0-5])))' . $aOptions['p'];
+
+                       // Path - Can be as simple as '/' or have multiple folders and filenames
+    $path              = '(/((;)?(' . $unreserved . '|' . $escaped . '|' . '[:@&=+$,]' . ')+(/)?)*)' . $aOptions['f'];
+
+                       // Query Section - Accepts ?var1=value1&var2=value2 or ?2393,1221 and much more
+    $querystring       = '(\?(' . $reserved . '|' . $unreserved . '|' . $escaped . ')*)' . $aOptions['q'];
+
+                       // Fragment Section - Accepts anchors such as #top
+    $fragment          = '(#(' . $reserved . '|' . $unreserved . '|' . $escaped . ')*)' . $aOptions['r'];
+
+
+    // Building Regular Expression
+    $regexp = '^' . $scheme . $userinfo . $address . $port_number . $path . $querystring . $fragment . '$';
+
+    // DEBUGGING - Uncomment Line Below To Display The Regular Expression Built
+    // echo '<pre>' . htmlentities(wordwrap($regexp,70,"\n",1)) . '</pre>';
+
+    // Running the regular expression
+    if (eregi( $regexp, $urladdr ))
+    {
+        return true; // The domain passed
+    }
+    else
+    {
+        return false; // The domain didn't pass the expression
+    }
+
+}
+
+function validateEmail($email) {
+	// checks proper syntax
+	if( !preg_match( "/^([a-zA-Z0-9])+([a-zA-Z0-9\+=._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $email)) {
+	    return false;
+	}
+	// gets domain name
+	list($username,$domain)=split('@',$email);
+	// checks for if MX records in the DNS
+	$mxhosts = array();
+	if(!getmxrr($domain, $mxhosts)) {
+		// no mx records, can't email
+		return false;
+	} else {
+		// Found MX record.. Might be ok.
+		return true;
+	}
+}
+
+// ########################## PRE CLEAN ##########################
+// preclean: cleans all post, get, and cookie data - before entering database
+
+function PreClean($data) {
+	if(is_array($data)) {
+		foreach($data as $key => $val) {
+			$return[$key] = PreClean($val);
+		}
+	    return ($return);
+	} else {
+    	return (strip_tags(trim($data)));
+  	}
+}
+
+// ################################### IIF  ####################################
+
+function iif($expression, $returntrue, $returnfalse) {
+	if ($expression==0) {
+		return $returnfalse;
+	} else {
+		return $returntrue;
+  	}
+}
+
+?>
