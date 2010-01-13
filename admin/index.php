@@ -52,7 +52,7 @@ echo '<html>
 	  <body>
 	  <table width="100%" border="1" cellpadding="5" cellspacing="0">
 	  <tr>
-		<td colspan="10" align="center" class="header">WebsOS-Patches Admin<br/>
+		<td colspan="11" align="center" class="header">WebsOS-Patches Admin<br/>
 		<a href="/admin/">Home</a> | ';
 	if($do != "new") {
 		echo '<a href="?do=new">'.iif($new_count[num_new]>=1, "<b>", "").'New Submissions ('.$new_count[num_new].')'.iif($new_count[num_new]>=1, "</b>", "").'</a>';
@@ -68,83 +68,55 @@ echo ' | '.iif($do=="browse", "Browse Patches", '<a href="?do=browse">Browse Pat
 	  </tr>';
 }
 
-function DisplayUpdatesNew($do) {
-	global $DB;
-	
-	echo '<tr>
-			<td width="175px" align="center"><b>Title</b></td>
-			<td width="275px" align="center"><b>Description</b></td>
-			<td width="30px" align="center"><b>Patch</b></td>
-			<td width="100px" align="center"><b>Category</b></td>
-			<td width="30px" align="center"><b>SS1</b></td>
-			<td width="30px" align="center"><b>SS2</b></td>
-			<td width="30px" align="center"><b>SS3</b></td>
-			<td width="50px" align="center"><b>WebOS Versions</b></td>
-			<td width="75px" align="center"><b>Maintainer</b></td>
-			<td width="50px" align="center"><b>Homepage</b></td>
-		  </tr>';
-
-	$getnew = $DB->query("SELECT * FROM ".TABLE_PREFIX."patches WHERE status = '0' AND update_pid ".iif($do=="new", "IS", "IS NOT")." NULL");
-	while($patch = $DB->fetch_array($getnew)) {
-		echo '<tr>
-			<td><a href="?do=build_form&pid='.$patch[pid].'">'.$patch[title].'</a></td>
-			<td>'.$patch[description].'</td>
-			<td><a href="?do=get_patch&pid='.$patch[pid].'">Show</a></td>
-			<td>'.$patch[category].'</td>
-			<td>'.iif(strlen($patch[screenshot_1_type])>=1, "<a href=\"?do=get_image&ss=1&pid=$patch[pid]\">Show</a>", "&nbsp;").'</td>
-			<td>'.iif(strlen($patch[screenshot_2_type])>=1, "<a href=\"?do=get_image&ss=2&pid=$patch[pid]\">Show</a>", "&nbsp;").'</td>
-			<td>'.iif(strlen($patch[screenshot_3_type])>=1, "<a href=\"?do=get_image&ss=3&pid=$patch[pid]\">Show</a>", "&nbsp;").'</td>
-			<td>'.str_replace(" ", "<br/>", $patch[webos_versions]).'</td>
-			<td>'.iif(strlen($patch[email])>=1, "<a href=mailto://$patch[email]>", "").$patch[maintainer].iif(strlen($patch[email])>=1, "</a>", "").'</td>
-			<td>'.iif(strlen($patch[homepage])>=1, "<a href=$patch[homepage]>Link</a>", "None").'</td>
-		</tr>';
-	}
-}
-
-function BrowsePatches($webosver, $category) {
+function BrowsePatches($do, $webosver, $category) {
 	global $DB, $webos_versions_array, $categories;
 	echo '<tr>
-			<td colspan="10" class="header2" align="center">';
-	foreach($webos_versions_array as $key=>$webos_version) {
-		$count = $DB->query_first("SELECT count(pid) as num FROM ".TABLE_PREFIX."patches WHERE versions LIKE '%".$webos_version."%'");
-		if($count['num'] > '0') {
-			$versions[] = $webos_version;
-		}
-	}
-	$i=0;
-	foreach($versions as $key=>$version) {
-		echo iif($i==0, "", " | ").iif($webosver==$version, $version, '<a href="?do=browse&webosver='.$version.'">'.$version.'</a>');
-		$i++;
-	}
-	echo iif($i==0, "", " | ").iif($webosver=="all", 'All', '<a href="?do=browse&webosver=all">All</a>').'</td>
-		</tr>';
-	if($webosver) {
-		echo '<tr>
-				<td colspan="10" class="header2" align="center">';
-		foreach($categories as $key=>$category1) {
-			if($webosver == "all") {
-				$count = $DB->query_first("SELECT count(pid) as num FROM ".TABLE_PREFIX."patches WHERE category = '".$category1."'");
-			} else {
-				$count = $DB->query_first("SELECT count(pid) as num FROM ".TABLE_PREFIX."patches WHERE category = '".$category1."' AND versions LIKE '%".$webosver."%'");
-			}
+			<td colspan="11" class="header2" align="center">';
+	if($do == "browse") {
+		foreach($webos_versions_array as $key=>$webos_version) {
+			$count = $DB->query_first("SELECT count(pid) as num FROM ".TABLE_PREFIX."patches WHERE versions LIKE '%".$webos_version."%'");
 			if($count['num'] > '0') {
-				$category_list[] = $category1;
+				$versions[] = $webos_version;
 			}
 		}
 		$i=0;
-		foreach($category_list as $key=>$category1) {
-			echo iif($i==0, "", " | ").iif($category==$category1, $category1, '<a href="?do=browse&webosver='.$webosver.'&category='.$category1.'">'.$category1.'</a>');
+		foreach($versions as $key=>$version) {
+			echo iif($i==0, "", " | ").iif($webosver==$version, $version, '<a href="?do=browse&webosver='.$version.'">'.$version.'</a>');
 			$i++;
 		}
-		echo iif($i==0, "", " | ").iif($category==all, 'All', '<a href="?do=browse&webosver='.$webosver.'&category=all">All</a>').'</td>
+		echo iif($i==0, "", " | ").iif($webosver=="all", 'All', '<a href="?do=browse&webosver=all">All</a>').'</td>
 			</tr>';
+		if($webosver) {
+			echo '<tr>
+					<td colspan="11" class="header2" align="center">';
+			foreach($categories as $key=>$category1) {
+				if($webosver == "all") {
+					$count = $DB->query_first("SELECT count(pid) as num FROM ".TABLE_PREFIX."patches WHERE category = '".$category1."'");
+				} else {
+					$count = $DB->query_first("SELECT count(pid) as num FROM ".TABLE_PREFIX."patches WHERE category = '".$category1."' AND versions LIKE '%".$webosver."%'");
+				}
+				if($count['num'] > '0') {
+					$category_list[] = $category1;
+				}
+			}
+			$i=0;
+			foreach($category_list as $key=>$category1) {
+				echo iif($i==0, "", " | ").iif($category==$category1, $category1, '<a href="?do=browse&webosver='.$webosver.'&category='.$category1.'">'.$category1.'</a>');
+				$i++;
+			}
+			echo iif($i==0, "", " | ").iif($category==all, 'All', '<a href="?do=browse&webosver='.$webosver.'&category=all">All</a>').'</td>
+				</tr>';
+		}
 	}
-	if($category) {
+	if($category || $do != "browse") {
 		echo '<tr>
 				<td width="64px">&nbsp;</td>
 				<td width="175px" align="center"><b>Title</b></td>
-				<td width="275px" align="center"><b>Description</b></td>
-				<td width="100px" align="center"><b>Category</b></td>
+				<td width="275px" align="center"><b>Description</b></td>';
+		if($do == "new" || $do == "updates") {
+			echo '<td width="30px" align="center"><b>Patch</b></td>';
+		}
+		echo '	<td width="100px" align="center"><b>Category</b></td>
 				<td width="30px" align="center"><b>SS1</b></td>
 				<td width="30px" align="center"><b>SS2</b></td>
 				<td width="30px" align="center"><b>SS3</b></td>
@@ -152,17 +124,27 @@ function BrowsePatches($webosver, $category) {
 				<td width="50px" align="center"><b>Homepage</b></td>
 				<td width="50px" align="center"><b>Versions</b></td>
 		  	</tr>';
-		if($webosver == 'all') {
-			$webosver_query = '';
-		} else {
-			$webosver_query = $webosver;
+		switch($do) {
+			case "browse":
+				if($webosver == 'all') {
+					$webosver_query = '';
+				} else {
+					$webosver_query = $webosver;
+				}
+				if($category == 'all') {
+					$category_query = '';
+				} else {
+					$category_query = " AND category = '".$category."'";
+				}
+				$getpatches = $DB->query("SELECT * FROM ".TABLE_PREFIX."patches WHERE status = '1' AND versions LIKE '%".$webosver_query."%'".$category_query);
+				break;
+			case "updates":
+				$getpatches = $DB->query("SELECT * FROM ".TABLE_PREFIX."patches WHERE status = '0' AND update_pid IS NOT NULL");
+				break;
+			case "new":
+				$getpatches = $DB->query("SELECT * FROM ".TABLE_PREFIX."patches WHERE status = '0' AND update_pid IS NULL");
+				break;
 		}
-		if($category == 'all') {
-			$category_query = '';
-		} else {
-			$category_query = " AND category = '".$category."'";
-		}
-		$getpatches = $DB->query("SELECT * FROM ".TABLE_PREFIX."patches WHERE status = '1' AND versions LIKE '%".$webosver_query."%'".$category_query);
 		while($patch = $DB->fetch_array($getpatches)) {
 			$maintainer_array = explode(',', $patch['maintainer']);
 			$num_maintainers = count($maintainer_array);
@@ -177,16 +159,29 @@ function BrowsePatches($webosver, $category) {
 			$num_maintainers = 0;
 			echo '<tr>
 				<td><img src="'.$patch[icon].'"></img></td>
-				<td>'.$patch[title].'</td>
-				<td align="justify">'.$patch[description].'</td>
-				<td align="center">'.$patch[category].'</td>
-				<td align="center">'.iif(strlen($patch[screenshot_1])>=1, "<a href=\"".$patch[screenshot_1]."\" target=\"SS_OUT\">Show</a>", "&nbsp;").'</td>
+				<td><a href="?do=build_form&pid='.$patch[pid].'">'.$patch[title].'</a></td>
+				<td align="justify">'.$patch[description].'</td>';
+			if($do != "browse") {
+				echo '<td><a href="?do=get_patch&pid='.$patch[pid].'">Show</a></td>';
+			}
+			echo '<td align="center">'.$patch[category].'</td>';
+			if($do == "browse") {
+				echo '<td align="center">'.iif(strlen($patch[screenshot_1])>=1, "<a href=\"".$patch[screenshot_1]."\" target=\"SS_OUT\">Show</a>", "&nbsp;").'</td>
 				<td align="center">'.iif(strlen($patch[screenshot_2])>=1, "<a href=\"".$patch[screenshot_2]."\" target=\"SS_OUT\">Show</a>", "&nbsp;").'</td>
-				<td align="center">'.iif(strlen($patch[screenshot_3])>=1, "<a href=\"".$patch[screenshot_3]."\" target=\"SS_OUT\">Show</a>", "&nbsp;").'</td>
-				<td align="center">'.$maintainer_out.'</td>
-				<td align="center">'.iif(strlen($patch[homepage])>=1, "<a href=$patch[homepage]>Link</a>", "None").'</td>
-				<td>'.str_replace(" ", "<br/>", $patch[versions]).iif(strlen($patch[changelog])>=1, "<br/><br/><a href=\"?do=get_changelog&pid=".$patch[pid]."\" target=\"changelog\">Changelog</a>", "").'</td>
-			</tr>';
+				<td align="center">'.iif(strlen($patch[screenshot_3])>=1, "<a href=\"".$patch[screenshot_3]."\" target=\"SS_OUT\">Show</a>", "&nbsp;").'</td>';
+			} else {
+				echo '<td>'.iif(strlen($patch[screenshot_1_type])>=1, "<a href=\"?do=get_image&ss=1&pid=$patch[pid]\">Show</a>", "&nbsp;").'</td>
+				<td>'.iif(strlen($patch[screenshot_2_type])>=1, "<a href=\"?do=get_image&ss=2&pid=$patch[pid]\">Show</a>", "&nbsp;").'</td>
+				<td>'.iif(strlen($patch[screenshot_3_type])>=1, "<a href=\"?do=get_image&ss=3&pid=$patch[pid]\">Show</a>", "&nbsp;").'</td>';
+			}
+			echo '<td align="center">'.$maintainer_out.'</td>
+				<td align="center">'.iif(strlen($patch[homepage])>=1, "<a href=$patch[homepage]>Link</a>", "None").'</td>';
+			if ($do == "browse") {
+				echo '<td>'.str_replace(" ", "<br/>", $patch[versions]).iif(strlen($patch[changelog])>=1, "<br/><br/><a href=\"?do=get_changelog&pid=".$patch[pid]."\" target=\"changelog\">Changelog</a>", "").'</td>';
+			} else {
+				echo '<td>'.str_replace(" ", "<br/>", $patch[webos_versions]).'</td>';
+			}
+			echo '</tr>';
 			$maintainer_out = NULL;
 		}
 	}
@@ -488,7 +483,7 @@ HOMEPAGE =$homepage2";
 
 function MainFooter() {
 	echo '	  <tr>
-		<td colspan="10" width="100%" align="center" class="copyright"><center>&copy; 2009 - 2010 Daniel Beames (dBsooner) and webOS-Internals Group</center></td>
+		<td colspan="11" width="100%" align="center" class="copyright"><center>&copy; 2009 - 2010 Daniel Beames (dBsooner) and webOS-Internals Group</center></td>
 	  </tr>
 	  </table>
 	  </body>
@@ -500,17 +495,17 @@ function MainFooter() {
 switch($do) {
 	case 'new':
 		MainHeader();
-		DisplayUpdatesNew($_GET['do']);
+		BrowsePatches($_GET['do'], 'all', 'all');
 		MainFooter();
 		break;
 	case 'updates':
 		MainHeader();
-		DisplayUpdatesNew($_GET['do']);
+		BrowsePatches($_GET['do'], 'all', 'all');
 		MainFooter();
 		break;
 	case 'browse':
 		MainHeader();
-		BrowsePatches($_GET['webosver'], $_GET['category']);
+		BrowsePatches($_GET['do'], $_GET['webosver'], $_GET['category']);
 		MainFooter();
 		break;
 	case 'get_patch':
