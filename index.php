@@ -392,6 +392,12 @@ function HandleForm($pid) {
 			$screenshot_3_blob = file_get_contents($screenshot3['tmp_name'], FILE_BINARY);
 		}
 	}
+	
+	$maintainer_array = explode(',', $maintainer);
+	for($i=0; $i < count($maintainer_array); $i++) {
+		$maintainer_array2[] = trim($maintainer_array[$i]);
+	}
+	$maintainer = implode(',', $maintainer_array2);
 
 	if($pid) {
 		$cur = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");

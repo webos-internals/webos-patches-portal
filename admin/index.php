@@ -189,24 +189,21 @@ function BrowsePatches($do, $webosver, $category) {
 
 function BuildForm($errors, $pid) {
 	global $DB, $categories, $webos_versions_array;
-
 	$patch = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
 
-	if($errors) {
+	if(($pid >= "1") && (!$errors) && ($patch['status'] != "0")) {
+		$get_webos_versions = explode(' ', $patch['versions']);
+		foreach($get_webos_versions as $key=>$value) {
+			$patch[webos_versions][] .= array_shift(explode('-',$value,2));
+		}
+	} else if($errors) {
+		$patch = $_POST;
 		foreach($_POST as $key => $value) {
 			$$key = $value;
 		}
 	} else {
-		$title = $patch['title'];
-		$description = $patch['description'];
-		$category = str_replace(" ", "-", $patch['category']);
-		$webos_versions = explode(" ", $patch['webos_versions']);
-		$maintainer = $patch['maintainer'];
-		$email = $patch['email'];
-		$private = $patch['private'];
-		$homepage = $patch['homepage'];
+		$patch[webos_versions] = explode(' ', $patch['webos_versions']);
 	}
-
 	echo '		<form name="submitpatch" method="post" action="/admin/?do=submitform&pid='.$patch[pid].'" enctype="multipart/form-data">
 		<table width="100%" border="0" cellpadding="5" cellspacing="0">
 		<tr>
@@ -226,25 +223,30 @@ function BuildForm($errors, $pid) {
 	}
 	echo '		<tr>
 			<td width="15%" class="'.iif($errors, "cell11", "cell3").'">Title: (*)</td>
-			<td width="85%" class="'.iif($errors, "cell12", "cell4").'"><input type="text" class="uploadpatch" name="title" value="'.FormatForForm($title).'" size="50" maxlength="40"><br/>
+			<td width="85%" class="'.iif($errors, "cell12", "cell4").'"><input type="text" class="uploadpatch" name="title" value="'.FormatForForm($patch[title]).'" size="50" maxlength="40"><br/>
 			<b>Note:</b> Do not use category name, personalizations (your name, username,<br/>
 			company name, tagline, etc), webOS Version. Be short and sweet. Limit 40<br/>
 			characters. Numbers, Letters, apostrophes or spaces only.</td>
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Description: (*)</td>
-			<td width="85%" class="cell4"><TEXTAREA class="uploadpatch" name="description" cols="50" rows="3">'.FormatForForm($description).'</TEXTAREA></td>
+			<td width="85%" class="cell4"><TEXTAREA class="uploadpatch" name="description" cols="50" rows="3">'.FormatForForm($patch[description]).'</TEXTAREA></td>
 		</tr>
 		<tr>
 			<td width="15%" class="cell3">Patch File: (*)</td>
 			<td width="85%" class="cell4"><a href="?do=get_patch&pid='.$patch[pid].'">View Patch</a></td>
 		</tr>
 		<tr>
+			<td width="15%" class="cell3">Dependants:</td>
+			<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="depends" value="'.FormatForForm($patch[depends]).'" size="50" maxlength="512"><br/>
+			<b>Note:</b> Enter the packageid of all packages this patch is dependant on. Seperate packages with a comma. Example: org.webosinternals.patches.univseral-search-command-line</td>
+		</tr>
+		<tr>
 			<td width="15%" class="cell3">Category: (*)</td>
 			<td width="85%" class="cell4"><SELECT name="category" class="uploadpatch">';
 	foreach($categories as $key => $category1) {
 		echo '				<OPTION value="'.$category1.'"';
-		if($category == $category1) {
+		if($patch[category] == $category1) {
 			echo ' SELECTED';
 		}
 		echo '>'.$category1.'</OPTION>';
@@ -271,7 +273,7 @@ function BuildForm($errors, $pid) {
 			<td width="85%" class="cell4">';
 	foreach($webos_versions_array as $key => $webos_version) {
 		echo '			<input type="checkbox" name="webos_versions[]" value="'.$webos_version.'"';
-		if(in_array($webos_version, $webos_versions)) {
+		if(in_array($webos_version, $patch['webos_versions'])) {
 			echo 'CHECKED';
 		}
 		echo '>&nbsp;&nbsp;'.$webos_version.'<br/>';
@@ -280,14 +282,14 @@ function BuildForm($errors, $pid) {
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Maintainer: (*)</td>
-			<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="maintainer" value="'.FormatForForm($maintainer).'" size="50" maxlength="50"><br/>
+			<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="maintainer" value="'.FormatForForm($patch[maintainer]).'" size="50" maxlength="50"><br/>
 			<b>Note:</b> Use your PreCentral.net or webOS-Internals.org username if you do not<br/>
 			want to give your real name. This information is published in the package\'s<br/>
 			meta-data. It will be viewable by the public.</td>
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Email: (*)</td>
-			<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="email" value="'.FormatForForm($email).'" size="50" maxlength="128">&nbsp;&nbsp;<input type="checkbox" name="private" value="1"'.iif($private==1, " CHECKED", "").'> Keep Private?<br/>
+			<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="email" value="'.FormatForForm($patch[email]).'" size="50" maxlength="128">&nbsp;&nbsp;<input type="checkbox" name="private" value="1"'.iif($patch['private']==1, " CHECKED", "").'> Keep Private?<br/>
 			<b>Note:</b> This information is published in the package\'s meta-data if the above box is not checked. It will be<br/>
 			viewable by the public. Remember you, as the developer of the patch, are<br/>
 			responsible for support. Giving your email makes it easier for a user to<br/>
@@ -295,7 +297,7 @@ function BuildForm($errors, $pid) {
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Patch Homepage:</td>
-			<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="homepage" value="'.FormatForForm($homepage).'" size="50" maxlength="256"><br/>
+			<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="homepage" value="'.FormatForForm($patch[homepage]).'" size="50" maxlength="256"><br/>
 			<b>Note:</b> This information is published in the package\'s meta-data. It will be<br/>
 			viewable by the public. Remember you, as the developer of the patch, are<br/>
 			responisble for support. Giving a URL to the patch\'s thread on PreCentral.net<br/>
@@ -303,7 +305,7 @@ function BuildForm($errors, $pid) {
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Note to Admins:</td>
-			<td width="85%" class="cell4"><textarea class="uploadpatch" name="notes_to_admin" cols="50" rows="3" disabled>'.FormatForForm($notes_to_admin).'</textarea><br/>
+			<td width="85%" class="cell4"><textarea class="uploadpatch" name="notes_to_admin" cols="50" rows="3" disabled>'.FormatForForm($patch[notes_to_admin]).'</textarea><br/>
 			<b>Note:</b> This will not be published. It is simply a note to the Admins.</td>
 		</tr>
 		<tr>
@@ -330,7 +332,7 @@ function SubmitForm() {
 	                       );
 	$allowedpatchext = array(".patch");
 
-   	$patchext = strrchr(strtolower($patch['name']),'.');
+//   	$patchext = strrchr(strtolower($patch['name']),'.');
 	
 	if(strlen($title) < '1') {
 		$errors[] = 'You must enter a title.';
@@ -371,11 +373,27 @@ function SubmitForm() {
 		return;
 	}
 
-	$description2 = str_replace("\r\n", "<br/> ", $patch[description]);
+	$description2 = str_replace("\r\n", "<br/> ", $description);
 	$description2 = str_replace("\n", "<br/> ", $description2);
 	$description2 = stripslashes(str_replace('"', "'", $description2));
 	$icon = $icon_array[$category];
 
+	if(strlen($depends) >= '1') {
+		$depends_array = explode(',', $depends);
+		for($i=0; $i < count($depends_array); $i++) {
+			$depends_array2[] = trim($depends_array[$i]);
+		}
+		$depends = implode(',', $depends_array2);
+	}
+	
+	$maintainer_array = explode(',', $maintainer);
+	for($i=0; $i < count($maintainer_array); $i++) {
+		$maintainer_array2[] = trim($maintainer_array[$i]);
+	}
+	$maintainer = implode(',', $maintainer_array2);
+
+	// DURING UPDATE OF PATCH (NOT NEW) CHECK FOR EXISTING VERSIONS, DON'T OVERWRITE!
+	
 	unset($versions2);
 	$ver_count=0;
 	foreach($webos_versions as $key => $webos_version) {
@@ -394,10 +412,13 @@ function SubmitForm() {
 	
 	// CHECK CATEGORY STR_REPLACE - Probably doesn't need to replace '-' with ' '.
 	
+	// GOING TO NEED TO UPDATE 'UPDATE_PID' AND DELETE PID(?)
+	
 	$DB->query("UPDATE ".TABLE_PREFIX."patches SET title = '".mysql_real_escape_string($title)."',
 											description = '".mysql_real_escape_string($description2)."',
 											patch_file = NULL,
-											category = '".str_replace('-', ' ', $category)."', 
+											category = '".str_replace('-', ' ', $category)."',
+											depends = '$depends',
 											screenshot_1_blob = NULL,
 											screenshot_1_type = NULL,
 											screenshot_2_blob = NULL,
@@ -415,7 +436,7 @@ function SubmitForm() {
 											homepage = '$homepage',
 											status = '1',
 											versions = '$versions2'
-									WHERE pid = '".$pid."'");
+									WHERE pid = '".$pid."'"); 
 
 	$patch = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
 	$title2 = strtolower($patch['title']);
@@ -441,17 +462,22 @@ function SubmitForm() {
 		$screenshots2 .= '\"'.$screenshot3.'\" ';
 	}
 	$screenshots2 .= ']';
-	if((strlen($patch['email']) > '0') && ($patch['private'] != '1')) {
-		$maintainer2 = ' '.$patch[maintainer].' <'.$patch[email].'>';
-	} else {
-		$maintainer2 = ' '.$patch[maintainer];
+	
+	$maintainer_array = explode(',', $patch['maintainer']);
+	$num_maintainers = count($maintainer_array);
+	for($i=0; $i < $num_maintainers; $i++) {
+		if($patch['email'] && ($patch['private'] != '1') && ($i=="0")) {
+			$maintainer_out .= trim($maintainer_array[$i]).' <'.$patch[email].'>';
+		} else {
+			$maintainer_out .= iif($i>=2, ', ', '').trim($maintainer_array[$i]);
+		}
 	}
 	if(strlen($homepage) > '0') {
 		$homepage2 = ' '.$homepage;
 	} else {
 		$homepage2 = '';
 	}
-	
+
 	$makefile_content = "NAME = \$(shell basename \$(shell pwd))
 PATCH = $category2/\${NAME}.patch
 TITLE = $patch[title]
@@ -463,12 +489,14 @@ $screenshots2
 META_SUB_VERSION = 1
 
 include ../common.mk
+".iif(strlen($patch[depends])>=1, "DEPENDS := \${DEPENDS}, $patch[depends]", "")."
 include ../modifications.mk
 
-MAINTAINER =$maintainer2
+MAINTAINER =$maintainer_out
 HOMEPAGE =$homepage2";
 
 	file_put_contents('../../git/build/autopatch/'.$patchname.'/Makefile', $makefile_content);
+
 
 	//Let the user know the outcome
 	 return '
@@ -478,7 +506,7 @@ HOMEPAGE =$homepage2";
 			<tr>
 				<td colspan="2" class="header2" align="center">The patch has been accepted! Thank you!</td>
 			</tr>
-			</table>';
+			</table>'; 
 }
 
 function MainFooter() {
