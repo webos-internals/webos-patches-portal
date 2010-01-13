@@ -47,14 +47,14 @@ echo '<html>
 	  <meta http-equiv="Pragma" content="no-cache" />
 	  </head>
 	  <body>
-	  <table width="100%" border="'.iif($do=="list", "1", "0").'" cellpadding="5" cellspacing="0">
+	  <table width="100%" border="'.iif($do=="browse", "1", "0").'" cellpadding="5" cellspacing="0">
 	  <tr>
 		<td colspan="10" align="center" class="header">WebsOS-Patches Web Portal<br/>
-		<a href="/">Home</a> | <a href="?do=submit_new">Submit New Patch</a> | <a href="?do=submit_update">Submit Update</a> | '.iif($do=="list", "List Patches", '<a href="?do=list">List Patches</a>').'</td>
+		<a href="/">Home</a> | <a href="?do=submit_new">Submit New Patch</a> | <a href="?do=submit_update">Submit Update</a> | '.iif($do=="browse", "Browse Patches", '<a href="?do=browse">Browse Patches</a>').'</td>
 	  </tr>';
 }
 
-function ListPatches($webosver, $category) {
+function BrowsePatches($webosver, $category) {
 	global $DB, $webos_versions_array, $categories;
 	echo '<tr>
 			<td colspan="10" class="header2" align="center">';
@@ -66,10 +66,10 @@ function ListPatches($webosver, $category) {
 	}
 	$i=0;
 	foreach($versions as $key=>$version) {
-		echo iif($i==0, "", " | ").iif($webosver==$version, '<font color="red">'.$version.'</font>', '<a href="?do=list&webosver='.$version.'">'.$version.'</a>');
+		echo iif($i==0, "", " | ").iif($webosver==$version, '<font color="red">'.$version.'</font>', '<a href="?do=browse&webosver='.$version.'">'.$version.'</a>');
 		$i++;
 	}
-	echo iif($i==0, "", " | ").iif($webosver=="all", '<font color="red">All</font>', '<a href="?do=list&webosver=all">All</a>').'</td>
+	echo iif($i==0, "", " | ").iif($webosver=="all", '<font color="red">All</font>', '<a href="?do=browse&webosver=all">All</a>').'</td>
 		</tr>';
 	if($webosver) {
 		echo '<tr>
@@ -86,10 +86,10 @@ function ListPatches($webosver, $category) {
 		}
 		$i=0;
 		foreach($category_list as $key=>$category1) {
-			echo iif($i==0, "", " | ").iif($category==$category1, '<font color="red">'.$category1.'</font>', '<a href="?do=list&webosver='.$webosver.'&category='.$category1.'" class="header2">'.$category1.'</a>');
+			echo iif($i==0, "", " | ").iif($category==$category1, '<font color="red">'.$category1.'</font>', '<a href="?do=browse&webosver='.$webosver.'&category='.$category1.'" class="header2">'.$category1.'</a>');
 			$i++;
 		}
-		echo iif($i==0, "", " | ").iif($category==all, '<font color="red">All</font>', '<a href="?do=list&webosver='.$webosver.'&category=all">All</a>').'</td>
+		echo iif($i==0, "", " | ").iif($category==all, '<font color="red">All</font>', '<a href="?do=browse&webosver='.$webosver.'&category=all">All</a>').'</td>
 			</tr>';
 	}
 	if($category) {
@@ -475,9 +475,9 @@ function MainFooter() {
 // LET'S BUILD THE PAGE!
 
 switch($do) {
-	case 'list':
+	case 'browse':
 		MainHeader();
-		ListPatches($_GET['webosver'], $_GET['category']);
+		BrowsePatches($_GET['webosver'], $_GET['category']);
 		MainFooter();
 		break;
 	case 'get_changelog':

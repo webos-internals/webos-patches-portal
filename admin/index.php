@@ -64,7 +64,7 @@ echo '<html>
 	} else {
 		echo ' | Update Submissions ('.$update_count[num_update].')';
 	}
-echo ' | '.iif($do=="list", "List Patches", '<a href="?do=list">List Patches</a>').'</td>
+echo ' | '.iif($do=="browse", "Browse Patches", '<a href="?do=browse">Browse Patches</a>').'</td>
 	  </tr>';
 }
 
@@ -101,7 +101,7 @@ function DisplayUpdatesNew($do) {
 	}
 }
 
-function ListPatches($webosver, $category) {
+function BrowsePatches($webosver, $category) {
 	global $DB, $webos_versions_array, $categories;
 	echo '<tr>
 			<td colspan="10" class="header2" align="center">';
@@ -113,10 +113,10 @@ function ListPatches($webosver, $category) {
 	}
 	$i=0;
 	foreach($versions as $key=>$version) {
-		echo iif($i==0, "", " | ").iif($webosver==$version, $version, '<a href="?do=list&webosver='.$version.'">'.$version.'</a>');
+		echo iif($i==0, "", " | ").iif($webosver==$version, $version, '<a href="?do=browse&webosver='.$version.'">'.$version.'</a>');
 		$i++;
 	}
-	echo iif($i==0, "", " | ").iif($webosver=="all", 'All', '<a href="?do=list&webosver=all">All</a>').'</td>
+	echo iif($i==0, "", " | ").iif($webosver=="all", 'All', '<a href="?do=browse&webosver=all">All</a>').'</td>
 		</tr>';
 	if($webosver) {
 		echo '<tr>
@@ -133,10 +133,10 @@ function ListPatches($webosver, $category) {
 		}
 		$i=0;
 		foreach($category_list as $key=>$category1) {
-			echo iif($i==0, "", " | ").iif($category==$category1, $category1, '<a href="?do=list&webosver='.$webosver.'&category='.$category1.'">'.$category1.'</a>');
+			echo iif($i==0, "", " | ").iif($category==$category1, $category1, '<a href="?do=browse&webosver='.$webosver.'&category='.$category1.'">'.$category1.'</a>');
 			$i++;
 		}
-		echo iif($i==0, "", " | ").iif($category==all, 'All', '<a href="?do=list&webosver='.$webosver.'&category=all">All</a>').'</td>
+		echo iif($i==0, "", " | ").iif($category==all, 'All', '<a href="?do=browse&webosver='.$webosver.'&category=all">All</a>').'</td>
 			</tr>';
 	}
 	if($category) {
@@ -508,9 +508,9 @@ switch($do) {
 		DisplayUpdatesNew($_GET['do']);
 		MainFooter();
 		break;
-	case 'list':
+	case 'browse':
 		MainHeader();
-		ListPatches($_GET['webosver'], $_GET['category']);
+		BrowsePatches($_GET['webosver'], $_GET['category']);
 		MainFooter();
 		break;
 	case 'get_patch':
