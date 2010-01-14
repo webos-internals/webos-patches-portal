@@ -64,7 +64,7 @@ echo '<html>
 	} else {
 		echo ' | Update Submissions ('.$update_count[num_update].')';
 	}
-echo ' | '.iif($do=="browse", "Browse Patches", '<a href="?do=browse">Browse Patches</a>').'</td>
+echo ' | '.iif($do=="browse", "Browse Patches", '<a href="?do=browse">Browse Patches</a>').' | <a href="?do=git&cmd=status">Git Status</a> | <a href="?do=git&cmd=add">Git Add</a> | <a href="?do=git&cmd=commit">Git Commit</a> | <a href="?do=git&cmd=tag">Git Tag</a> | <a href="?do=git&cmd=push">Git Push</a></td>
 	  </tr>';
 }
 
@@ -419,6 +419,7 @@ function HandleForm($pid) {
 	$maintainer = implode(',', $maintainer_array2);
 
 	foreach($webos_versions as $key => $webos_version) {
+		$get_sub_version = array();
 		exec('cd ../../git/modifications/v'.$webos_version.' ; /usr/bin/git tag | grep '.$webos_version.' | cut -d- -f2', $get_sub_version);
 		$sub_version = max($get_sub_version);
 		$sub_version++;
@@ -441,9 +442,12 @@ function HandleForm($pid) {
 	sort($keep_versions);
 	$versions2 = implode(' ', $keep_versions);
 	
+	$get_patch_file = $DB->query_first("SELECT patch_file FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
+	$patch_file_contents = $get_patch_file['patch_file'];
+	
 	// GOING TO NEED TO UPDATE 'UPDATE_PID' AND DELETE PID(?)
 	
-/*	$DB->query("UPDATE ".TABLE_PREFIX."patches SET title = '".mysql_real_escape_string($title)."',
+	$DB->query("UPDATE ".TABLE_PREFIX."patches SET title = '".mysql_real_escape_string($title)."',
 											description = '".mysql_real_escape_string($description2)."',
 											patch_file = NULL,
 											category = '$category',
@@ -466,10 +470,22 @@ function HandleForm($pid) {
 											status = '1',
 											versions = '$versions2',
 											note_to_admins = '".mysql_real_escape_string($note_to_admins)."',
-											changelog = '".mysql_real_escape_string($changelog2)."
-									WHERE pid = '".iif($updateform==1, $update_pid, $pid)."'"); */
+											changelog = '".mysql_real_escape_string($changelog2)."',
+											".iif($updateform==1, "lastupdated", "dateaccepted")." = '".time()."'
+									WHERE pid = '".iif($updateform==1, $update_pid, $pid)."'"); 
+	foreach($new_versions as $key=>$version) {
+		$gitversions = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'gitversions'");
+		$gitversions_array = explode(',',$gitversions['value']);
+		if(!in_array($version, $gitversions_array)) {
+			$gitversions_array[] = $version;
+			echo 'Version: '.$version.'<br>';
+		}
+		$gitversions_out = implode(',', $gitversions_array);
+		$DB->query("UPDATE ".TABLE_PREFIX."settings SET value = '".$gitversions_out."' WHERE setting = 'gitversions'");
+	}
+
 	if($updateform == '1') {
-	//	$DB->query("DELETE FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."' LIMIT 1");
+		$DB->query("DELETE FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."' LIMIT 1");
 		$pid = $update_pid;
 	}
 
@@ -483,7 +499,7 @@ function HandleForm($pid) {
 	$patchname = $category2.'-'.$title2;
 	$versions = 'VERSIONS = '.$versions2;
 	foreach($webos_versions as $key => $webos_version) {
-		file_put_contents('../../git/modifications/v'.$webos_version.'/'.$category2.'/'.$patchname.'.patch', $patch['patch_file']);
+		file_put_contents('../../git/modifications/v'.$webos_version.'/'.$category2.'/'.$patchname.'.patch', $patch_file_contents);
 	}
 
 	$ssout=NULL;
@@ -555,6 +571,122 @@ HOMEPAGE =$homepage2";
 			</table>'; 
 }
 
+function GitExec($cmd) {
+	global $DB, $webos_versions_array;
+	$fetch_gitversions = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'gitversions'");
+	$gitversions = explode(',', $fetch_gitversions[value]);
+	foreach($gitversions as $key=>$gitversion) {
+		$gitversions_main[array_shift(explode('-',$gitversion,2))] = substr(strstr($gitversion, '-'), 1);
+	}
+	switch($cmd) {
+		case 'status':
+			$output = '<b>Preware/build.git:</b><br/><pre>';
+			$output .= "cd ../../git/build/ ; /usr/bin/git status 2>&1\n";
+			$output .= `cd ../../git/build/ ; /usr/bin/git status 2>&1`;
+			$output .= '</pre>';
+			foreach($webos_versions_array as $key=>$version) {
+				$output .= '<hr><b>modifications.git/webos-'.$version.':</b><pre>';
+				$output .= "cd ../../git/modifications/v$version ; /usr/bin/git status 2>&1\n";
+				$output .= `cd ../../git/modifications/v$version ; /usr/bin/git status 2>&1`;
+				$output .= '</pre>';
+			}
+			break;
+		case 'add':
+			$output = '<b>Preware/build.git:</b><pre>';
+			$output .= "cd ../../git/build/autopatch ; /usr/bin/git add . 2>&1\n";
+			$output .= `cd ../../git/build/autopatch ; /usr/bin/git add . 2>&1`;
+			$output .= "</pre>";
+			foreach($webos_versions_array as $key=>$version) {
+				$output .= '<hr><b>modifications.git/webos-'.$version.':</b>';
+				if(!$gitversions_main[$version]) {
+					$output .= ' No Add Necessary.';
+				} else {
+					$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git all . 2>&1\n";
+					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git add . 2>&1`;
+					$output .= "</pre>";
+				}
+			}
+			break;
+		case 'commit':
+			if($_POST['submitaction'] == '1') {
+				$output = '<b>Preware/build.git:</b> ';
+				$output .= "<pre>cd ../../git/build/autopatch ; /usr/bin/git commit -m \"".$_POST['commit_message']."\" 2>&1\n";
+				$output .= `cd ../../git/build/autopatch ; /usr/bin/git commit -m "$_POST[commit_message]" 2>&1`;
+				$output .= "</pre>";
+				foreach($webos_versions_array as $key=>$version) {
+					$output .= '<hr><b>modifications.git/webos-'.$version.':</b>';
+					if(!$gitversions_main[$version]) {
+						$output .= ' No Commit Necessary.';
+					} else {
+						$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git commit -m \"$_POST[commit_message]\" 2>&1\n";
+						$output .= `cd ../../git/modifications/v$version ; /usr/bin/git commit -m "$_POST[commit_message]" 2>&1`;
+						$output .= "</pre>";
+					}
+				}
+			} else {
+				echo '<form method="post" name="commitform" action="?do=git&cmd=commit">
+					<tr>
+						<td width="20%">Commit Message:</td>
+						<td width="80%"><input type="text" name="commit_message" size="50" maxlength="512"></td>
+					</tr>
+					<tr>
+						<td colspan="2"><input type="hidden" name="submitaction" value="1"><input type="submit" value="Commit"></td>
+					</tr>';
+			}
+			break;
+		case 'push':
+			$output = '<b>Preware/build.git:</b><pre>';
+			$output .= "cd ../../git/build/autopatch ; /usr/bin/git pull 2>&1\n";
+			$output .= `cd ../../git/build/autopatch ; /usr/bin/git pull 2>&1`;
+			$output .= "cd ../../git/build/autopatch ; /usr/bin/git push 2>&1\n";
+			$output .= `cd ../../git/build/autopatch ; /usr/bin/git push 2>&1`;
+			$output .= '</pre>';
+			foreach($webos_versions_array as $key=>$version) {
+				$output .= '<hr><b>modifications.git/webos-'.$version.':</b>';
+				if(!$gitversions_main[$version]) {
+					$output .= ' No Push Necessary.';
+				} else {
+					$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1\n";
+					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1`;
+					$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git push 2>&1\n";
+					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git push 2>&1`;
+					$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git push --tags 2>&1\n";
+					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git push --tags 2>&1`;
+					$output .= "</pre>";
+					unset($gitversions_main[$version]);
+				}
+			}
+			$count=0;
+			foreach($gitversions_main as $key=>$value) {
+				if(strlen($value)>=1) {
+					if($count==0) {
+						$gitversions_return = $key.'-'.$value;
+					} else {
+						$gitversions_return = ','.$key.'-'.$value;
+					}
+					$count++;
+				}
+			}
+			$DB->query("UPDATE ".TABLE_PREFIX."settings SET value = '".$gitversions_return."' WHERE setting = 'gitversions'");
+			break;
+		case 'tag':
+			foreach($webos_versions_array as $key=>$version) {
+				$output .= '<hr><b>modifications.git/webos-'.$version.':</b>';
+				if(!$gitversions_main[$version]) {
+					$output .= ' No Commit Necessary.';
+				} else {
+					$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version]\n";
+					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version]`;
+					$output .= '</pre>';
+				}
+			}
+			break;
+	}
+	echo '<tr>
+			<td>'.$output.'</td>
+		</tr>';
+}
+
 function MainFooter() {
 	echo '	  <tr>
 		<td colspan="11" width="100%" align="center" class="copyright"><center>&copy; 2009 - 2010 Daniel Beames (dBsooner) and webOS-Internals Group</center></td>
@@ -604,6 +736,11 @@ switch($do) {
 			MainHeader();
 			echo $output;
 		}
+		MainFooter();
+		break;
+	case 'git':
+		MainHeader();
+		GitExec($_GET['cmd']);
 		MainFooter();
 		break;
 	default:

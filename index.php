@@ -198,19 +198,19 @@ function BuildForm($errors, $pid) {
 	echo '			</SELECT>'.iif(strlen($pid)>=1, "<input type=\"hidden\" name=\"category\" value=\"".$patch[category]."\">", "").'</td>
 		</tr>
 		<tr>
-			<td width="15%" class="cell3" valign="top">Screenshot 1:'.iif(strlen($patch[screenshot_1])>=1, "<br/><a href=\"".$patch[screenshot_1]."\">Current Image</a><input type=\"hidden\" name=\"screenshot_1\" value=\"".$patch[screenshot_1]."\">").'</td>
+			<td width="15%" class="cell3" valign="top">Screenshot 1:'.iif(strlen($patch[screenshot_1])>=1, "<br/><a href=\"".$patch[screenshot_1]."\">Current Image</a><input type=\"hidden\" name=\"screenshot_1\" value=\"".$patch[screenshot_1]."\">", "").'</td>
 		  	<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="screenshot1"><br/>
 			<b>Note:</b> Screenshots should be 320x480. They should not contain any other<br/>
 			modifications in the picture as this can be misleading and cause confusion.</td>
 		</tr>
 		<tr>
-			<td width="15%" class="cell3" valign="top">Screenshot 2:'.iif(strlen($patch[screenshot_2])>=1, "<br/><a href=\"".$patch[screenshot_2]."\">Current Image</a><input type=\"hidden\" name=\"screenshot_2\" value=\"".$patch[screenshot_2]."\">").'</td>
+			<td width="15%" class="cell3" valign="top">Screenshot 2:'.iif(strlen($patch[screenshot_2])>=1, "<br/><a href=\"".$patch[screenshot_2]."\">Current Image</a><input type=\"hidden\" name=\"screenshot_2\" value=\"".$patch[screenshot_2]."\">", "").'</td>
 			<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="screenshot2"><br/>
                         <b>Note:</b> Screenshots should be 320x480. They should not contain any other<br/>
                         modifications in the picture as this can be misleading and cause confusion.</td>
 		</tr>
 		<tr>
-			<td width="15%" class="cell3" valign="top">Screenshot 3:'.iif(strlen($patch[screenshot_3])>=1, "<br/><a href=\"".$patch[screenshot_3]."\">Current Image</a><input type=\"hidden\" name=\"screenshot_3\" value=\"".$patch[screenshot_3]."\">").'</td>
+			<td width="15%" class="cell3" valign="top">Screenshot 3:'.iif(strlen($patch[screenshot_3])>=1, "<br/><a href=\"".$patch[screenshot_3]."\">Current Image</a><input type=\"hidden\" name=\"screenshot_3\" value=\"".$patch[screenshot_3]."\">", "").'</td>
 			<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="screenshot3"><br/>
                         <b>Note:</b> Screenshots should be 320x480. They should not contain any other<br/>
                         modifications in the picture as this can be misleading and cause confusion.</td>
