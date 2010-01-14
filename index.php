@@ -261,7 +261,7 @@ function BuildForm($errors, $pid) {
 	}
 	echo '<tr>
 			<td width="15%" class="cell3" valign="top">Note to Admins:</td>
-			<td width="85%" class="cell4"><textarea class="uploadpatch" name="notes_to_admin" cols="50" rows="3">'.FormatForForm($patch[notes_to_admin]).'</textarea><br/>
+			<td width="85%" class="cell4"><textarea class="uploadpatch" name="note_to_admins" cols="50" rows="3">'.FormatForForm($patch[note_to_admins]).'</textarea><br/>
 			<b>Note:</b> This will not be published. It is simply a note to the Admins.</td>
 		</tr>
 		<tr>
@@ -292,7 +292,6 @@ function HandleForm($pid) {
 
    	$patchext = strrchr(strtolower($patch['name']),'.');
 
-	
 	if(strlen($title) < '1') {
 		$errors[] = 'You must enter a title.';
 	} else {
@@ -304,6 +303,7 @@ function HandleForm($pid) {
 	if(strlen($description) < '10') {
 		$errors[] = 'Please be more descriptive.';
 	}
+
 	if($patch['size']) {
 		if(!in_array($patchext, $allowedpatchext)) {
 			$errors[] = 'Only patch files are allowed.';
@@ -315,6 +315,7 @@ function HandleForm($pid) {
 	} else {
 		$errors[] = 'You must include a patch file.';
 	}
+
 	if(($screenshot1['size']) && !$known_image_types[$screenshot1['type']]) {
 		  	$errors[] = 'You can only choose jpg, jpeg, bmp or png images for screenshot 1.';
   	}
@@ -324,15 +325,19 @@ function HandleForm($pid) {
 	if(($screenshot3['size']) && !$known_image_types[$screenshot3['type']]) {
 		  	$errors[] = 'You can only choose jpg, jpeg, bmp or png images for screenshot 3.';
   	}
+
 	if($category == 'Select...') {
 		$errors[] = 'You must select a category.';
 	}
+
 	if(!$webos_versions) {
 		$errors[] = 'You must select at least one webOS Version.';
 	}
+
 	if(!$maintainer) {
 		$errors[] = 'You must enter the maintainer.';
 	}
+
 	if($email) {
 		if(!validateEmail($email)) {
 			$errors[] = 'Email address is invalid.';
@@ -340,6 +345,7 @@ function HandleForm($pid) {
 	} else {
 		$errors[] = 'You must supply your email address.';
 	}
+
 	if($homepage) {
 		if(!validateUrlSyntax($homepage, '')) {
 			$errors[] = 'Patch homepage is invalid.';
@@ -354,13 +360,15 @@ function HandleForm($pid) {
 	$ver_count=0;
 	foreach ($webos_versions as $key => $webos_version) {
 		if($ver_count==0) {
-			$versions = $webos_version;
+			$webos_versions_out = $webos_version;
 		} else {
-			$versions .= ' '.$webos_version;
+			$webos_versions_out .= ' '.$webos_version;
 		}
 		$ver_count++;
 	}
+
 	$icon = $icon_array[$category];
+
 	$screenshots = '0';
 	if($screenshot1['size']) {
 		$screenshots++;
@@ -371,13 +379,6 @@ function HandleForm($pid) {
 	if($screenshot3['size']) {
 		$screenshots++;
 	}
-
-	$description2 = mynl2br($description);
-	$description2 = stripslashes(str_replace('"', "'", $description2));
-	$changelog2 = mynl2br($changelog);
-	$changelog2 = stripslashes(str_replace('"', "'", $changelog2));
-	$patch_file = file_get_contents($patch['tmp_name'], FILE_BINARY);
-
 	if($screenshots > '0') {
 		if($screenshot1['size']) {
 			$screenshot_1_type = $screenshot1['type'];
@@ -392,6 +393,14 @@ function HandleForm($pid) {
 			$screenshot_3_blob = file_get_contents($screenshot3['tmp_name'], FILE_BINARY);
 		}
 	}
+
+	$description2 = mynl2br($description);
+	$description2 = stripslashes(str_replace('"', "'", $description2));
+
+	$changelog2 = mynl2br($changelog);
+	$changelog2 = stripslashes(str_replace('"', "'", $changelog2));
+
+	$patch_file_contents = file_get_contents($patch['tmp_name'], FILE_BINARY);
 	
 	$maintainer_array = explode(',', $maintainer);
 	for($i=0; $i < count($maintainer_array); $i++) {
@@ -407,11 +416,11 @@ function HandleForm($pid) {
 
 	$DB->query("INSERT INTO ".TABLE_PREFIX."patches (pid, title, description, patch_file, category, screenshot_1_blob, 
 				screenshot_1_type, screenshot_2_blob, screenshot_2_type, screenshot_3_blob, screenshot_3_type, icon, 
-				webos_versions, maintainer, email, private, homepage, changelog, notes_to_admin, status, datesubmitted".$extra.")
+				webos_versions, maintainer, email, private, homepage, changelog, note_to_admins, status, datesubmitted".$extra.")
 				VALUES ('',
 						'".mysql_real_escape_string($title)."',
 						'".mysql_real_escape_string($description2)."',
-						'".mysql_real_escape_string($patch_file)."',
+						'".mysql_real_escape_string($patch_file_contents)."',
 						'$category',
 						'".mysql_real_escape_string($screenshot_1_blob)."',
 						'$screenshot_1_type',
@@ -420,13 +429,13 @@ function HandleForm($pid) {
 						'".mysql_real_escape_string($screenshot_3_blob)."',
 						'$screenshot_3_type',
 						'$icon',
-						'$versions',
+						'$webos_versions_out',
 						'".mysql_real_escape_string($maintainer)."',
 						'$email',
 						'$private',
 						'$homepage',
 						'".mysql_real_escape_string($changelog2)."',
-						'".mysql_real_escape_string($notes_to_admin)."',
+						'".mysql_real_escape_string($note_to_admins)."',
 						'0',
 						'".time()."'".$extra2.")
 				");

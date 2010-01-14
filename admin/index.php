@@ -204,6 +204,10 @@ function BuildForm($errors, $pid) {
 	} else {
 		$patch[webos_versions] = explode(' ', $patch['webos_versions']);
 	}
+	if($patch['update_pid'] >= '1') {
+		$original = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$patch[update_pid]."'");
+		$updateform = '1';
+	}
 	echo '		<form name="submitpatch" method="post" action="/admin/?do=submitform&pid='.$patch[pid].'" enctype="multipart/form-data">
 		<table width="100%" border="0" cellpadding="5" cellspacing="0">
 		<tr>
@@ -213,6 +217,7 @@ function BuildForm($errors, $pid) {
 			<td colspan="2" align="center" class="header2">(*) = Required</td>
 		  	<input type="hidden" name="submitaction" value="1">
 			<input type="hidden" name="pid" value="'.$patch[pid].'">
+			'.iif($updateform==1, '<input type="hidden" name="update_pid" value="'.$patch[update_pid].'">', '').'
 		</tr>';
 	if($errors) {
 		foreach($errors as $key => $value) {
@@ -222,8 +227,9 @@ function BuildForm($errors, $pid) {
 		}
 	}
 	echo '		<tr>
-			<td width="15%" class="'.iif($errors, "cell11", "cell3").'">Title: (*)</td>
-			<td width="85%" class="'.iif($errors, "cell12", "cell4").'"><input type="text" class="uploadpatch" name="title" value="'.FormatForForm($patch[title]).'" size="50" maxlength="40"><br/>
+			<td width="15%" class="'.iif($errors, "cell11", "cell3").'" valign="top">Title: (*)</td>
+			<td width="85%" class="'.iif($errors, "cell12", "cell4").'"><input type="text" class="uploadpatch" name="title" value="'.FormatForForm($patch[title]).'" size="50" maxlength="40"'.
+			iif($updateform==1, ' DISABLED><input type="hidden" name="title" value="'.$patch[title].'"><br/><b>Original:</b> '.$original[title], '>').'<br/>
 			<b>Note:</b> Do not use category name, personalizations (your name, username,<br/>
 			company name, tagline, etc), webOS Version. Be short and sweet. Limit 40<br/>
 			characters. Numbers, Letters, apostrophes or spaces only.</td>
@@ -239,11 +245,11 @@ function BuildForm($errors, $pid) {
 		<tr>
 			<td width="15%" class="cell3">Dependants:</td>
 			<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="depends" value="'.FormatForForm($patch[depends]).'" size="50" maxlength="512"><br/>
-			<b>Note:</b> Enter the packageid of all packages this patch is dependant on. Seperate packages with a comma. Example: org.webosinternals.patches.univseral-search-command-line</td>
+			'.iif($updateform==1, "<b>Original:</b> ".$original[depends]."<br/>", "").'<b>Note:</b> Enter the packageid of all packages this patch is dependant on. Seperate packages with a comma. Example: org.webosinternals.patches.univseral-search-command-line</td>
 		</tr>
 		<tr>
 			<td width="15%" class="cell3">Category: (*)</td>
-			<td width="85%" class="cell4"><SELECT name="category" class="uploadpatch">';
+			<td width="85%" class="cell4"><SELECT name="category" class="uploadpatch"'.iif($updateform==1, "DISABLED>", ">");
 	foreach($categories as $key => $category1) {
 		echo '				<OPTION value="'.$category1.'"';
 		if($patch[category] == $category1) {
@@ -251,20 +257,21 @@ function BuildForm($errors, $pid) {
 		}
 		echo '>'.$category1.'</OPTION>';
 	}
-	echo '			</SELECT></td>
+	echo '			</SELECT>'.iif($updateform==1, '<input type="hidden" name="category" value="'.$patch[category].'"><br/>
+		<b>Original:</b> '.$original[category], '').'</td>
 		</tr>
 		<tr>
-			<td width="15%" class="cell3" valign="top">Screenshot 1:</td>
+			<td width="15%" class="cell3" valign="top">Screenshot 1:'.iif(strlen($patch[screenshot_1_type])>=1, "<br/><a href=\"?do=get_image&ss=1&pid=$patch[pid]\">NEW SS</a>", "").'</td>
 		  	<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="screenshot1" size="50"><br/>
 			<b>Note:</b> Direct address of image file on WebOS-Internals Wiki.</td>
 		</tr>
 		<tr>
-			<td width="15%" class="cell3" valign="top">Screenshot 2:</td>
+			<td width="15%" class="cell3" valign="top">Screenshot 2:'.iif(strlen($patch[screenshot_2_type])>=1, "<br/><a href=\"?do=get_image&ss=2&pid=$patch[pid]\">NEW SS</a>", "").'</td>
 		  	<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="screenshot2" size="50"><br/>
 			<b>Note:</b> Direct address of image file on WebOS-Internals Wiki.</td>
 		</tr>
 		<tr>
-			<td width="15%" class="cell3" valign="top">Screenshot 3:</td>
+			<td width="15%" class="cell3" valign="top">Screenshot 3:'.iif(strlen($patch[screenshot_3_type])>=1, "<br/><a href=\"?do=get_image&ss=3&pid=$patch[pid]\">NEW SS</a>", "").'</td>
 		  	<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="screenshot3" size="50"><br/>
 			<b>Note:</b> Direct address of image file on WebOS-Internals Wiki.</td>
 		</tr>
@@ -278,19 +285,23 @@ function BuildForm($errors, $pid) {
 		}
 		echo '>&nbsp;&nbsp;'.$webos_version.'<br/>';
 	}
-	echo '			</td>
+	echo '	'.iif($updateform==1, '<b>Original:</b> '.$original[versions], '').'</td>
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Maintainer: (*)</td>
 			<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="maintainer" value="'.FormatForForm($patch[maintainer]).'" size="50" maxlength="50"><br/>
+			'.iif($updateform==1, '<b>Original:</b> '.$original[maintainer].'<br/>', '').'
 			<b>Note:</b> Use your PreCentral.net or webOS-Internals.org username if you do not<br/>
 			want to give your real name. This information is published in the package\'s<br/>
 			meta-data. It will be viewable by the public.</td>
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Email: (*)</td>
-			<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="email" value="'.FormatForForm($patch[email]).'" size="50" maxlength="128">&nbsp;&nbsp;<input type="checkbox" name="private" value="1"'.iif($patch['private']==1, " CHECKED", "").'> Keep Private?<br/>
-			<b>Note:</b> This information is published in the package\'s meta-data if the above box is not checked. It will be<br/>
+			<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="email" value="'.FormatForForm($patch[email]).'" size="50" maxlength="128">&nbsp;&nbsp;<input type="checkbox" name="private" value="1"'.iif($patch['private']==1, " CHECKED", "").'> Keep Private?<br/>';
+	if($updateform == '1') {
+		echo '<b>Original:</b> '.iif(strlen($original[email])>=1, $original[email], 'None').' - '.iif($original['private']==1, 'Private<br/>', 'Not Private<br/>');
+	}
+	echo '	<b>Note:</b> This information is published in the package\'s meta-data if the above box is not checked. It will be<br/>
 			viewable by the public. Remember you, as the developer of the patch, are<br/>
 			responsible for support. Giving your email makes it easier for a user to<br/>
 			request support.</td>
@@ -298,14 +309,22 @@ function BuildForm($errors, $pid) {
 		<tr>
 			<td width="15%" class="cell3" valign="top">Patch Homepage:</td>
 			<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="homepage" value="'.FormatForForm($patch[homepage]).'" size="50" maxlength="256"><br/>
+			'.iif($updateform==1, '<b>Original:</b> '.$original[homepage].'<br/>', '').'
 			<b>Note:</b> This information is published in the package\'s meta-data. It will be<br/>
 			viewable by the public. Remember you, as the developer of the patch, are<br/>
 			responisble for support. Giving a URL to the patch\'s thread on PreCentral.net<br/>
 			or wiki page on webOS-Internals.org makes it easier for a user to request support.</td>
-		</tr>
-		<tr>
+		</tr>';
+	if($patch['update_pid'] != NULL) {
+		echo '<tr>
+				<td width="15%" class="cell3" valign="top">Changelog:</td>
+				<td width="85%" class="cell4"><textarea class="uploadpatch" name="changelog" cols="50" rows="3">'.FormatForForm($patch[changelog]).'</textarea><br/>
+				<b>Note:</b> Recommended format is \'YYYY-MM-DD: What Was Done\'. Separate entries by newline.</td>
+			</tr>';
+	}
+	echo '<tr>
 			<td width="15%" class="cell3" valign="top">Note to Admins:</td>
-			<td width="85%" class="cell4"><textarea class="uploadpatch" name="notes_to_admin" cols="50" rows="3" disabled>'.FormatForForm($patch[notes_to_admin]).'</textarea><br/>
+			<td width="85%" class="cell4"><textarea class="uploadpatch" name="note_to_admins" cols="50" rows="3" disabled>'.FormatForForm($patch[note_to_admins]).'</textarea><br/>
 			<b>Note:</b> This will not be published. It is simply a note to the Admins.</td>
 		</tr>
 		<tr>
@@ -316,23 +335,12 @@ function BuildForm($errors, $pid) {
 
 }
 
-function SubmitForm() {
+function HandleForm($pid) {
 	global $DB, $icon_array;
 
 	foreach($_POST as $key => $value) {
 		$$key = $value;
 	}
-
-	$known_image_types = array(
-	                         'image/pjpeg' => 'jpg',
-	                         'image/jpeg'  => 'jpg',
-	                         'image/bmp'   => 'bmp',
-	                         'image/x-png' => 'png',
-				 'image/png'   => 'png'
-	                       );
-	$allowedpatchext = array(".patch");
-
-//   	$patchext = strrchr(strtolower($patch['name']),'.');
 	
 	if(strlen($title) < '1') {
 		$errors[] = 'You must enter a title.';
@@ -369,14 +377,32 @@ function SubmitForm() {
 
 	if($errors) {
 		MainHeader();
-		BuildForm($errors, '');
+		BuildForm($errors, $_POST['pid']);
 		return;
 	}
 
-	$description2 = str_replace("\r\n", "<br/> ", $description);
-	$description2 = str_replace("\n", "<br/> ", $description2);
-	$description2 = stripslashes(str_replace('"', "'", $description2));
+	if($update_pid) {
+		$updateform = '1';
+		$original = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$update_pid."'");
+	}
+
 	$icon = $icon_array[$category];
+
+	if(strlen($screenshot1) < '1') {
+		$screenshot1 = NULL;
+	}
+	if(strlen($screenshot2) < '1') {
+		$screenshot2 = NULL;
+	}
+	if(strlen($screenshot3) < '1') {
+		$screenshot3 = NULL;
+	}
+		
+	$description2 = mynl2br($description);
+	$description2 = stripslashes(str_replace('"', "'", $description2));
+
+	$changelog2 = mynl2br($changelog);
+	$changelog2 = stripslashes(str_replace('"', "'", $changelog2));
 
 	if(strlen($depends) >= '1') {
 		$depends_array = explode(',', $depends);
@@ -392,32 +418,35 @@ function SubmitForm() {
 	}
 	$maintainer = implode(',', $maintainer_array2);
 
-	// DURING UPDATE OF PATCH (NOT NEW) CHECK FOR EXISTING VERSIONS, DON'T OVERWRITE!
-	
-	unset($versions2);
-	$ver_count=0;
 	foreach($webos_versions as $key => $webos_version) {
 		exec('cd ../../git/modifications/v'.$webos_version.' ; /usr/bin/git tag | grep '.$webos_version.' | cut -d- -f2', $get_sub_version);
 		$sub_version = max($get_sub_version);
 		$sub_version++;
-		if($ver_count==0) {
-			$versions2 = $webos_version.'-'.$sub_version;
-		} else {
-			$versions2 .= ' '.$webos_version.'-'.$sub_version;
-		}
-		$ver_count++;
-		unset($sub_version);
-		unset($get_sub_version);
+		$new_versions[] = $webos_version.'-'.$sub_version;
 	}
-	
-	// CHECK CATEGORY STR_REPLACE - Probably doesn't need to replace '-' with ' '.
+
+	if($updateform == '1') {
+		$versions_array = explode(' ', $original['versions']);
+		foreach($versions_array as $key=>$version) {
+			$main_ver .= array_shift(explode('-',$version,2));
+			if(!in_array($main_ver, $webos_versions)) {
+				$keep_versions[] = $version;
+			}
+			unset($main_ver);
+		}
+	}
+	foreach($new_versions as $key=>$version) {
+		$keep_versions[] = $version;
+	}
+	sort($keep_versions);
+	$versions2 = implode(' ', $keep_versions);
 	
 	// GOING TO NEED TO UPDATE 'UPDATE_PID' AND DELETE PID(?)
 	
-	$DB->query("UPDATE ".TABLE_PREFIX."patches SET title = '".mysql_real_escape_string($title)."',
+/*	$DB->query("UPDATE ".TABLE_PREFIX."patches SET title = '".mysql_real_escape_string($title)."',
 											description = '".mysql_real_escape_string($description2)."',
 											patch_file = NULL,
-											category = '".str_replace('-', ' ', $category)."',
+											category = '$category',
 											depends = '$depends',
 											screenshot_1_blob = NULL,
 											screenshot_1_type = NULL,
@@ -435,8 +464,14 @@ function SubmitForm() {
 											private = '$private',
 											homepage = '$homepage',
 											status = '1',
-											versions = '$versions2'
-									WHERE pid = '".$pid."'"); 
+											versions = '$versions2',
+											note_to_admins = '".mysql_real_escape_string($note_to_admins)."',
+											changelog = '".mysql_real_escape_string($changelog2)."
+									WHERE pid = '".iif($updateform==1, $update_pid, $pid)."'"); */
+	if($updateform == '1') {
+	//	$DB->query("DELETE FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."' LIMIT 1");
+		$pid = $update_pid;
+	}
 
 	$patch = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
 	$title2 = strtolower($patch['title']);
@@ -446,30 +481,39 @@ function SubmitForm() {
 	$title2 = str_replace("\\", "-", $title2);
 	$category2 = strtolower(str_replace(" ", "-", $patch['category']));
 	$patchname = $category2.'-'.$title2;
-	$versions = 'VERSIONS =';
+	$versions = 'VERSIONS = '.$versions2;
 	foreach($webos_versions as $key => $webos_version) {
 		file_put_contents('../../git/modifications/v'.$webos_version.'/'.$category2.'/'.$patchname.'.patch', $patch['patch_file']);
 	}
 
-	$screenshots2 = 'SCREENSHOTS = [ ';
+	$ssout=NULL;
+	$sscount=0;
 	if(strlen($screenshot1) >= 1) {
-		$screenshots2 .= '\"'.$screenshot1.'\", ';
+		$ssout .= '\"'.$screenshot1.'\"';
+		$sscount++;
 	}
 	if(strlen($screenshot2) >= 1) {
-		$screenshots2 .= '\"'.$screenshot2.'\", ';
+		$ssout .= iif(strlen($ssout)>=1, ",\\\n", "").'\"'.$screenshot2.'\"';
+		$sscount++;
 	}	
 	if(strlen($screenshot3) >= 1) {
-		$screenshots2 .= '\"'.$screenshot3.'\" ';
+		$ssout .= iif(strlen($ssout)>=1, ",\\\n", "").'\"'.$screenshot3.'\"';
+		$sscount++;
 	}
-	$screenshots2 .= ']';
-	
+	if($sscount >= 2) {
+		$screenshots2 = "SCREENSHOTS = [\\\n".$ssout." ]";
+	} else if($sscount == '1') {
+		$screenshots2 = "SCREENSHOTS = [ ".$ssout." ]";
+	} else {
+		$screenshots2 = "SCREENSHOTS =";
+	}
 	$maintainer_array = explode(',', $patch['maintainer']);
 	$num_maintainers = count($maintainer_array);
 	for($i=0; $i < $num_maintainers; $i++) {
 		if($patch['email'] && ($patch['private'] != '1') && ($i=="0")) {
-			$maintainer_out .= trim($maintainer_array[$i]).' <'.$patch[email].'>';
+			$maintainer_out .= ' '.trim($maintainer_array[$i]).' <'.$patch[email].'>';
 		} else {
-			$maintainer_out .= iif($i>=2, ', ', '').trim($maintainer_array[$i]);
+			$maintainer_out .= iif($i>=2, ', ', ' ').trim($maintainer_array[$i]);
 		}
 	}
 	if(strlen($homepage) > '0') {
@@ -495,9 +539,11 @@ include ../modifications.mk
 MAINTAINER =$maintainer_out
 HOMEPAGE =$homepage2";
 
+	if(!is_dir($dir = '../../git/build/autopatch/'.$patchname.'/')) {
+		mkdir($dir);
+	}
 	file_put_contents('../../git/build/autopatch/'.$patchname.'/Makefile', $makefile_content);
-
-
+	
 	//Let the user know the outcome
 	 return '
 			<tr>
@@ -553,7 +599,7 @@ switch($do) {
 		MainFooter();
 		break;
 	case 'submitform':
-		$output = SubmitForm($_GET['pid']);
+		$output = HandleForm($_GET['pid']);
 		if($output) {
 			MainHeader();
 			echo $output;
