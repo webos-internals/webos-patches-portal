@@ -45,7 +45,8 @@ function MainHeader() {
 echo '<html>
 	  <head>
 	  <title>dBsooner\'s webOS-Patches Admin Area</title>
-	  <link rel="stylesheet" href="http://www.dbsooner.com/webospatchuploadstyles.css" />
+	  <link rel="stylesheet" href="http://webos-patches.dbsooner.com/styles.css" />
+	  <link rel="shortcut icon" href="http://webos-patches.dbsooner.com/favicon.ico" />
 	  <meta http-equiv="expires" content="0" />
 	  <meta http-equiv="Pragma" content="no-cache" />
 	  </head>

@@ -155,40 +155,42 @@ function mynl2br($string) {
 }
 
 function SpamCheck($ip) {
-	$logfile = "../webospatches.log";
-	$log = fopen($logfile, "r");
-	while (($data = fgetcsv($log, 8000, ",")) !== FALSE) {
-		$logdata[][$data[0]] = $data[1];
-	}
-	fclose($log);
-	$orignum = count($logdata);
-	for($i=0;$i<$orignum;$i++) {
-		if($logdata[$i][$ip]) {
-			if(time() < ($logdata[$i][$ip]+(5*60))) {
-				return 1;
+	global $DB;
+	$wait = (60*5);
+	$get_safe_ip_list = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'safe_ip_list'");
+	$safe_ip_list = explode(',', $get_safe_ip_list['value']);
+	if(!in_array($ip, $safe_ip_list)) {
+		$spamcheck = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."spamcheck WHERE ip = '".$ip."'");
+		if($spamcheck['sid'] >= "1") {
+			if(time() >= ($spamcheck['time']+$wait)) {
+				$DB->query("DELETE FROM ".TABLE_PREFIX."spamcheck WHERE sid = '".$spamcheck."' LIMIT 1");
 			} else {
-				unset($logdata[$i]);
-				$unset=1;
+				return 1;
 			}
 		}
-	}
-
-	if($unset) {
-		$logdata = array_values($logdata);
-		$num = count($logdata);
-		for($j=0;$j<$num;$j++) {
-			foreach($logdata[$j] as $key => $value) {
-				if(strlen($value > '1')) {
-					$newcsvdata .= $key.",".$value."\n";
-				}
-			}
-		}
-
-		$log = fopen($logfile, "w+");
-		fwrite($log, $newcsvdata);
-		fclose($log);
+	} else {
+		$DB->query("DELETE FROM ".TABLE_PREFIX."spamcheck WHERE ip = '".$ip."' LIMIT 1");
 	}
 	return 0;
+}
+
+function PreventSpam($ip) {
+	global $DB;
+	$time = time();
+	$get_safe_ip_list = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'safe_ip_list'");
+	$safe_ip_list = explode(',', $get_safe_ip_list['value']);
+	if(!in_array($ip, $safe_ip_list)) {
+		$dupcheck = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."spamcheck WHERE ip = '".$ip."'");
+		if($dupcheck['sid'] >= "1") {
+			$query = "UPDATE ".TABLE_PREFIX."spamcheck SET time = '".$time."' WHERE sid = '".$dupcheck['sid']."'";
+			echo $query;
+			$DB->query($query);
+		} else {
+			$DB->query("INSERT INTO ".TABLE_PREFIX."spamcheck ( ip, time ) VALUES ( '".$ip."', '".$time."')");
+		}
+	} else {
+		$DB->query("DELETE FROM ".TABLE_PREFIX."spamcheck WHERE ip = '".$ip."' LIMIT 1");
+	}
 }
 
 function GetRemoteAddress() {

@@ -42,7 +42,8 @@ function MainHeader() {
 echo '<html>
 	  <head>
 	  <title>dBsooner\'s webOS-Patches Web Portal</title>
-	  <link rel="stylesheet" href="http://www.dbsooner.com/webospatchuploadstyles.css" />
+	  <link rel="stylesheet" href="http://webos-patches.dbsooner.com/styles.css" />
+	  <link rel="shortcut icon" href="http://webos-patches.dbsooner.com/favicon.ico" />
 	  <meta http-equiv="expires" content="0" />
 	  <meta http-equiv="Pragma" content="no-cache" />
 	  </head>
@@ -351,6 +352,12 @@ function HandleForm($pid) {
 			$errors[] = 'Patch homepage is invalid.';
 		}
 	}
+	if(!$pid) {
+		$dupcheck = $DB->query_first("SELECT pid FROM ".TABLE_PREFIX."patches WHERE category = '".$category."' AND title = '".$title."'");
+		if($dupcheck['pid'] >= "1") {
+			$errors[] = 'There is already an '.$category.': '.$title.' patch. If this is an update to that patch, please select "Submit Update" above. Otherwise, choose a new title.';
+		}
+	}
 
 	if($errors) {
 		BuildForm($errors, $_POST['pid']);
@@ -454,10 +461,7 @@ your browser\'s back button and try to submit again, it will not let you. Instea
 you know when you can submit again. </td>
 			</tr>
 			</table>';
-	$log = fopen("../webospatches.log", "a");
-	$csvdata = GetRemoteAddress().",".time()."\n";
-	fwrite($log, $csvdata);
-	fclose($log);
+	PreventSpam(GetRemoteAddress());
 }
 
 function SpamWait() {
