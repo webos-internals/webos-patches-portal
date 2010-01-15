@@ -163,7 +163,7 @@ function BrowsePatches($do, $webosver, $category) {
 				<td><a href="?do=build_form&pid='.$patch[pid].'">'.$patch[title].'</a></td>
 				<td align="justify">'.$patch[description].'</td>';
 			if($do != "browse") {
-				echo '<td><a href="?do=get_patch&pid='.$patch[pid].'">Show</a></td>';
+				echo '<td align="center"><a href="?do=get_patch&pid='.$patch[pid].'">Show</a><br/><br/><a href="?do=testpatch&pid='.$patch[pid].'">Test</a></td>';
 			}
 			echo '<td align="center">'.$patch[category].'</td>';
 			if($do == "browse") {
@@ -676,8 +676,8 @@ function GitExec($cmd) {
 				if(!$gitversions_main[$version]) {
 					$output .= ' No Commit Necessary.';
 				} else {
-					$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version]\n";
-					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version]`;
+					$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version] 2>&1\n";
+					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version] 2>&1`;
 					$output .= '</pre>';
 				}
 			}
@@ -686,6 +686,36 @@ function GitExec($cmd) {
 	echo '<tr>
 			<td>'.$output.'</td>
 		</tr>';
+}
+
+function TestPatch($pid) {
+	global $DB, $webos_versions_array;
+	$patch = $DB->query_first("SELECT patch_file,webos_versions,versions,update_pid FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
+	if($patch['update_pid'] >= "1") {
+		$versions_temp = explode(' ', $patch[versions]);
+		for($i=0; $i < count($versions_temp); $i++) {
+			if($i=="0") {
+				$versions_out = array_shift(explode('-',$versions_temp[$i],2));
+			} else {
+				$versions_out .= ' '.array_shift(explode('-',$versions_temp[$i],2));
+			}
+		}
+		$patch['webos_versions'] = $versions_out;
+	}
+
+	$versions = explode(' ', $patch['webos_versions']);
+	system('rm -f /tmp/tmp/patch');
+	file_put_contents('/tmp/tmp.patch', $patch['patch_file']);
+	foreach($versions as $key=>$version) {
+		if(in_array($version, $webos_versions_array)) {
+			echo "<tr>
+					<td>Testing ".$version.":<br/><pre>/usr/bin/patch -p1 --dry-run -d ../../git/StockWebOS/v".$version."/ < /tmp/tmp.patch 2<&1\n";
+			echo `/usr/bin/patch -p1 --dry-run -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1`;
+			echo "</pre></td>
+				</tr>";
+		}
+	}
+	system('rm -f /tmp/tmp.patch');
 }
 
 function MainFooter() {
@@ -742,6 +772,11 @@ switch($do) {
 	case 'git':
 		MainHeader();
 		GitExec($_GET['cmd']);
+		MainFooter();
+		break;
+	case 'testpatch':
+		MainHeader();
+		TestPatch($_GET['pid']);
 		MainFooter();
 		break;
 	default:
