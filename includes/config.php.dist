@@ -19,4 +19,7 @@ $dbpassword  = 'db_p@ssword';        // mysql password
 
 define('TABLE_PREFIX', "patches_");  // Abbrevation for tables
 
+$wikiun = 'wiki-username';           // Username for WebOS-Internals wiki
+$wikipw = 'wiki-password';           // Password for WebOS-Internals wiki
+
 ?>

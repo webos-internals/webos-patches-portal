@@ -263,18 +263,15 @@ function BuildForm($errors, $pid) {
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Screenshot 1:'.iif(strlen($patch[screenshot_1_type])>=1, "<br/><a href=\"?do=get_image&ss=1&pid=$patch[pid]\">NEW SS</a>", "").'</td>
-		  	<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="screenshot1" size="50"><br/>
-			<b>Note:</b> Direct address of image file on WebOS-Internals Wiki.</td>
+		  	<td width="85%" class="cell4">'.iif(strlen($patch[screenshot_1_type])>=1, '<input type="checkbox" name="screenshot1" value="1" id="screenshot1"><label for="screenshot1">Save the New SS 1 to the Wiki?</label>', 'No Screenshot 1 attached.').'</td>
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Screenshot 2:'.iif(strlen($patch[screenshot_2_type])>=1, "<br/><a href=\"?do=get_image&ss=2&pid=$patch[pid]\">NEW SS</a>", "").'</td>
-		  	<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="screenshot2" size="50"><br/>
-			<b>Note:</b> Direct address of image file on WebOS-Internals Wiki.</td>
+		  	<td width="85%" class="cell4">'.iif(strlen($patch[screenshot_2_type])>=1, '<input type="checkbox" name="screenshot2" value="1" id="screenshot2"><label for="screenshot2">Save the New SS 2 to the Wiki?</label>', 'No Screenshot 2 attached.').'</td>
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Screenshot 3:'.iif(strlen($patch[screenshot_3_type])>=1, "<br/><a href=\"?do=get_image&ss=3&pid=$patch[pid]\">NEW SS</a>", "").'</td>
-		  	<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="screenshot3" size="50"><br/>
-			<b>Note:</b> Direct address of image file on WebOS-Internals Wiki.</td>
+		  	<td width="85%" class="cell4">'.iif(strlen($patch[screenshot_3_type])>=1, '<input type="checkbox" name="screenshot3" value="1" id="screenshot3"><label for="screenshot1">Save the New SS 3 to the Wiki?</label>', 'No Screenshot 3 attached.').'</td>
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Compatible webOS Version(s): (*)</font></td>
@@ -389,16 +386,21 @@ function HandleForm($pid) {
 
 	$icon = $icon_array[$category];
 
-	if(strlen($screenshot1) < '1') {
+	if($screenshot1 == "1") {
+		$screenshot1 = UploadImage($pid, "1");
+	} else {
 		$screenshot1 = NULL;
 	}
-	if(strlen($screenshot2) < '1') {
+	if($screenshot2 == "1") {
+		$screenshot2 = UploadImage($pid, "2");
+	} else {
 		$screenshot2 = NULL;
 	}
-	if(strlen($screenshot3) < '1') {
+	if($screenshot1 == "1") {
+		$screenshot3 = UploadImage($pid, "3");
+	} else {
 		$screenshot3 = NULL;
 	}
-		
 	$description2 = mynl2br($description);
 	$description2 = stripslashes(str_replace('"', "'", $description2));
 
@@ -730,6 +732,11 @@ function MainFooter() {
 // LET'S BUILD THE PAGE!
 
 switch($do) {
+	case 'test':
+		MainHeader();
+		echo UploadImage("206", "1");
+		MainFooter();
+		break;
 	case 'new':
 		MainHeader();
 		BrowsePatches($_GET['do'], 'all', 'all');

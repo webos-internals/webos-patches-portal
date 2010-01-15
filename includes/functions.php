@@ -137,6 +137,65 @@ function GetChangelog($pid) {
 		</tr>';
 }
 
+function UploadImage($pid, $ss) {
+	global $DB, $wikiun, $wikipw;
+
+	switch($ss) {
+		case '1':
+			$sstype = 'screenshot_1_type';
+			$ssblob = 'screenshot_1_blob';
+			break;
+		case '2':
+			$sstype = 'screenshot_2_type';
+			$ssblob = 'screenshot_2_blob';
+			break;
+		case '3':
+			$sstype = 'screenshot_3_type';
+			$ssblob = 'screenshot_3_blob';
+			break;
+	}
+
+	$getpatch = $DB->query_first("SELECT title,category,".$ssblob.",".$sstype." FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
+	$title = strtolower($getpatch['title']);
+	$title = str_replace(" ", "-", $title);
+	$title = str_replace("_", "-", $title);
+	$title = str_replace("/", "-", $title);
+	$title = str_replace("\\", "-", $title);
+	$category = strtolower($getpatch['category']);
+	$category = str_replace(" ", "-", $category);
+	$known_image_types = array(
+	                         'image/pjpeg' => 'jpg',
+	                         'image/jpeg'  => 'jpg',
+	                         'image/bmp'   => 'bmp',
+	                         'image/x-png' => 'png',
+							 'image/png'   => 'png'
+	                       );
+	$image_type = $getpatch[$sstype];
+	$ext = $known_image_types[$image_type];
+	$name = ucfirst($category.'-'.$title.'-'.$ss.'.'.$ext);
+	system('rm -f /tmp/'.$name);
+	file_put_contents('/tmp/'.$name, $getpatch[$ssblob]);
+	require_once('simpletest/browser.php');
+	$browser = &new SimpleBrowser();
+	$browser->get('http://www.webos-internals.org/wiki/Special:Userlogin');
+	$browser->setFieldById('wpName1', $wikiun);
+	$browser->setFieldById('wpPassword1', $wikipw);
+	$browser->clickSubmitById('wpLoginattempt');
+	$browser->get('http://www.webos-internals.org/wiki/Special:Upload');
+	$browser->setFieldById('wpUploadFile', '/tmp/'.$name);
+	$browser->setFieldById('wpDestFile', $name);
+	$browser->setFieldById('wpIgnoreWarning', 'true');
+	$page = $browser->clickSubmitByName('wpUpload');
+	system('rm -f /tmp/'.$name);
+	preg_match('/img alt="Image:'.$name.'" src=(.*)/', $page, $matches);
+	$start_pos = strpos($matches[0], "=", 10)+2;
+	$temp_url = substr($matches[0], $start_pos);
+	$stop_pos = strpos($temp_url, '"');
+	$image_url = substr($temp_url, 0, $stop_pos);
+	return 'http://www.webos-internals.org'.$image_url;
+
+}
+
 global $rootpath;
 
 function FormatForForm($input) {
