@@ -137,7 +137,7 @@ function GetChangelog($pid) {
 		</tr>';
 }
 
-function UploadImage($pid, $ss) {
+function UploadImage($pid, $ss, $title) {
 	global $DB, $wikiun, $wikipw;
 
 	switch($ss) {
@@ -156,7 +156,11 @@ function UploadImage($pid, $ss) {
 	}
 
 	$getpatch = $DB->query_first("SELECT title,category,".$ssblob.",".$sstype." FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
-	$title = strtolower($getpatch['title']);
+	if(strlen($title) < "1") {
+		$title = strtolower($getpatch['title']);
+	} else {
+		$title = strtolower($title);
+	}
 	$title = str_replace(" ", "-", $title);
 	$title = str_replace("_", "-", $title);
 	$title = str_replace("/", "-", $title);

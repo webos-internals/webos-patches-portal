@@ -65,7 +65,7 @@ echo '<html>
 	} else {
 		echo ' | Update Submissions ('.$update_count[num_update].')';
 	}
-echo ' | '.iif($do=="browse", "Browse Patches", '<a href="?do=browse">Browse Patches</a>').' | <a href="?do=git&cmd=status">Git Status</a> | <a href="?do=git&cmd=add">Git Add</a> | <a href="?do=git&cmd=commit">Git Commit</a> | <a href="?do=git&cmd=tag">Git Tag</a> | <a href="?do=git&cmd=push">Git Push</a></td>
+echo ' | '.iif($do=="browse", "Browse Patches", '<a href="?do=browse">Browse Patches</a>').' | <a href="?do=git&cmd=status">Git Status</a> | <a href="?do=git&cmd=add">Add All</a> | <a href="?do=git&cmd=commit">Commit All</a> | <a href="?do=git&cmd=push_mods">Push Mods</a> | <a href="?do=git&cmd=tag">Tag Mods</a> | <a href="?do=git&cmd=push_build">Push Build</a></td>
 	  </tr>';
 }
 
@@ -263,15 +263,15 @@ function BuildForm($errors, $pid) {
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Screenshot 1:'.iif(strlen($patch[screenshot_1_type])>=1, "<br/><a href=\"?do=get_image&ss=1&pid=$patch[pid]\">NEW SS</a>", "").'</td>
-		  	<td width="85%" class="cell4">'.iif(strlen($patch[screenshot_1_type])>=1, '<input type="checkbox" name="screenshot1" value="1" id="screenshot1"><label for="screenshot1">Save the New SS 1 to the Wiki?</label>', 'No Screenshot 1 attached.').'</td>
+		  	<td width="85%" class="cell4">'.iif(strlen($patch[screenshot_1_type])>=1, '<input type="checkbox" name="screenshot1" value="1" id="screenshot1" CHECKED><label for="screenshot1">Save the New SS 1 to the Wiki?</label>', 'No Screenshot 1 attached.').'</td>
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Screenshot 2:'.iif(strlen($patch[screenshot_2_type])>=1, "<br/><a href=\"?do=get_image&ss=2&pid=$patch[pid]\">NEW SS</a>", "").'</td>
-		  	<td width="85%" class="cell4">'.iif(strlen($patch[screenshot_2_type])>=1, '<input type="checkbox" name="screenshot2" value="1" id="screenshot2"><label for="screenshot2">Save the New SS 2 to the Wiki?</label>', 'No Screenshot 2 attached.').'</td>
+		  	<td width="85%" class="cell4">'.iif(strlen($patch[screenshot_2_type])>=1, '<input type="checkbox" name="screenshot2" value="1" id="screenshot2" CHECKED><label for="screenshot2">Save the New SS 2 to the Wiki?</label>', 'No Screenshot 2 attached.').'</td>
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Screenshot 3:'.iif(strlen($patch[screenshot_3_type])>=1, "<br/><a href=\"?do=get_image&ss=3&pid=$patch[pid]\">NEW SS</a>", "").'</td>
-		  	<td width="85%" class="cell4">'.iif(strlen($patch[screenshot_3_type])>=1, '<input type="checkbox" name="screenshot3" value="1" id="screenshot3"><label for="screenshot1">Save the New SS 3 to the Wiki?</label>', 'No Screenshot 3 attached.').'</td>
+		  	<td width="85%" class="cell4">'.iif(strlen($patch[screenshot_3_type])>=1, '<input type="checkbox" name="screenshot3" value="1" id="screenshot3" CHECKED><label for="screenshot1">Save the New SS 3 to the Wiki?</label>', 'No Screenshot 3 attached.').'</td>
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Compatible webOS Version(s): (*)</font></td>
@@ -387,17 +387,17 @@ function HandleForm($pid) {
 	$icon = $icon_array[$category];
 
 	if($screenshot1 == "1") {
-		$screenshot1 = UploadImage($pid, "1");
+		$screenshot1 = UploadImage($pid, "1", $title);
 	} else {
 		$screenshot1 = NULL;
 	}
 	if($screenshot2 == "1") {
-		$screenshot2 = UploadImage($pid, "2");
+		$screenshot2 = UploadImage($pid, "2", $title);
 	} else {
 		$screenshot2 = NULL;
 	}
 	if($screenshot1 == "1") {
-		$screenshot3 = UploadImage($pid, "3");
+		$screenshot3 = UploadImage($pid, "3", $title);
 	} else {
 		$screenshot3 = NULL;
 	}
@@ -481,7 +481,6 @@ function HandleForm($pid) {
 		$gitversions_array = explode(',',$gitversions['value']);
 		if(!in_array($version, $gitversions_array)) {
 			$gitversions_array[] = $version;
-			echo 'Version: '.$version.'<br>';
 		}
 		$gitversions_out = implode(',', $gitversions_array);
 		$DB->query("UPDATE ".TABLE_PREFIX."settings SET value = '".$gitversions_out."' WHERE setting = 'gitversions'");
@@ -532,7 +531,7 @@ function HandleForm($pid) {
 		if($patch['email'] && ($patch['private'] != '1') && ($i=="0")) {
 			$maintainer_out .= ' '.trim($maintainer_array[$i]).' <'.$patch[email].'>';
 		} else {
-			$maintainer_out .= iif($i>=2, ', ', ' ').trim($maintainer_array[$i]);
+			$maintainer_out .= iif($i>=1, ', ', ' ').trim($maintainer_array[$i]);
 		}
 	}
 	if(strlen($homepage) > '0') {
@@ -637,15 +636,11 @@ function GitExec($cmd) {
 					</tr>';
 			}
 			break;
-		case 'push':
-			$output = '<b>Preware/build.git:</b><pre>';
-			$output .= "cd ../../git/build/autopatch ; /usr/bin/git pull 2>&1\n";
-			$output .= `cd ../../git/build/autopatch ; /usr/bin/git pull 2>&1`;
-			$output .= "cd ../../git/build/autopatch ; /usr/bin/git push 2>&1\n";
-			$output .= `cd ../../git/build/autopatch ; /usr/bin/git push 2>&1`;
-			$output .= '</pre>';
+		case 'push_mods':
+			$loop=0;
+			$output= NULL;
 			foreach($webos_versions_array as $key=>$version) {
-				$output .= '<hr><b>modifications.git/webos-'.$version.':</b>';
+				$output .= iif($loop==0, '', '<hr>').'<b>modifications.git/webos-'.$version.':</b>';
 				if(!$gitversions_main[$version]) {
 					$output .= ' No Push Necessary.';
 				} else {
@@ -653,11 +648,10 @@ function GitExec($cmd) {
 					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1`;
 					$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git push 2>&1\n";
 					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git push 2>&1`;
-					$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git push --tags 2>&1\n";
-					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git push --tags 2>&1`;
 					$output .= "</pre>";
 					unset($gitversions_main[$version]);
 				}
+				$loop++;
 			}
 			$count=0;
 			foreach($gitversions_main as $key=>$value) {
@@ -673,16 +667,29 @@ function GitExec($cmd) {
 			$DB->query("UPDATE ".TABLE_PREFIX."settings SET value = '".$gitversions_return."' WHERE setting = 'gitversions'");
 			break;
 		case 'tag':
+			$loop=0;
+			$output=NULL;
 			foreach($webos_versions_array as $key=>$version) {
-				$output .= '<hr><b>modifications.git/webos-'.$version.':</b>';
+				$output .= iif($loop==0, '', '<hr>').'<b>modifications.git/webos-'.$version.':</b>';
 				if(!$gitversions_main[$version]) {
-					$output .= ' No Commit Necessary.';
+					$output .= ' No Tag Necessary.';
 				} else {
 					$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version] 2>&1\n";
 					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version] 2>&1`;
+					$output .= "\ncd ../../git/modifications/v$version ; /usr/bin/git push --tags 2>&1\n";
+					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git push --tags 2>&1`;
 					$output .= '</pre>';
 				}
+				$loop++;
 			}
+			break;
+		case 'push_build':
+			$output = '<b>Preware/build.git:</b><pre>';
+			$output .= "cd ../../git/build/autopatch ; /usr/bin/git pull 2>&1\n";
+			$output .= `cd ../../git/build/autopatch ; /usr/bin/git pull 2>&1`;
+			$output .= "cd ../../git/build/autopatch ; /usr/bin/git push 2>&1\n";
+			$output .= `cd ../../git/build/autopatch ; /usr/bin/git push 2>&1`;
+			$output .= '</pre>';
 			break;
 	}
 	echo '<tr>
@@ -692,19 +699,7 @@ function GitExec($cmd) {
 
 function TestPatch($pid) {
 	global $DB, $webos_versions_array;
-	$patch = $DB->query_first("SELECT patch_file,webos_versions,versions,update_pid FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
-	if($patch['update_pid'] >= "1") {
-		$versions_temp = explode(' ', $patch[versions]);
-		for($i=0; $i < count($versions_temp); $i++) {
-			if($i=="0") {
-				$versions_out = array_shift(explode('-',$versions_temp[$i],2));
-			} else {
-				$versions_out .= ' '.array_shift(explode('-',$versions_temp[$i],2));
-			}
-		}
-		$patch['webos_versions'] = $versions_out;
-	}
-
+	$patch = $DB->query_first("SELECT patch_file,webos_versions FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
 	$versions = explode(' ', $patch['webos_versions']);
 	system('rm -f /tmp/tmp/patch');
 	file_put_contents('/tmp/tmp.patch', $patch['patch_file']);
@@ -732,11 +727,6 @@ function MainFooter() {
 // LET'S BUILD THE PAGE!
 
 switch($do) {
-	case 'test':
-		MainHeader();
-		echo UploadImage("206", "1");
-		MainFooter();
-		break;
 	case 'new':
 		MainHeader();
 		BrowsePatches($_GET['do'], 'all', 'all');

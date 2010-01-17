@@ -355,7 +355,7 @@ function HandleForm($pid) {
 	if(!$pid) {
 		$dupcheck = $DB->query_first("SELECT pid FROM ".TABLE_PREFIX."patches WHERE category = '".$category."' AND title = '".$title."'");
 		if($dupcheck['pid'] >= "1") {
-			$errors[] = 'There is already an '.$category.': '.$title.' patch. If this is an update to that patch, please select "Submit Update" above. Otherwise, choose a new title.';
+			$errors[] = 'There is already a	 '.$category.': '.$title.' patch. If this is an update to that patch, please select "Submit Update" above. Otherwise, choose a new title.';
 		}
 	}
 
