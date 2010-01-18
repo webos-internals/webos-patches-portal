@@ -53,7 +53,7 @@ echo '<html>
 	  <body>
 	  <table width="100%" border="1" cellpadding="5" cellspacing="0">
 	  <tr>
-		<td colspan="11" align="center" class="header">WebsOS-Patches Admin<br/>
+		<td colspan="12" align="center" class="header">WebsOS-Patches Admin<br/>
 		<a href="/admin/">Home</a> | ';
 	if($do != "new") {
 		echo '<a href="?do=new">'.iif($new_count[num_new]>=1, "<b>", "").'New Submissions ('.$new_count[num_new].')'.iif($new_count[num_new]>=1, "</b>", "").'</a>';
@@ -72,7 +72,7 @@ echo ' | '.iif($do=="browse", "Browse Patches", '<a href="?do=browse">Browse Pat
 function BrowsePatches($do, $webosver, $category, $order, $desc) {
 	global $DB, $webos_versions_array, $categories;
 	echo '<tr>
-			<td colspan="11" class="header2" align="center">';
+			<td colspan="12" class="header2" align="center">';
 	if($do == "browse") {
 		foreach($webos_versions_array as $key=>$webos_version) {
 			$count = $DB->query_first("SELECT count(pid) as num FROM ".TABLE_PREFIX."patches WHERE versions LIKE '%".$webos_version."%'");
@@ -89,7 +89,7 @@ function BrowsePatches($do, $webosver, $category, $order, $desc) {
 			</tr>';
 		if($webosver) {
 			echo '<tr>
-					<td colspan="11" class="header2" align="center">';
+					<td colspan="12" class="header2" align="center">';
 			foreach($categories as $key=>$category1) {
 				if($webosver == "all") {
 					$count = $DB->query_first("SELECT count(pid) as num FROM ".TABLE_PREFIX."patches WHERE category = '".$category1."'");
@@ -116,11 +116,13 @@ function BrowsePatches($do, $webosver, $category, $order, $desc) {
 			$ssorder1 = 'screenshot_1_type';
 			$ssorder2 = 'screenshot_2_type';
 			$ssorder3 = 'screenshot_3_type';
+			$dateorder = 'datesubmitted';
 		} else {
 			$verorder = 'versions';
 			$ssorder1 = 'screenshot_1';
 			$ssorder2 = 'screenshot_2';
 			$ssorder3 = 'screenshot_3';
+			$dateorder = 'lastupdated';
 		}
 		if($order == "versions" || $order == "webos_versions") {
 			$verorder2 = "1";
@@ -133,6 +135,9 @@ function BrowsePatches($do, $webosver, $category, $order, $desc) {
 		}
 		if($order == "screenshot_3" || $order == "screenshot_3_type") {
 			$ssorder_3 = "1";
+		}
+		if($order == "datesubmitted" || $order == "lastupdated") {
+			$dateorder2 = "1";
 		}
 		if(!$order) {
 			$order = 'category';
@@ -153,53 +158,58 @@ function BrowsePatches($do, $webosver, $category, $order, $desc) {
 			echo "&desc=1";
 		}
 		echo '" '.iif($order=="title", $imageurl, "").'>Title</a> '.iif($order=="title", $image, "").'</b></td>
-				<td width="275px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order=description';
+				<td width="220px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order=description';
 		if($order=="description" && $desc!="1") {
 			echo "&desc=1";
 		}
 		echo '" '.iif($order=="description", $imageurl, "").'>Description</a> '.iif($order=="description", $image, "").'</b></td>';
 		if($do == "new" || $do == "updates") {
-			echo '<td width="30px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order=patch_file';
+			echo '<td width="25px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order=patch_file';
 			if($order=="patch_file" && $desc!="1") {
 				echo "&desc=1";
 			}
 			echo '" '.iif($order=="patch_file", $imageurl, "").'>Patch</a> '.iif($order=="patch_file", $image, "").'</b></td>';
 		}
-		echo '	<td width="100px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order=category';
+		echo '	<td width="80px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order=category';
 		if($order=="category" && $desc!="1") {
 			echo "&desc=1";
 		}
 		echo '" '.iif($order=="category", $imageurl, "").'>Category</a> '.iif($order=="category", $image, "").'</b></td>
-				<td width="30px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order='.$ssorder1;
+				<td width="25px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order='.$ssorder1;
 		if(($order=="screenshot_1" || $order=="screenshot_1_type") && $desc!="1") {
 			echo "&desc=1";
 		}
 		echo '" '.iif($ssorder_1=="1", $imageurl, "").'>SS1</a> '.iif($ssorder_1=="1", $image, "").'</b></td>
-				<td width="30px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order='.$ssorder2;
+				<td width="25px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order='.$ssorder2;
 		if(($order=="screenshot_2" || $order=="screenshot_2_type") && $desc!="1") {
 			echo "&desc=1";
 		}
 		echo '" '.iif($ssorder_2=="1", $imageurl, "").'>SS2</a> '.iif($ssorder_2=="1", $image, "").'</b></td>
-				<td width="30px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order='.$ssorder3;
+				<td width="25px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order='.$ssorder3;
 		if(($order=="screenshot_3" || $order=="screenshot_3_type") && $desc!="1") {
 			echo "&desc=1";
 		}
 		echo '" '.iif($ssorder_3=="1", $imageurl, "").'>SS3</a> '.iif($ssorder_3=="1", $image, "").'</b></td>
-				<td width="75px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order=maintainer';
+				<td width="56px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order=maintainer';
 		if($order=="maintainer" && $desc!="1") {
 			echo "&desc=1";
 		}
 		echo '" '.iif($order=="maintainer", $imageurl, "").'>Maintainer</a> '.iif($order=="maintainer", $image, "").'</b></td>
-				<td width="50px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order=homepage';
+				<td width="40px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order=homepage';
 		if($order=="homepage" && $desc!="1") {
 			echo "&desc=1";
 		}
 		echo '" '.iif($order=="homepage", $imageurl, "").'>Homepage</a> '.iif($order=="homepage", $image, "").'</b></td>
-				<td width="50px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order='.$verorder;
+				<td width="40px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order='.$verorder;
 		if(($order=="versions" || $order=="webos_versions") && $desc!="1") {
 			echo "&desc=1";
 		}
 		echo '" '.iif($verorder2=="1", $imageurl, "").'>Versions</a> '.iif($verorder2=="1", $image, "").'</b></td>
+				<td width="100px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order='.$dateorder;
+		if(($order=="lastupdated" || $order=="datesubmitted") && $desc!="1") {
+			echo "&desc=1";
+		}
+		echo '" '.iif($dateorder2=="1", $imageurl, "").'>'.iif($dateorder=="lastupdated", "Updated", "Submitted").'</a> '.iif($dateorder2=="1", $image, "").'</b></td>
 		  	</tr>';
 		switch($do) {
 			case "browse":
@@ -247,16 +257,18 @@ function BrowsePatches($do, $webosver, $category, $order, $desc) {
 				<td align="center">'.iif(strlen($patch[screenshot_2])>=1, "<a href=\"".$patch[screenshot_2]."\" target=\"SS_OUT\">Show</a>", "&nbsp;").'</td>
 				<td align="center">'.iif(strlen($patch[screenshot_3])>=1, "<a href=\"".$patch[screenshot_3]."\" target=\"SS_OUT\">Show</a>", "&nbsp;").'</td>';
 			} else {
-				echo '<td>'.iif(strlen($patch[screenshot_1_type])>=1, "<a href=\"?do=get_image&ss=1&pid=$patch[pid]\">Show</a>", "&nbsp;").'</td>
-				<td>'.iif(strlen($patch[screenshot_2_type])>=1, "<a href=\"?do=get_image&ss=2&pid=$patch[pid]\">Show</a>", "&nbsp;").'</td>
-				<td>'.iif(strlen($patch[screenshot_3_type])>=1, "<a href=\"?do=get_image&ss=3&pid=$patch[pid]\">Show</a>", "&nbsp;").'</td>';
+				echo '<td align="center">'.iif(strlen($patch[screenshot_1_type])>=1, "<a href=\"?do=get_image&ss=1&pid=$patch[pid]\">Show</a>", "&nbsp;").'</td>
+				<td align="center">'.iif(strlen($patch[screenshot_2_type])>=1, "<a href=\"?do=get_image&ss=2&pid=$patch[pid]\">Show</a>", "&nbsp;").'</td>
+				<td align="center">'.iif(strlen($patch[screenshot_3_type])>=1, "<a href=\"?do=get_image&ss=3&pid=$patch[pid]\">Show</a>", "&nbsp;").'</td>';
 			}
 			echo '<td align="center">'.$maintainer_out.'</td>
 				<td align="center">'.iif(strlen($patch[homepage])>=1, "<a href=$patch[homepage]>Link</a>", "None").'</td>';
 			if ($do == "browse") {
-				echo '<td>'.str_replace(" ", "<br/>", $patch[versions]).iif(strlen($patch[changelog])>=1, "<br/><br/><a href=\"?do=get_changelog&pid=".$patch[pid]."\" target=\"changelog\">Changelog</a>", "").'</td>';
+				echo '<td align="center">'.str_replace(" ", "<br/>", $patch[versions]).iif(strlen($patch[changelog])>=1, "<br/><br/><a href=\"?do=get_changelog&pid=".$patch[pid]."\" target=\"changelog\">Changelog</a>", "").'</td>
+					<td align="center">'.gmdate("D, d M Y H:i:s \U\T\C", $patch[lastupdated]).'</td>';
 			} else {
-				echo '<td>'.str_replace(" ", "<br/>", $patch[webos_versions]).'</td>';
+				echo '<td align="center">'.str_replace(" ", "<br/>", $patch[webos_versions]).'</td>
+					<td align="center">'.gmdate("D, d M Y H:i:s \U\T\C", $patch[datesubmitted]).'</td>';
 			}
 			echo '</tr>';
 			$maintainer_out = NULL;
@@ -550,6 +562,7 @@ function HandleForm($pid) {
 											versions = '$versions2',
 											note_to_admins = '".mysql_real_escape_string($note_to_admins)."',
 											changelog = '".mysql_real_escape_string($changelog2)."',
+											".iif($updateform!=1, "lastupdated = '".time()."',", "")."
 											".iif($updateform==1, "lastupdated", "dateaccepted")." = '".time()."'
 									WHERE pid = '".iif($updateform==1, $update_pid, $pid)."'"); 
 	foreach($new_versions as $key=>$version) {
@@ -793,7 +806,7 @@ function TestPatch($pid) {
 
 function MainFooter() {
 	echo '	  <tr>
-		<td colspan="11" width="100%" align="center" class="copyright"><center>&copy; 2009 - 2010 Daniel Beames (dBsooner) and webOS-Internals Group</center></td>
+		<td colspan="12" width="100%" align="center" class="copyright"><center>&copy; 2009 - 2010 Daniel Beames (dBsooner) and webOS-Internals Group</center></td>
 	  </tr>
 	  </table>
 	  </body>
