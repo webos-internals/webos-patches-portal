@@ -7,6 +7,8 @@ if(!defined('IN_SCRIPT')) {
   die("Hacking attempt!!");
 }
 
+global $rootpath;
+
 // GLOBAL VARIABLES
 $categories = array(	"Select...",
 			"App Catalog",
@@ -197,10 +199,72 @@ function UploadImage($pid, $ss, $title) {
 	$stop_pos = strpos($temp_url, '"');
 	$image_url = substr($temp_url, 0, $stop_pos);
 	return 'http://www.webos-internals.org'.$image_url;
-
 }
 
-global $rootpath;
+function SendEmail($emailtype, $pid) {
+	global $DB;
+	$admin_email = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'admin_emails'");
+	$patch = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
+	$to = $patch['email'];
+	$from = 'webOS-Patches@dbsooner.com';
+	$random_hash = md5(date('r', time()));
+	$headers = "From: ".$from."\r\n";
+	$headers .= "Return-Path: ".$from."\r\n";
+	$headers .= "Reply-To: ".$from."\r\n";
+	$headers .= "Bcc: ".$admin_email['value']."\r\n";
+	$headers .= "MIME-Version: 1.0\r\n";
+	$headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+	if($emailtype == "submit_update" || $emailtype == "submit_new") {
+		$subject = '[Patch-Submitted] '.$patch['title'];
+		ob_start();
+?>
+<html>
+<head>
+  <title>Patch Submitted via the WebOS-Patches Web Portal!</title>
+</head>
+<body>
+<h2>Patch Submitted via the <a href="http://webos-patches.dbsooner.com/">WebOS-Patches Web Portal</a>!</h2>
+<p>Thank you for submitting <?php echo iif($emailtype=="submit_update", "an update to the", "a new"); ?> patch entitled <?php echo '<b>'.$patch['category'].':</b> '.$patch['title']; ?>.</p>
+<p>You will receive another email once the patch is either approved or denied.<br/>
+If you did not submit this patch and are receiving this email, it is more than likely because your email is still listed as the primary contact for this patch. If you would like your email removed, please reply to this email requesting so.</p>
+<p>-Daniel (dBsooner) and WebOS-Internals<br/><a href="http://webos-patches.dbsooner.com/">http://webos-patches.dbsooner.com/</a></p>
+</body>
+</html>
+<?php
+	}
+	if($emailtype == "approved" || $emailtype == "denied") {
+		$subject = '[Patch-'.ucfirst($emailtype).'] '.$patch['title'];
+		ob_start();
+?>
+<html>
+<head>
+  <title>Patch <?php echo ucfirst($emailtype); ?> at the WebOS-Patches Web Portal!</title>
+</head>
+<body>
+<h2>Patch <?php echo ucfirst($emailtype); ?> at the <a href="http://webos-patches.dbsooner.com/">WebOS-Patches Web Portal</a>!</h2>
+<p>Thank you for submitting <?php echo iif($patch['update_pid']>="1", "an update to the", "a new"); ?> patch entitled <?php echo '<b>'.$patch['category'].':</b> '.$patch['title']; ?>.</p>
+<p>This email is to inform you the patch has been <?php echo $emailtype; ?>!<br/>
+<br/>
+<?php
+	if($emailtype == "denied") {
+		echo "It was denied for the following reason:<br/><br/>".$patch['denied_reason']."<br/><br/>If you feel this is a mistake, please contact the admins. Otherwise, if applicable, correct the patch and resubmit it.";
+	} else {
+		echo "You should see it in the WebOS-Patches Feed in Preware (and other installers) within the next 15 minutes.";
+	}
+?><br/>
+<br/>
+If you did not submit this patch and are receiving this email, it is more than likely because your email is still listed as the primary contact for this patch. If you would like your email removed, please reply to this email requesting so.</p>
+<p>-Daniel (dBsooner) and WebOS-Internals<br/><a href="http://webos-patches.dbsooner.com/">http://webos-patches.dbsooner.com/</a></p>
+</body>
+</html>
+<?php
+	}
+	$message = ob_get_clean();
+	if(!@mail( $to, $subject, $message, $headers )) {
+		mail($admin_email['value'], "WebOS-Patches Web Portal Email Error", "There was an error in sending the email to the developer.", "From: webOS-Patches@dbsooner.com");
+	}
+
+}
 
 function FormatForForm($input) {
 	$return = htmlspecialchars(stripslashes(br2nl($input)));

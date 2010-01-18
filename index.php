@@ -474,6 +474,7 @@ function HandleForm($pid) {
 		$cur = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
 		$extra  = ", update_pid, versions, meta_sub_version, depends, screenshot_1, screenshot_2, screenshot_3";
 		$extra2 = ", '".$pid."', '".$cur[versions]."', '".$cur[meta_sub_version]."', '".$cur[depends]."', '".$cur[screenshot_1]."', '".$cur[screenshot_2]."', '".$cur[screenshot_3]."'";
+		$update = "1";
 	}
 
 	$DB->query("INSERT INTO ".TABLE_PREFIX."patches (pid, title, description, patch_file, category, screenshot_1_blob, 
@@ -509,13 +510,13 @@ function HandleForm($pid) {
 				<td colspan="2" align="center" class="header">Submit Patch for webOS-Patches - Results</td>
 			</tr>
 			<tr>
-				<td colspan="2" class="header2">Thank you for submitting a patch! Look for it very soon in the webOS-Patches feed in Preware (and 
-other programs that use the webOS-Patches feed)! If there are any questions, please contact <a 
-href="mailto:webOS-Patches@dbsooner.com">webOS-Patches@dbsooner.com</a>. Please note you will not be able to submit another patch for 5 minutes. Do not use 
-your browser\'s back button and try to submit again, it will not let you. Instead, <a href="webospatchupload.php">click here</a> and refresh that page. It will let 
-you know when you can submit again. </td>
+				<td colspan="2" class="header2" align="center">Thank you for submitting a patch! Look for it very soon in the webOS-Patches feed in Preware (and other programs that use the webOS-Patches feed)!<br/>
+<br/>You should receive an email at the email address you provided confirming the successful submitting of this patch. You will also receive an email when it is approved or denied. Please add "WebOS-Patches@dBsooner.com" to your safe sender list.<br/>
+<br/>Please note you will not be able to submit another patch for 5 minutes. Do not use your browser\'s back button and try to submit again, it will not let you. Instead, <a href="webospatchupload.php">click here</a> and refresh that page. It will let you know when you can submit again.<br/>
+<br/>If there are any questions, please contact <a href="mailto:webOS-Patches@dbsooner.com">webOS-Patches@dbsooner.com</a>.</td>
 			</tr>
 			</table>';
+	SendEmail(iif($update=="1", "submit_update", "submit_new"), $pid);
 	PreventSpam(GetRemoteAddress());
 }
 

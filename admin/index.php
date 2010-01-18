@@ -650,7 +650,10 @@ HOMEPAGE =$homepage2";
 		mkdir($dir);
 	}
 	file_put_contents('../../git/build/autopatch/'.$patchname.'/Makefile', $makefile_content);
-	
+
+	//Send Email
+	SendEmail("accepted", $pid);
+
 	//Let the user know the outcome
 	 return '
 			<tr>
@@ -659,7 +662,7 @@ HOMEPAGE =$homepage2";
 			<tr>
 				<td colspan="2" class="header2" align="center">The patch has been accepted! Thank you!</td>
 			</tr>
-			</table>'; 
+			</table>';
 }
 
 function GitExec($cmd) {
