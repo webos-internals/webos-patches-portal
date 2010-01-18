@@ -298,7 +298,9 @@ function BuildForm($errors, $pid) {
 			<b>Note:</b> This information is published in the package\'s meta-data if the above box is not checked. It will be<br/>
 			viewable by the public. Remember you, as the developer of the patch, are<br/>
 			responsible for support. Giving your email makes it easier for a user to<br/>
-			request support.</td>
+			request support.<br/>
+			<b>Important:</b>This is the email address that will be used by the admins to<br/>
+			contact you when the patch is approved or denied, or if there are any issues.</td>
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Patch Homepage:</td>
@@ -321,7 +323,12 @@ function BuildForm($errors, $pid) {
 			<b>Note:</b> This will not be published. It is simply a note to the Admins.</td>
 		</tr>
 		<tr>
-			<td colspan="2" align="center" class="cell5"><input type="submit" value="Send it Off!"></td>
+			<td colspan="2" align="center" class="cell5"><input type="submit" value="Send it Off!">
+			<hr class="bodysep"><center>By submitting this form, you, the submitter, explicitly agree you are either the original author of the patch or have the right to submit the patch under the <b>MIT Open Source
+			License</b>. Further, you agree the patch will be licensed under the <b>MIT Open Source License</b>. This is to allow Palm to use the
+			patch as-is to incorporate them into future webOS releases. Information regarding this license can be found at: 
+			<a href="http://www.webos-internals.org/wiki/MIT_Open_Source_License_-_webOS-Patches" target="_blank">
+			http://www.webos-internals.org/wiki/MIT_Open_Source_License_-_webOS-Patches</a></td>
 		</tr>
 		</form>';
 }
@@ -534,13 +541,7 @@ function SpamWait() {
 
 function MainFooter() {
 	echo '	  <tr>
-		<td colspan="11" width="100%" align="center" class="copyright"><hr class="bodysep"><center>By submitting this form, you, the submitter, 
-		explicitly agree you are either the original author of the patch or have the right to submit the patch under the <b>MIT Open Source
-		License</b>. Further, you agree the patch will be licensed under the <b>MIT Open Source License</b>. This is to allow Palm to use the
-		patch as-is to incorporate them into future webOS releases. Information regarding this license can be found at: 
-		<a href="http://www.webos-internals.org/wiki/MIT_Open_Source_License_-_webOS-Patches" target="_blank">
-		http://www.webos-internals.org/wiki/MIT_Open_Source_License_-_webOS-Patches</a><br/>
-		&copy; 2009 - 2010 Daniel Beames (dBsooner) and webOS-Internals Group</center></td>
+		<td colspan="11" align="center" class="copyright">&copy; 2009 - 2010 Daniel Beames (dBsooner) and webOS-Internals Group</center></td>
 	  </tr>
 	  </table>
 	  </body>
@@ -613,6 +614,20 @@ switch($do) {
 		break;
 	default:
 		MainHeader();
+		echo '<tr>
+				<td colspan="2" class="cell">Welcome to the new WebOS-Patches Web Portal! The goal of this portal is to make it easier for developers to submit their patches for inclusion in the WebOS-Patches feed as well as provide a way for everyone to browse the patches in the WebOS-Patches feed from their browsers.<br/>
+				<br/>
+				To browse the patches, click <a href="?do=browse">Browse Patches</a> above. You will be able to browse by WebOS Version and by Category. You will also be able to sort each list by all table values. This should help you find what you are looking for faster. All links in the tables open to separate tabs/windows, so please ensure your popup blocker allows this.<br/>
+				<br/>
+				Developers: If you are submitting an update to an existing patch (one that is available in the feed already), please click the <a href="?do=submit_update">Submit Update</a> link above. You will be presented with a drop down list of all patches in the feed. Select the one you are updating and click next. This will bring you to the submission form with most values already filled in.<br/>
+				If you are submitting a new patch, please click <a href="?do=submit_new">Submit New Patch</a> above. Fill out the form with as much detail as possible.<br/>
+				<br/>
+				<a href="http://donate.dbsooner.com/">Donations</a> are greatly appreciated and go towards operating costs of the servers I and the <a href="http://www.webos-internals.org/">WebOS-Internals Group</a> maintain.<br/>
+				<br/>
+				Thank you for visiting the WebOS-Patches Web Portal!<br/>
+				<br/>
+				--Daniel Beames (dBsooner) and the <a href="http://www.webos-internals.org/">WebOS-Internals Group</a></td>
+			</tr>';
 		MainFooter();
 }
 ?>
