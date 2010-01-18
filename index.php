@@ -67,10 +67,10 @@ function BrowsePatches($webosver, $category, $order, $desc) {
 	}
 	$i=0;
 	foreach($versions as $key=>$version) {
-		echo iif($i==0, "", " | ").iif($webosver==$version, '<font color="red">'.$version.'</font>', '<a href="?do=browse&webosver='.$version.'">'.$version.'</a>');
+		echo iif($i==0, "", " | ").iif($webosver==$version, '<font color="#0066cc">'.$version.'</font>', '<a href="?do=browse&webosver='.$version.'">'.$version.'</a>');
 		$i++;
 	}
-	echo iif($i==0, "", " | ").iif($webosver=="all", '<font color="red">All</font>', '<a href="?do=browse&webosver=all">All</a>').'</td>
+	echo iif($i==0, "", " | ").iif($webosver=="all", '<font color="#0066cc">All</font>', '<a href="?do=browse&webosver=all">All</a>').'</td>
 		</tr>';
 	if($webosver) {
 		echo '<tr>
@@ -87,10 +87,10 @@ function BrowsePatches($webosver, $category, $order, $desc) {
 		}
 		$i=0;
 		foreach($category_list as $key=>$category1) {
-			echo iif($i==0, "", " | ").iif($category==$category1, '<font color="red">'.$category1.'</font>', '<a href="?do=browse&webosver='.$webosver.'&category='.$category1.'" class="header2">'.$category1.'</a>');
+			echo iif($i==0, "", " | ").iif($category==$category1, '<font color="#0066cc">'.$category1.'</font>', '<a href="?do=browse&webosver='.$webosver.'&category='.$category1.'" class="header2">'.$category1.'</a>');
 			$i++;
 		}
-		echo iif($i==0, "", " | ").iif($category==all, '<font color="red">All</font>', '<a href="?do=browse&webosver='.$webosver.'&category=all">All</a>').'</td>
+		echo iif($i==0, "", " | ").iif($category==all, '<font color="#0066cc">All</font>', '<a href="?do=browse&webosver='.$webosver.'&category=all">All</a>').'</td>
 			</tr>';
 	}
 	if($category) {
@@ -622,7 +622,7 @@ switch($do) {
 				Developers: If you are submitting an update to an existing patch (one that is available in the feed already), please click the <a href="?do=submit_update">Submit Update</a> link above. You will be presented with a drop down list of all patches in the feed. Select the one you are updating and click next. This will bring you to the submission form with most values already filled in.<br/>
 				If you are submitting a new patch, please click <a href="?do=submit_new">Submit New Patch</a> above. Fill out the form with as much detail as possible.<br/>
 				<br/>
-				<a href="http://donate.dbsooner.com/">Donations</a> are greatly appreciated and go towards operating costs of the servers I and the <a href="http://www.webos-internals.org/">WebOS-Internals Group</a> maintain.<br/>
+				<a href="http://donate.dbsooner.com/">Donations</a> are greatly appreciated and go towards operating costs of the servers I maintain as well as further development for WebOS.<br/>
 				<br/>
 				Thank you for visiting the WebOS-Patches Web Portal!<br/>
 				<br/>

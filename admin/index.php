@@ -246,7 +246,7 @@ function BrowsePatches($do, $webosver, $category, $order, $desc) {
 			$num_maintainers = 0;
 			echo '<tr>
 				<td><img src="'.$patch[icon].'"></img></td>
-				<td><a href="?do=build_form&pid='.$patch[pid].'">'.$patch[title].'</a></td>
+				<td>'.iif($do!="browse", '<a href="?do=build_form&pid='.$patch[pid].'">'.$patch[title].'</a>', $patch[title]).'</td>
 				<td align="justify">'.$patch[description].'</td>';
 			if($do != "browse") {
 				echo '<td align="center"><a href="?do=get_patch&pid='.$patch[pid].'">Show</a><br/><br/><a href="?do=testpatch&pid='.$patch[pid].'">Test</a></td>';
