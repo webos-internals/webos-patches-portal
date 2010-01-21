@@ -568,7 +568,7 @@ function HandleForm($pid) {
 											changelog = '".mysql_real_escape_string($changelog2)."',
 											".iif($updateform!=1, "lastupdated = '".time()."',", "")."
 											".iif($updateform==1, "lastupdated", "dateaccepted")." = '".time()."'
-									WHERE pid = '".iif($updateform==1, $update_pid, $pid)."'"); 
+									WHERE pid = '".iif($updateform==1, $update_pid, $pid)."'");  
 	foreach($new_versions as $key=>$version) {
 		$gitversions = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'gitversions'");
 		$gitversions_array = explode(',',$gitversions['value']);
@@ -597,9 +597,13 @@ function HandleForm($pid) {
 	$category2 = strtolower(str_replace(" ", "-", $patch['category']));
 	$patchname = $category2.'-'.$title2;
 	$versions = 'VERSIONS = '.$versions2;
+	file_put_contents('/tmp/'.$patchname.'.patch', $patch_file_contents);
 	foreach($webos_versions as $key => $webos_version) {
-		file_put_contents('../../git/modifications/v'.$webos_version.'/'.$category2.'/'.$patchname.'.patch', $patch_file_contents);
+		$new_patch_file = `cd ../../git/StockWebOS/v$webos_version/ ; /usr/bin/patch -p1 --no-backup-if-mismatch -i /tmp/$patchname.patch >> /dev/null 2>&1 ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff -b --cached`;
+		system('cd ../../git/StockWebOS/v'.$webos_version.'/ ; /usr/bin/git checkout -f HEAD ; /usr/bin/git clean -f -d -x');
+		file_put_contents('../../git/modifications/v'.$webos_version.'/'.$category2.'/'.$patchname.'.patch', $new_patch_file);
 	}
+	system('rm -f /tmp/'.$patchname.'.patch');
 
 	$ssout=NULL;
 	$sscount=0;
@@ -798,7 +802,7 @@ function TestPatch($pid) {
 	global $DB, $webos_versions_array;
 	$patch = $DB->query_first("SELECT patch_file,webos_versions FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
 	$versions = explode(' ', $patch['webos_versions']);
-	system('rm -f /tmp/tmp/patch');
+	system('rm -f /tmp/tmp.patch');
 	file_put_contents('/tmp/tmp.patch', $patch['patch_file']);
 	echo "<tr>
 			<td><hr/><b>WebOS-Versions Selected as Compatible:</b><br/><hr/></td>
