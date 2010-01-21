@@ -40,7 +40,7 @@ $categories = array(	"Select...",
 			"Other"
 		);
 
-$webos_versions_array = array("1.3.1","1.3.5");
+$webos_versions_array = array("1.3.1","1.3.5","1.4.0");
 
 $icon_array = array(	"App Catalog"		=>"http://www.webos-internals.org/images/0/03/Icon_WebOSInternals_Patches_Findapps.png",
 			"App Launcher"		=>"http://www.webos-internals.org/images/b/b1/Icon_WebOSInternals_Patches_Applauncher.png",

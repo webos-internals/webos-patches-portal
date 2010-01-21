@@ -107,7 +107,22 @@ function BrowsePatches($webosver, $category, $order, $desc) {
 			$dir = 'ASC';
 			$imageurl = "onmouseover=\"if(document.getElementById('orderimage')){ document.getElementById('orderimage').src='./images/s_desc.png'; }\" onmouseout=\"if(document.getElementById('orderimage')){ document.getElementById('orderimage').src='./images/s_asc.png'; }\"";
 		}
+		if($webosver == 'all') {
+			$webosver_query = '';
+		} else {
+			$webosver_query = $webosver;
+		}
+		if($category == 'all') {
+			$category_query = '';
+		} else {
+			$category_query = " AND category = '".$category."'";
+		}
+		$getpatches = $DB->query("SELECT * FROM ".TABLE_PREFIX."patches WHERE status = '1' AND versions LIKE '%".$webosver_query."%'".$category_query." ORDER BY ".$order." ".$dir.", title ASC");
+		$numpatches = $DB->get_num_rows($getpatches);
 		echo '<tr>
+				<td colspan="11" class="header2" align="center">Displaying <b>'.$numpatches.'</b> Patches</td>
+			</tr>
+			<tr>
 				<td width="64px">&nbsp;</td>
 				<td width="175px" align="center"><b><a href="?do=browse&webosver='.$webosver.'&category='.$category.'&order=title';
 		if($order=="title" && $desc!="1") {
@@ -160,17 +175,6 @@ function BrowsePatches($webosver, $category, $order, $desc) {
 		}
 		echo '" '.iif($order=="lastupdated", $imageurl, "").'>Updated</a> '.iif($order=="lastupdated", $image, "").'</b></td>
 		  	</tr>';			
-		if($webosver == 'all') {
-			$webosver_query = '';
-		} else {
-			$webosver_query = $webosver;
-		}
-		if($category == 'all') {
-			$category_query = '';
-		} else {
-			$category_query = " AND category = '".$category."'";
-		}
-		$getpatches = $DB->query("SELECT * FROM ".TABLE_PREFIX."patches WHERE status = '1' AND versions LIKE '%".$webosver_query."%'".$category_query." ORDER BY ".$order." ".$dir.", title ASC");
 		while($patch = $DB->fetch_array($getpatches)) {
 			$maintainer_array = explode(',', $patch['maintainer']);
 			$num_maintainers = count($maintainer_array);
@@ -541,7 +545,7 @@ function SpamWait() {
 
 function MainFooter() {
 	echo '	  <tr>
-		<td colspan="11" align="center" class="copyright">&copy; 2009 - 2010 Daniel Beames (dBsooner) and webOS-Internals Group</center></td>
+		<td colspan="11" align="center" class="copyright">&copy; 2009 - 2010 Daniel Beames (dBsooner) and webOS-Internals Group<br/><a href="http://donate.dbsooner.com/">Donations greatly appreciated!</a></center></td>
 	  </tr>
 	  </table>
 	  </body>

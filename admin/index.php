@@ -71,9 +71,9 @@ echo ' | '.iif($do=="browse", "Browse Patches", '<a href="?do=browse">Browse Pat
 
 function BrowsePatches($do, $webosver, $category, $order, $desc) {
 	global $DB, $webos_versions_array, $categories;
-	echo '<tr>
-			<td colspan="12" class="header2" align="center">';
 	if($do == "browse") {
+		echo '<tr>
+				<td colspan="12" class="header2" align="center">';
 		foreach($webos_versions_array as $key=>$webos_version) {
 			$count = $DB->query_first("SELECT count(pid) as num FROM ".TABLE_PREFIX."patches WHERE versions LIKE '%".$webos_version."%'");
 			if($count['num'] > '0') {
@@ -151,7 +151,32 @@ function BrowsePatches($do, $webosver, $category, $order, $desc) {
 			$dir = 'ASC';
 			$imageurl = "onmouseover=\"if(document.getElementById('orderimage')){ document.getElementById('orderimage').src='../images/s_desc.png'; }\" onmouseout=\"if(document.getElementById('orderimage')){ document.getElementById('orderimage').src='../images/s_asc.png'; }\"";
 		}
+		switch($do) {
+			case "browse":
+				if($webosver == 'all') {
+					$webosver_query = '';
+				} else {
+					$webosver_query = $webosver;
+				}
+				if($category == 'all') {
+					$category_query = '';
+				} else {
+					$category_query = " AND category = '".$category."'";
+				}
+				$getpatches = $DB->query("SELECT * FROM ".TABLE_PREFIX."patches WHERE status = '1' AND versions LIKE '%".$webosver_query."%'".$category_query." ORDER BY ".$order." ".$dir.", title ASC");
+				break;
+			case "updates":
+				$getpatches = $DB->query("SELECT * FROM ".TABLE_PREFIX."patches WHERE status = '0' AND update_pid IS NOT NULL ORDER BY ".$order." ".$dir.", title ASC");
+				break;
+			case "new":
+				$getpatches = $DB->query("SELECT * FROM ".TABLE_PREFIX."patches WHERE status = '0' AND update_pid IS NULL ORDER BY ".$order." ".$dir.", title ASC");
+				break;
+		}
+		$numpatches = $DB->get_num_rows($getpatches);
 		echo '<tr>
+				<td colspan="12" align="center" class="header2">Displaying '.$numpatches.' Patches</td>
+			</tr>
+			<tr>
 				<td width="64px">&nbsp;</td>
 				<td width="175px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order=title';
 		if($order=="title" && $desc!="1") {
@@ -211,27 +236,6 @@ function BrowsePatches($do, $webosver, $category, $order, $desc) {
 		}
 		echo '" '.iif($dateorder2=="1", $imageurl, "").'>'.iif($dateorder=="lastupdated", "Updated", "Submitted").'</a> '.iif($dateorder2=="1", $image, "").'</b></td>
 		  	</tr>';
-		switch($do) {
-			case "browse":
-				if($webosver == 'all') {
-					$webosver_query = '';
-				} else {
-					$webosver_query = $webosver;
-				}
-				if($category == 'all') {
-					$category_query = '';
-				} else {
-					$category_query = " AND category = '".$category."'";
-				}
-				$getpatches = $DB->query("SELECT * FROM ".TABLE_PREFIX."patches WHERE status = '1' AND versions LIKE '%".$webosver_query."%'".$category_query." ORDER BY ".$order." ".$dir.", title ASC");
-				break;
-			case "updates":
-				$getpatches = $DB->query("SELECT * FROM ".TABLE_PREFIX."patches WHERE status = '0' AND update_pid IS NOT NULL ORDER BY ".$order." ".$dir.", title ASC");
-				break;
-			case "new":
-				$getpatches = $DB->query("SELECT * FROM ".TABLE_PREFIX."patches WHERE status = '0' AND update_pid IS NULL ORDER BY ".$order." ".$dir.", title ASC");
-				break;
-		}
 		while($patch = $DB->fetch_array($getpatches)) {
 			$maintainer_array = explode(',', $patch['maintainer']);
 			$num_maintainers = count($maintainer_array);
@@ -484,7 +488,7 @@ function HandleForm($pid) {
 	} else {
 		$screenshot2 = NULL;
 	}
-	if($screenshot1 == "1") {
+	if($screenshot3 == "1") {
 		$screenshot3 = UploadImage($pid, "3", $title);
 	} else {
 		$screenshot3 = NULL;
@@ -533,9 +537,9 @@ function HandleForm($pid) {
 	sort($keep_versions);
 	$versions2 = implode(' ', $keep_versions);
 	
-	$get_patch_file = $DB->query_first("SELECT patch_file FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
+	$get_patch_file = $DB->query_first("SELECT patch_file,update_pid FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
 	$patch_file_contents = $get_patch_file['patch_file'];
-	
+
 	// GOING TO NEED TO UPDATE 'UPDATE_PID' AND DELETE PID(?)
 	
 	$DB->query("UPDATE ".TABLE_PREFIX."patches SET title = '".mysql_real_escape_string($title)."',
@@ -551,7 +555,7 @@ function HandleForm($pid) {
 											screenshot_3_type = NULL,
 											screenshot_1 = '$screenshot1',
 											screenshot_2 = '$screenshot2',
-											screenshot_3 = '$screenshot3',
+											screenshot_2 = '$screenshot2',
 											icon = '$icon',
 											webos_versions = NULL,
 											maintainer = '".mysql_real_escape_string($maintainer)."',
@@ -574,6 +578,10 @@ function HandleForm($pid) {
 		$gitversions_out = implode(',', $gitversions_array);
 		$DB->query("UPDATE ".TABLE_PREFIX."settings SET value = '".$gitversions_out."' WHERE setting = 'gitversions'");
 	}
+
+	//Send Email - Need to send this here because SendEmail relies on the database entry.
+	//             The db entry of an updated patch is deleted in next if statement.
+	SendEmail("approved", $pid);
 
 	if($updateform == '1') {
 		$DB->query("DELETE FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."' LIMIT 1");
@@ -650,9 +658,6 @@ HOMEPAGE =$homepage2";
 		mkdir($dir);
 	}
 	file_put_contents('../../git/build/autopatch/'.$patchname.'/Makefile', $makefile_content);
-
-	//Send Email
-	SendEmail("accepted", $pid);
 
 	//Let the user know the outcome
 	 return '
@@ -745,18 +750,6 @@ function GitExec($cmd) {
 				}
 				$loop++;
 			}
-			$count=0;
-			foreach($gitversions_main as $key=>$value) {
-				if(strlen($value)>=1) {
-					if($count==0) {
-						$gitversions_return = $key.'-'.$value;
-					} else {
-						$gitversions_return = ','.$key.'-'.$value;
-					}
-					$count++;
-				}
-			}
-			$DB->query("UPDATE ".TABLE_PREFIX."settings SET value = '".$gitversions_return."' WHERE setting = 'gitversions'");
 			break;
 		case 'tag':
 			$loop=0;
@@ -774,6 +767,18 @@ function GitExec($cmd) {
 				}
 				$loop++;
 			}
+			$count=0;
+			foreach($gitversions_main as $key=>$value) {
+				if(strlen($value)>=1) {
+					if($count==0) {
+						$gitversions_return = $key.'-'.$value;
+					} else {
+						$gitversions_return = ','.$key.'-'.$value;
+					}
+					$count++;
+				}
+			}
+			$DB->query("UPDATE ".TABLE_PREFIX."settings SET value = '".$gitversions_return."' WHERE setting = 'gitversions'");
 			break;
 		case 'push_build':
 			$output = '<b>Preware/build.git:</b><pre>';
@@ -795,6 +800,9 @@ function TestPatch($pid) {
 	$versions = explode(' ', $patch['webos_versions']);
 	system('rm -f /tmp/tmp/patch');
 	file_put_contents('/tmp/tmp.patch', $patch['patch_file']);
+	echo "<tr>
+			<td><hr/><b>WebOS-Versions Selected as Compatible:</b><br/><hr/></td>
+		</tr>";
 	foreach($versions as $key=>$version) {
 		if(in_array($version, $webos_versions_array)) {
 			echo "<tr>
@@ -803,6 +811,25 @@ function TestPatch($pid) {
 			echo "</pre></td>
 				</tr>";
 		}
+	}
+	echo "<tr>
+			<td><hr/><b>WebOS-Versions NOT Selected as Compatible:</b><br/><hr/></td>
+		</tr>";
+	$not_selected=0;
+	foreach($webos_versions_array as $key=>$version) {
+		if(!in_array($version, $versions)) {
+			echo "<tr>
+					<td>Testing ".$version.":<br/><pre>/usr/bin/patch -p1 --dry-run -d ../../git/StockWebOS/v".$version."/ < /tmp/tmp.patch 2<&1\n";
+			echo `/usr/bin/patch -p1 --dry-run -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1`;
+			echo "</pre></td>
+				</tr>";
+			$not_selected++;
+		}
+	}
+	if($not_selected=="0") {
+		echo "<tr>
+				<td>None. All WebOS-Versions were selected as compatible.</td>
+			</tr>";
 	}
 	system('rm -f /tmp/tmp.patch');
 }
