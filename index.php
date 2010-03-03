@@ -194,6 +194,16 @@ function BrowsePatches($webosver, $category, $order, $desc) {
 			}
 			$maintainer_array = array();
 			$num_maintainers = 0;
+			$versions_out = NULL;
+			$ver_count = 0;
+			$get_webos_versions = explode(' ', $patch['versions']);
+			foreach($get_webos_versions as $key=>$value) {
+				if(!in_array(array_shift(explode('-',$value,2)), $webos_versions_hide_array)) {
+					$versions_out .= $value.iif($ver_count==0, '', ' ');
+					$ver_count++;
+				}
+			}
+			$get_webos_versions = array();
 			echo '<tr>
 				<td><img src="'.$patch[icon].'"></img></td>
 				<td>'.$patch[title].'</td>
@@ -204,7 +214,7 @@ function BrowsePatches($webosver, $category, $order, $desc) {
 				<td align="center">'.iif(strlen($patch[screenshot_3])>=1, "<a href=\"".$patch[screenshot_3]."\" target=\"SS_OUT\">Show</a>", "&nbsp;").'</td>
 				<td align="center">'.$maintainer_out.'</td>
 				<td align="center">'.iif(strlen($patch[homepage])>=1, "<a href=\"".$patch[homepage]."\" target=\"homepage\">Link</a>", "&nbsp;").'</td>
-				<td align="center">'.str_replace(" ", "<br/>", $patch[versions]).iif(strlen($patch[changelog])>=1, "<br/><br/><a href=\"?do=get_changelog&pid=".$patch[pid]."\" target=\"changelog\">Changelog</a>", "").'</td>
+				<td align="center">'.str_replace(" ", "<br/>", $versions_out).iif(strlen($patch[changelog])>=1, "<br/><br/><a href=\"?do=get_changelog&pid=".$patch[pid]."\" target=\"changelog\">Changelog</a>", "").'</td>
 				<td align="center">'.gmdate("D, d M Y H:i:s \U\T\C", $patch[lastupdated]).'</td>
 			</tr>';
 			$maintainer_out = NULL;
