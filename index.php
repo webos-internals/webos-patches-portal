@@ -249,9 +249,9 @@ function BuildForm($errors, $pid) {
 	}
 	echo '		<tr>
 			<td width="15%" class="'.iif($errors, "cell11", "cell3").'" valign="top">Title: (*)</td>
-			<td width="85%" class="'.iif($errors, "cell12", "cell4").'"><input type="text" class="uploadpatch" name="title" value="'.FormatForForm($patch[title]).'" size="50" maxlength="40"'.iif(strlen($pid)>=1, "disabled><input type=\"hidden\" name=\"title\" value=\"".$patch[title]."\">", ">").'<br/>
+			<td width="85%" class="'.iif($errors, "cell12", "cell4").'"><input type="text" class="uploadpatch" name="title" value="'.FormatForForm($patch[title]).'" size="50" maxlength="45"'.iif(strlen($pid)>=1, "disabled><input type=\"hidden\" name=\"title\" value=\"".$patch[title]."\">", ">").'<br/>
 			<b>Note:</b> Do not use category name, personalizations (your name, username,<br/>
-			company name, tagline, etc), webOS Version. Be short and sweet. Limit 40<br/>
+			company name, tagline, etc), webOS Version. Be short and sweet. Limit 45<br/>
 			characters. Numbers, Letters, apostrophes or spaces only.</td>
 		</tr>
 		<tr>

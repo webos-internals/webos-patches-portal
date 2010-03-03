@@ -915,7 +915,7 @@ function TestPatch($pid) {
 				echo "\ncd ../../git/StockWebOS/v".$version."/ ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached\n";
 				$new_patch_file = `cd ../../git/StockWebOS/v$version/ ; /usr/bin/patch -p1 --no-backup-if-mismatch -i /tmp/$tmp.patch >> /dev/null 2>&1 ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached`;
 				file_put_contents('/tmp/tmp-new.patch', $new_patch_file);
-				echo "\nPatch file regenerated. Testing -R...\n\n/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ -i /tmp/tmp-new.patch 2<&1\n\n";
+				echo "\nPatch file regenerated. Testing -R...\n\n/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ -i /tmp/tmp-new.patch 2<&1\n";
 				exec("/usr/bin/patch -p1 -R --dry-run --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ -i /tmp/tmp-new.patch 2<&1", $rdata2 = array(), $rval2);
 				echo `/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../git/StockWebOS/v$version/ -i /tmp/tmp-new.patch 2<&1`;
 				if($rval2 == "0") {
@@ -938,17 +938,17 @@ function TestPatch($pid) {
 	foreach($webos_versions_array as $key=>$version) {
 		if(!in_array($version, $versions)) {
 			echo "<tr>
-					<td>Testing ".$version.":<br/><pre>/usr/bin/patch -p1 --dry-run -d ../../git/StockWebOS/v".$version."/ < /tmp/tmp.patch 2<&1\n";
+					<td>Testing ".$version.":<br/><pre>/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../git/StockWebOS/v".$version."/ < /tmp/tmp.patch 2<&1\n";
 			ob_flush();
 			exec("/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1", $rdata = array(), $rval);
 			echo `/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1`;
 			if($rval == "0") {
-				echo "\nPatch applies successfully. Now applying patch to test regeneration and -R:\n\n/usr/bin/patch -p1 --no-backuo-if-mismatch -d ../../git/StockWebOS/v".$version."/ < /tmp/tmp.patch 2<&1\n";
+				echo "\nPatch applies successfully. Now applying patch to test regeneration and -R:\n\n/usr/bin/patch -p1 --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ < /tmp/tmp.patch 2<&1\n";
 				echo `/usr/bin/patch -p1 --no-backup-if-mismatch -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1`;
 				echo "\ncd ../../git/StockWebOS/v".$version."/ ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached\n";
 				$new_patch_file = `cd ../../git/StockWebOS/v$version/ ; /usr/bin/patch -p1 --no-backup-if-mismatch -i /tmp/$tmp.patch >> /dev/null 2>&1 ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached`;
 				file_put_contents('/tmp/tmp-new.patch', $new_patch_file);
-				echo "\nPatch file regenerated. Testing -R...\n\n/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ -i /tmp/tmp-new.patch 2<&1\n\n";
+				echo "\nPatch file regenerated. Testing -R...\n\n/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ -i /tmp/tmp-new.patch 2<&1\n";
 				exec("/usr/bin/patch -p1 -R --dry-run --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ -i /tmp/tmp-new.patch 2<&1", $rdata2 = array(), $rval2);
 				echo `/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../git/StockWebOS/v$version/ -i /tmp/tmp-new.patch 2<&1`;
 				if($rval2 == "0") {
@@ -961,6 +961,7 @@ function TestPatch($pid) {
 			echo "</pre></td>
 				</tr>";
 			$not_selected++;
+			ob_flush();
 		}
 	}
 	if($not_selected=="0") {
