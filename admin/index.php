@@ -37,12 +37,19 @@ $_GET    = PreClean($_GET);
 $_COOKIE = PreClean($_COOKIE);
 
 // ############################ MAIN OUTPUT #################################
-function MainHeader() {
+function MainHeader($do, $switch) {
 	global $DB;
-	$do = $_GET['do'];
 	$new_count = $DB->query_first("SELECT COUNT(pid) AS num_new FROM ".TABLE_PREFIX."patches WHERE status = '0' AND update_pid IS NULL");
 	$update_count = $DB->query_first("SELECT COUNT(pid) AS num_update FROM ".TABLE_PREFIX."patches WHERE status = '0' AND update_pid IS NOT NULL");
-echo '<html>
+	switch($switch) {
+		case '1':
+			$new_count['num_new'] = ($new_count['num_new']-1);
+			break;
+		case '2':
+			$update_count['num_update'] = ($update_count['num_update']-1);
+			break;
+	}
+	echo '<html>
 	  <head>
 	  <title>dBsooner\'s webOS-Patches Admin Area</title>
 	  <link rel="stylesheet" href="http://webos-patches.dbsooner.com/styles.css" />
@@ -65,7 +72,7 @@ echo '<html>
 	} else {
 		echo ' | Update Submissions ('.$update_count[num_update].')';
 	}
-echo ' | '.iif($do=="browse", "Browse Patches", '<a href="?do=browse">Browse Patches</a>').' | <a href="?do=git&cmd=status">Git Status</a> | <a href="?do=git&cmd=add">Add All</a> | <a href="?do=git&cmd=commit">Commit All</a> | <a href="?do=git&cmd=push_mods">Push Mods</a> | <a href="?do=git&cmd=tag">Tag Mods</a> | <a href="?do=git&cmd=push_build">Push Build</a></td>
+echo ' | '.iif($do=="browse", "Browse Patches", '<a href="?do=browse">Browse Patches</a>').' | <a href="?do=git&cmd=pull">Git Pull</a> | <a href="?do=git&cmd=status">Git Status</a> | <a href="?do=git&cmd=add">Add All</a> | <a href="?do=git&cmd=commit">Commit All</a> | <a href="?do=git&cmd=push_mods">Push Mods</a> | <a href="?do=git&cmd=tag">Tag Mods</a> | <a href="?do=git&cmd=push_build">Push Build</a></td>
 	  </tr>';
 }
 
@@ -321,10 +328,10 @@ function BuildForm($errors, $pid) {
 	}
 	echo '		<tr>
 			<td width="15%" class="'.iif($errors, "cell11", "cell3").'" valign="top">Title: (*)</td>
-			<td width="85%" class="'.iif($errors, "cell12", "cell4").'"><input type="text" class="uploadpatch" name="title" value="'.FormatForForm($patch[title]).'" size="50" maxlength="40"'.
+			<td width="85%" class="'.iif($errors, "cell12", "cell4").'"><input type="text" class="uploadpatch" name="title" value="'.FormatForForm($patch[title]).'" size="50" maxlength="45"'.
 			iif($updateform==1, ' DISABLED><input type="hidden" name="title" value="'.$patch[title].'"><br/><b>Original:</b> '.$original[title], '>').'<br/>
 			<b>Note:</b> Do not use category name, personalizations (your name, username,<br/>
-			company name, tagline, etc), webOS Version. Be short and sweet. Limit 40<br/>
+			company name, tagline, etc), webOS Version. Be short and sweet. Limit 45<br/>
 			characters. Numbers, Letters, apostrophes or spaces only.</td>
 		</tr>
 		<tr>
@@ -431,11 +438,11 @@ function HandleForm($pid) {
 	foreach($_POST as $key => $value) {
 		$$key = $value;
 	}
-	
+	$errors = NULL;
 	if(strlen($title) < '1') {
 		$errors[] = 'You must enter a title.';
 	} else {
-		if(preg_replace('/^[0-9A-Za-z- ]*$/', '', $title) != "") {
+		if((preg_replace('/^[0-9A-Za-z-\/ ]*$/', '', $title) != "") && (!$update_pid)) {
 			$errors[] = 'Title can only contain letters, numbers and -\'s.';
 		}
 	}
@@ -466,11 +473,15 @@ function HandleForm($pid) {
 	}
 
 	if($errors) {
-		MainHeader();
+		MainHeader($_GET['do'],'');
 		BuildForm($errors, $_POST['pid']);
 		return;
 	}
-
+	
+	MainHeader($_GET['do'], iif(strlen($update_pid)>="1", "2", "1"));
+	echo '<tr>
+			<td colspan="2">';
+	ob_flush();
 	if($update_pid) {
 		$updateform = '1';
 		$original = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$update_pid."'");
@@ -479,19 +490,43 @@ function HandleForm($pid) {
 	$icon = $icon_array[$category];
 
 	if($screenshot1 == "1") {
+		echo 'Screenshot 1: ... Please Wait ... ';
+		ob_flush();
 		$screenshot1 = UploadImage($pid, "1", $title);
+		echo '<b>Uploaded!</b><br/>';
+		ob_flush();
 	} else {
-		$screenshot1 = NULL;
+		if($update_pid) {
+			$screenshot1 = $original['screenshot_1'];
+		} else {
+			$screenshot1 = NULL;
+		}
 	}
 	if($screenshot2 == "1") {
+		echo 'Screenshot 2: ... Please Wait ... ';
+		ob_flush();
 		$screenshot2 = UploadImage($pid, "2", $title);
+		echo '<b>Uploaded!</b><br/>';
+		ob_flush();
 	} else {
-		$screenshot2 = NULL;
+		if($update_pid) {
+			$screenshot2 = $original['screenshot_2'];
+		} else {
+			$screenshot2 = NULL;
+		}
 	}
 	if($screenshot3 == "1") {
+		echo 'Screenshot 3: ... Please Wait ... ';
+		ob_flush();
 		$screenshot3 = UploadImage($pid, "3", $title);
+		echo '<b>Uploaded!</b><br/>';
+		ob_flush();
 	} else {
-		$screenshot3 = NULL;
+		if($update_pid) {
+			$screenshot3 = $original['screenshot_3'];
+		} else {
+			$screenshot3 = NULL;
+		}
 	}
 	$description2 = mynl2br($description);
 	$description2 = stripslashes(str_replace('"', "'", $description2));
@@ -583,6 +618,9 @@ function HandleForm($pid) {
 	//             The db entry of an updated patch is deleted in next if statement.
 	SendEmail("approved", $pid);
 
+	echo 'Email: <b>Sent!</b><br/>';
+	ob_flush();
+	
 	if($updateform == '1') {
 		$DB->query("DELETE FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."' LIMIT 1");
 		$pid = $update_pid;
@@ -596,12 +634,21 @@ function HandleForm($pid) {
 	$title2 = str_replace("\\", "-", $title2);
 	$category2 = strtolower(str_replace(" ", "-", $patch['category']));
 	$patchname = $category2.'-'.$title2;
+	$DB->query("UPDATE ".TABLE_PREFIX."patches SET app_id = '".$patchname."' WHERE pid = '".$pid."'");
 	$versions = 'VERSIONS = '.$versions2;
 	file_put_contents('/tmp/'.$patchname.'.patch', $patch_file_contents);
 	foreach($webos_versions as $key => $webos_version) {
-		$new_patch_file = `cd ../../git/StockWebOS/v$webos_version/ ; /usr/bin/patch -p1 --no-backup-if-mismatch -i /tmp/$patchname.patch >> /dev/null 2>&1 ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff -b --cached`;
-		system('cd ../../git/StockWebOS/v'.$webos_version.'/ ; /usr/bin/git checkout -f HEAD ; /usr/bin/git clean -f -d -x');
+		echo 'v'.$webos_version.' patch file: ... Please Wait ... ';
+		ob_flush();
+		$new_patch_file = `cd ../../git/StockWebOS/v$webos_version/ ; /usr/bin/patch -p1 --no-backup-if-mismatch -i /tmp/$patchname.patch >> /dev/null 2>&1 ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached`;
+#		$new_patch_file = $patch_file_contents;
+		system('cd ../../git/StockWebOS/v'.$webos_version.'/ ; /usr/bin/git checkout -f HEAD >> /dev/null ; /usr/bin/git clean -f -d -x >> /dev/null');
+		if(!is_dir($dir = '../../git/modifications/v'.$webos_version.'/'.$category2.'/')) {
+			mkdir($dir);
+		}
 		file_put_contents('../../git/modifications/v'.$webos_version.'/'.$category2.'/'.$patchname.'.patch', $new_patch_file);
+		echo '<b>Regenerated!</b><br/>';
+		ob_flush();
 	}
 	system('rm -f /tmp/'.$patchname.'.patch');
 
@@ -619,9 +666,9 @@ function HandleForm($pid) {
 		$ssout .= iif(strlen($ssout)>=1, ",\\\n", "").'\"'.$screenshot3.'\"';
 		$sscount++;
 	}
-	if($sscount >= 2) {
+	if($sscount >= "2") {
 		$screenshots2 = "SCREENSHOTS = [\\\n".$ssout." ]";
-	} else if($sscount == '1') {
+	} else if($sscount == "1") {
 		$screenshots2 = "SCREENSHOTS = [ ".$ssout." ]";
 	} else {
 		$screenshots2 = "SCREENSHOTS =";
@@ -649,7 +696,7 @@ CATEGORY = $patch[category]
 $versions
 ICON = $icon
 $screenshots2
-META_SUB_VERSION = 1
+META_SUB_VERSION = $patch[meta_sub_version]
 
 include ../common.mk
 ".iif(strlen($patch[depends])>=1, "DEPENDS := \${DEPENDS}, $patch[depends]", "")."
@@ -662,16 +709,15 @@ HOMEPAGE =$homepage2";
 		mkdir($dir);
 	}
 	file_put_contents('../../git/build/autopatch/'.$patchname.'/Makefile', $makefile_content);
+	echo 'Makefile: <b>Generated!</b><br/>';
+	ob_flush();
 
 	//Let the user know the outcome
-	 return '
-			<tr>
-				<td colspan="2" align="center" class="header">Patch Accepted!</td>
-			</tr>
-			<tr>
-				<td colspan="2" class="header2" align="center">The patch has been accepted! Thank you!</td>
-			</tr>
-			</table>';
+	echo '</td>
+		</tr>
+		<tr>
+			<td colspan="2" align="center">The patch has been accepted! Thank you!</td>
+		</tr>';
 }
 
 function GitExec($cmd) {
@@ -681,93 +727,136 @@ function GitExec($cmd) {
 	foreach($gitversions as $key=>$gitversion) {
 		$gitversions_main[array_shift(explode('-',$gitversion,2))] = substr(strstr($gitversion, '-'), 1);
 	}
+	echo '<tr>
+			<td>';
+	ob_flush();
 	switch($cmd) {
-		case 'status':
-			$output = '<b>Preware/build.git:</b><br/><pre>';
-			$output .= "cd ../../git/build/ ; /usr/bin/git status 2>&1\n";
-			$output .= `cd ../../git/build/ ; /usr/bin/git status 2>&1`;
-			$output .= '</pre>';
+		case 'pull':
+			echo '<b>Preware/build.git:</b><br/><pre>';
+			echo "cd ../../git/build/ ; /usr/bin/git pull 2>&1\n";
+			ob_flush();
+			echo `cd ../../git/build/ ; /usr/bin/git pull 2>&1`;
+			echo '</pre>';
+			ob_flush();
 			foreach($webos_versions_array as $key=>$version) {
-				$output .= '<hr><b>modifications.git/webos-'.$version.':</b><pre>';
-				$output .= "cd ../../git/modifications/v$version ; /usr/bin/git status 2>&1\n";
-				$output .= `cd ../../git/modifications/v$version ; /usr/bin/git status 2>&1`;
-				$output .= '</pre>';
+				echo '<hr><b>modifications.git/webos-'.$version.':</b><pre>';
+				echo "cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1\n";
+				ob_flush();
+				echo `cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1`;
+				echo '</pre>';
+				ob_flush();
+			}
+			break;			
+		case 'status':
+			echo '<b>Preware/build.git:</b><br/><pre>';
+			echo "cd ../../git/build/ ; /usr/bin/git status 2>&1\n";
+			ob_flush();
+			echo `cd ../../git/build/ ; /usr/bin/git status 2>&1`;
+			echo '</pre>';
+			ob_flush();
+			foreach($webos_versions_array as $key=>$version) {
+				echo '<hr><b>modifications.git/webos-'.$version.':</b><pre>';
+				echo "cd ../../git/modifications/v$version ; /usr/bin/git status 2>&1\n";
+				ob_flush();
+				echo `cd ../../git/modifications/v$version ; /usr/bin/git status 2>&1`;
+				echo '</pre>';
+				ob_flush();
 			}
 			break;
 		case 'add':
-			$output = '<b>Preware/build.git:</b><pre>';
-			$output .= "cd ../../git/build/autopatch ; /usr/bin/git add . 2>&1\n";
-			$output .= `cd ../../git/build/autopatch ; /usr/bin/git add . 2>&1`;
-			$output .= "</pre>";
+			echo '<b>Preware/build.git:</b><pre>';
+			echo "cd ../../git/build/autopatch ; /usr/bin/git add . 2>&1\n";
+			ob_flush();
+			echo `cd ../../git/build/autopatch ; /usr/bin/git add . 2>&1`;
+			echo "</pre>";
+			ob_flush();
 			foreach($webos_versions_array as $key=>$version) {
-				$output .= '<hr><b>modifications.git/webos-'.$version.':</b>';
+				echo '<hr><b>modifications.git/webos-'.$version.':</b>';
 				if(!$gitversions_main[$version]) {
-					$output .= ' No Add Necessary.';
+					echo ' No Add Necessary.';
+					ob_flush();
 				} else {
-					$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git all . 2>&1\n";
-					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git add . 2>&1`;
-					$output .= "</pre>";
+					echo "<pre>cd ../../git/modifications/v$version ; /usr/bin/git all . 2>&1\n";
+					ob_flush();
+					echo `cd ../../git/modifications/v$version ; /usr/bin/git add . 2>&1`;
+					echo "</pre>";
+					ob_flush();
 				}
 			}
 			break;
 		case 'commit':
 			if($_POST['submitaction'] == '1') {
-				$output = '<b>Preware/build.git:</b> ';
-				$output .= "<pre>cd ../../git/build/autopatch ; /usr/bin/git commit -m \"".$_POST['commit_message']."\" 2>&1\n";
-				$output .= `cd ../../git/build/autopatch ; /usr/bin/git commit -m "$_POST[commit_message]" 2>&1`;
-				$output .= "</pre>";
+				echo '<b>Preware/build.git:</b> ';
+				echo "<pre>cd ../../git/build/autopatch ; /usr/bin/git commit -m \"".$_POST['commit_message']."\" 2>&1\n";
+				ob_flush();
+				echo `cd ../../git/build/autopatch ; /usr/bin/git commit -m "$_POST[commit_message]" 2>&1`;
+				echo "</pre>";
+				ob_flush();
 				foreach($webos_versions_array as $key=>$version) {
-					$output .= '<hr><b>modifications.git/webos-'.$version.':</b>';
+					echo '<hr><b>modifications.git/webos-'.$version.':</b>';
 					if(!$gitversions_main[$version]) {
-						$output .= ' No Commit Necessary.';
+						echo ' No Commit Necessary.';
+						ob_flush();
 					} else {
-						$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git commit -m \"$_POST[commit_message]\" 2>&1\n";
-						$output .= `cd ../../git/modifications/v$version ; /usr/bin/git commit -m "$_POST[commit_message]" 2>&1`;
-						$output .= "</pre>";
+						echo "<pre>cd ../../git/modifications/v$version ; /usr/bin/git commit -m \"$_POST[commit_message]\" 2>&1\n";
+						ob_flush();
+						echo `cd ../../git/modifications/v$version ; /usr/bin/git commit -m "$_POST[commit_message]" 2>&1`;
+						echo "</pre>";
+						ob_flush();
 					}
 				}
 			} else {
-				echo '<form method="post" name="commitform" action="?do=git&cmd=commit">
-					<tr>
-						<td width="20%">Commit Message:</td>
+				echo '<form method="post" name="commitform" action="?do=git&cmd=commit">Commit Message:</td>
 						<td width="80%"><input type="text" name="commit_message" size="50" maxlength="512"></td>
 					</tr>
 					<tr>
-						<td colspan="2"><input type="hidden" name="submitaction" value="1"><input type="submit" value="Commit"></td>
-					</tr>';
+						<td colspan="2"><input type="hidden" name="submitaction" value="1"><input type="submit" value="Commit"></form>';
+				ob_flush();
 			}
 			break;
 		case 'push_mods':
 			$loop=0;
-			$output= NULL;
 			foreach($webos_versions_array as $key=>$version) {
-				$output .= iif($loop==0, '', '<hr>').'<b>modifications.git/webos-'.$version.':</b>';
+				echo iif($loop==0, '', '<hr>').'<b>modifications.git/webos-'.$version.':</b>';
 				if(!$gitversions_main[$version]) {
-					$output .= ' No Push Necessary.';
+					echo ' No Push Necessary.';
+					ob_flush();
 				} else {
-					$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1\n";
-					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1`;
-					$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git push 2>&1\n";
-					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git push 2>&1`;
-					$output .= "</pre>";
-					unset($gitversions_main[$version]);
+					echo "<pre>cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1\n";
+					ob_flush();
+					echo `cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1`;
+					ob_flush();
+					echo "<pre>cd ../../git/modifications/v$version ; /usr/bin/git push 2>&1\n";
+					ob_flush();
+					echo `cd ../../git/modifications/v$version ; /usr/bin/git push 2>&1`;
+					echo "</pre>";
+					ob_flush();
 				}
 				$loop++;
 			}
 			break;
 		case 'tag':
 			$loop=0;
-			$output=NULL;
 			foreach($webos_versions_array as $key=>$version) {
-				$output .= iif($loop==0, '', '<hr>').'<b>modifications.git/webos-'.$version.':</b>';
+				echo iif($loop==0, '', '<hr>').'<b>modifications.git/webos-'.$version.':</b>';
 				if(!$gitversions_main[$version]) {
-					$output .= ' No Tag Necessary.';
+					echo ' No Tag Necessary.';
+					ob_flush();
 				} else {
-					$output .= "<pre>cd ../../git/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version] 2>&1\n";
-					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version] 2>&1`;
-					$output .= "\ncd ../../git/modifications/v$version ; /usr/bin/git push --tags 2>&1\n";
-					$output .= `cd ../../git/modifications/v$version ; /usr/bin/git push --tags 2>&1`;
-					$output .= '</pre>';
+					echo "<pre>cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1\n";
+					ob_flush();
+					echo `cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1`;
+					ob_flush();
+					echo "cd ../../git/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version] 2>&1\n";
+					ob_flush();
+					echo `cd ../../git/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version] 2>&1`;
+					ob_flush();
+					echo "\ncd ../../git/modifications/v$version ; /usr/bin/git push --tags 2>&1\n";
+					ob_flush();
+					echo `cd ../../git/modifications/v$version ; /usr/bin/git push --tags 2>&1`;
+					echo '</pre>';
+					unset($gitversions_main[$version]);
+					ob_flush();
 				}
 				$loop++;
 			}
@@ -785,17 +874,21 @@ function GitExec($cmd) {
 			$DB->query("UPDATE ".TABLE_PREFIX."settings SET value = '".$gitversions_return."' WHERE setting = 'gitversions'");
 			break;
 		case 'push_build':
-			$output = '<b>Preware/build.git:</b><pre>';
-			$output .= "cd ../../git/build/autopatch ; /usr/bin/git pull 2>&1\n";
-			$output .= `cd ../../git/build/autopatch ; /usr/bin/git pull 2>&1`;
-			$output .= "cd ../../git/build/autopatch ; /usr/bin/git push 2>&1\n";
-			$output .= `cd ../../git/build/autopatch ; /usr/bin/git push 2>&1`;
-			$output .= '</pre>';
+			echo '<b>Preware/build.git:</b><pre>';
+			echo "cd ../../git/build/autopatch ; /usr/bin/git pull 2>&1\n";
+			ob_flush();
+			echo `cd ../../git/build/autopatch ; /usr/bin/git pull 2>&1`;
+			ob_flush();
+			echo "cd ../../git/build/autopatch ; /usr/bin/git push 2>&1\n";
+			ob_flush();
+			echo `cd ../../git/build/autopatch ; /usr/bin/git push 2>&1`;
+			echo '</pre>';
+			ob_flush();
 			break;
 	}
-	echo '<tr>
-			<td>'.$output.'</td>
+	echo '</td>
 		</tr>';
+	ob_flush();
 }
 
 function TestPatch($pid) {
@@ -803,28 +896,68 @@ function TestPatch($pid) {
 	$patch = $DB->query_first("SELECT patch_file,webos_versions FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
 	$versions = explode(' ', $patch['webos_versions']);
 	system('rm -f /tmp/tmp.patch');
+	system('rm -f /tmp/tmp-new.patch');
 	file_put_contents('/tmp/tmp.patch', $patch['patch_file']);
 	echo "<tr>
 			<td><hr/><b>WebOS-Versions Selected as Compatible:</b><br/><hr/></td>
 		</tr>";
+	ob_flush();
 	foreach($versions as $key=>$version) {
 		if(in_array($version, $webos_versions_array)) {
 			echo "<tr>
-					<td>Testing ".$version.":<br/><pre>/usr/bin/patch -p1 --dry-run -d ../../git/StockWebOS/v".$version."/ < /tmp/tmp.patch 2<&1\n";
-			echo `/usr/bin/patch -p1 --dry-run -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1`;
+					<td>Testing ".$version.":<br/><pre>/usr/bin/patch -p1 --dry-run --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ < /tmp/tmp.patch 2<&1\n";
+			ob_flush();
+			exec("/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1", $rdata = array(), $rval);
+			echo `/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1`;
+			if($rval == "0") {
+				echo "\nPatch applies successfully. Now applying patch to test regeneration and -R:\n\n/usr/bin/patch -p1 --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ < /tmp/tmp.patch 2<&1\n";
+				echo `/usr/bin/patch -p1 --no-backup-if-mismatch -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1`;
+				echo "\ncd ../../git/StockWebOS/v".$version."/ ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached\n";
+				$new_patch_file = `cd ../../git/StockWebOS/v$version/ ; /usr/bin/patch -p1 --no-backup-if-mismatch -i /tmp/$tmp.patch >> /dev/null 2>&1 ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached`;
+				file_put_contents('/tmp/tmp-new.patch', $new_patch_file);
+				echo "\nPatch file regenerated. Testing -R...\n\n/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ -i /tmp/tmp-new.patch 2<&1\n\n";
+				exec("/usr/bin/patch -p1 -R --dry-run --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ -i /tmp/tmp-new.patch 2<&1", $rdata2 = array(), $rval2);
+				echo `/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../git/StockWebOS/v$version/ -i /tmp/tmp-new.patch 2<&1`;
+				if($rval2 == "0") {
+					echo "\r\n-R completes successfully! Patch can be regenerated properly.";
+				} else {
+					echo "\r\n-R FAILS! Patch CAN NOT be regenerated properly!";
+				}
+			system('cd ../../git/StockWebOS/v'.$version.'/ ; /usr/bin/git checkout -f HEAD >> /dev/null ; /usr/bin/git clean -f -d -x >> /dev/null');
+			}				
 			echo "</pre></td>
 				</tr>";
+			ob_flush();
 		}
 	}
 	echo "<tr>
 			<td><hr/><b>WebOS-Versions NOT Selected as Compatible:</b><br/><hr/></td>
 		</tr>";
+	ob_flush();
 	$not_selected=0;
 	foreach($webos_versions_array as $key=>$version) {
 		if(!in_array($version, $versions)) {
 			echo "<tr>
 					<td>Testing ".$version.":<br/><pre>/usr/bin/patch -p1 --dry-run -d ../../git/StockWebOS/v".$version."/ < /tmp/tmp.patch 2<&1\n";
-			echo `/usr/bin/patch -p1 --dry-run -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1`;
+			ob_flush();
+			exec("/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1", $rdata = array(), $rval);
+			echo `/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1`;
+			if($rval == "0") {
+				echo "\nPatch applies successfully. Now applying patch to test regeneration and -R:\n\n/usr/bin/patch -p1 --no-backuo-if-mismatch -d ../../git/StockWebOS/v".$version."/ < /tmp/tmp.patch 2<&1\n";
+				echo `/usr/bin/patch -p1 --no-backup-if-mismatch -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1`;
+				echo "\ncd ../../git/StockWebOS/v".$version."/ ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached\n";
+				$new_patch_file = `cd ../../git/StockWebOS/v$version/ ; /usr/bin/patch -p1 --no-backup-if-mismatch -i /tmp/$tmp.patch >> /dev/null 2>&1 ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached`;
+				file_put_contents('/tmp/tmp-new.patch', $new_patch_file);
+				echo "\nPatch file regenerated. Testing -R...\n\n/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ -i /tmp/tmp-new.patch 2<&1\n\n";
+				exec("/usr/bin/patch -p1 -R --dry-run --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ -i /tmp/tmp-new.patch 2<&1", $rdata2 = array(), $rval2);
+				echo `/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../git/StockWebOS/v$version/ -i /tmp/tmp-new.patch 2<&1`;
+				if($rval2 == "0") {
+					echo "\r\n-R completes successfully! Patch can be regenerated properly.";
+				} else {
+					echo "\r\n-R FAILS! Patch CAN NOT be regenerated properly!";
+				}
+			system('cd ../../git/StockWebOS/v'.$version.'/ ; /usr/bin/git checkout -f HEAD >> /dev/null ; /usr/bin/git clean -f -d -x >> /dev/null');
+			}				
 			echo "</pre></td>
 				</tr>";
 			$not_selected++;
@@ -834,8 +967,10 @@ function TestPatch($pid) {
 		echo "<tr>
 				<td>None. All WebOS-Versions were selected as compatible.</td>
 			</tr>";
+		ob_flush();
 	}
 	system('rm -f /tmp/tmp.patch');
+	system('rm -f /tmp/tmp-new.patch');
 }
 
 function MainFooter() {
@@ -845,23 +980,24 @@ function MainFooter() {
 	  </table>
 	  </body>
 	  </html>';
+	ob_flush();
 }
 
 // LET'S BUILD THE PAGE!
 
 switch($do) {
 	case 'new':
-		MainHeader();
+		MainHeader($_GET['do'],'');
 		BrowsePatches($_GET['do'], 'all', 'all', $_GET['order'], $_GET['desc']);
 		MainFooter();
 		break;
 	case 'updates':
-		MainHeader();
+		MainHeader($_GET['do'],'');
 		BrowsePatches($_GET['do'], 'all', 'all', $_GET['order'], $_GET['desc']);
 		MainFooter();
 		break;
 	case 'browse':
-		MainHeader();
+		MainHeader($_GET['do'],'');
 		BrowsePatches($_GET['do'], $_GET['webosver'], $_GET['category'], $_GET['order'], $_GET['desc']);
 		MainFooter();
 		break;
@@ -872,35 +1008,35 @@ switch($do) {
 		GetImage($_GET['pid'], $_GET['ss']);
 		break;
 	case 'get_changelog':
-		MainHeader();
+		MainHeader($_GET['do'],'');
 		GetChangelog($_GET['pid']);
 		MainFooter();
 		break;
 	case 'build_form':
-		MainHeader();
+		MainHeader($_GET['do'],'');
 		BuildForm('', $_GET['pid']);
 		MainFooter();
 		break;
 	case 'submitform':
-		$output = HandleForm($_GET['pid']);
-		if($output) {
-			MainHeader();
-			echo $output;
-		}
+		HandleForm($_GET['pid']);
 		MainFooter();
 		break;
 	case 'git':
-		MainHeader();
+		MainHeader($_GET['do'],'');
 		GitExec($_GET['cmd']);
 		MainFooter();
 		break;
 	case 'testpatch':
-		MainHeader();
+		MainHeader($_GET['do'],'');
 		TestPatch($_GET['pid']);
 		MainFooter();
 		break;
+	case 'temp':
+		$patch_file = file_get_contents("/tmp/tmp.patch", FILE_BINARY);
+		$DB->query("UPDATE patches_patches SET patch_file = '".mysql_real_escape_string($patch_file)."' WHERE pid = '271'");
+		break;
 	default:
-		MainHeader();
+		MainHeader($_GET['do'],'');
 		MainFooter();
 }
 ?>

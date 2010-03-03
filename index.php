@@ -56,13 +56,20 @@ echo '<html>
 }
 
 function BrowsePatches($webosver, $category, $order, $desc) {
-	global $DB, $webos_versions_array, $categories;
+	global $DB, $webos_versions_array, $webos_versions_hide_array, $categories;
 	echo '<tr>
 			<td colspan="11" class="header2" align="center">';
+	if($webosver && in_array($webosver, $webos_versions_hide_array)) {
+		echo 'Ooops! An error has occurred.</td>
+			</tr>';
+		return;
+	}
 	foreach($webos_versions_array as $key=>$webos_version) {
 		$count = $DB->query_first("SELECT count(pid) as num FROM ".TABLE_PREFIX."patches WHERE versions LIKE '%".$webos_version."%'");
 		if($count['num'] > '0') {
-			$versions[] = $webos_version;
+			if(!in_array($webos_version, $webos_versions_hide_array)) {
+				$versions[] = $webos_version;
+			}
 		}
 	}
 	$i=0;

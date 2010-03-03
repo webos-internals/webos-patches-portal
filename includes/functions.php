@@ -9,6 +9,11 @@ if(!defined('IN_SCRIPT')) {
 
 global $rootpath;
 
+$get_webos_versions_array = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'webos_versions_array'");
+$webos_versions_array = split(",", $get_webos_versions_array['value']);
+$get_webos_versions_hide_array = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'webos_versions_hide_array'");
+$webos_versions_hide_array = split(",", $get_webos_versions_hide_array['value']);
+
 // GLOBAL VARIABLES
 $categories = array(	"Select...",
 			"App Catalog",
@@ -21,6 +26,7 @@ $categories = array(	"Select...",
 			"Contacts",
 			"Dangerous",
 			"Email",
+			"Google Maps",
 			"Messaging",
 			"Misc",
 			"Mojo",
@@ -40,8 +46,6 @@ $categories = array(	"Select...",
 			"Other"
 		);
 
-$webos_versions_array = array("1.3.1","1.3.5","1.4.0");
-
 $icon_array = array(	"App Catalog"		=>"http://www.webos-internals.org/images/0/03/Icon_WebOSInternals_Patches_Findapps.png",
 			"App Launcher"		=>"http://www.webos-internals.org/images/b/b1/Icon_WebOSInternals_Patches_Applauncher.png",
 			"Browser"		=>"http://www.webos-internals.org/images/4/4a/Icon_WebOSInternals_Patches_Browser.png",
@@ -52,6 +56,7 @@ $icon_array = array(	"App Catalog"		=>"http://www.webos-internals.org/images/0/0
 			"Contacts"		=>"http://www.webos-internals.org/images/c/ca/Icon_WebOSInternals_Patches_Contacts.png",
 			"Dangerous"		=>"http://www.webos-internals.org/images/c/c6/Icon_Patch_Dangerous.png",
 			"Email"			=>"http://www.webos-internals.org/images/2/29/Icon_WebOSInternals_Patches_Email.png",
+			"Google Maps"	=>"http://www.webos-internals.org/images/c/c3/Icon_WebOSInternals_Patches_SprintNav.png",
 			"Messaging"		=>"http://www.webos-internals.org/images/2/24/Icon_WebOSInternals_Patches_Messaging.png",
 			"Misc"			=>"http://www.webos-internals.org/images/f/f9/Icon_WebOSInternals_Patch.png",
 			"Mojo"			=>"http://www.webos-internals.org/images/f/f9/Icon_WebOSInternals_Patch.png",
@@ -206,7 +211,7 @@ function SendEmail($emailtype, $pid) {
 	$admin_email = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'admin_emails'");
 	$patch = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
 	$to = $patch['email'];
-	$from = 'webOS-Patches@dbsooner.com';
+	$from = 'WebOS-Patches Web Portal <webOS-Patches@dbsooner.com>';
 	$random_hash = md5(date('r', time()));
 	$headers = "From: ".$from."\r\n";
 	$headers .= "Return-Path: ".$from."\r\n";
@@ -223,11 +228,11 @@ function SendEmail($emailtype, $pid) {
   <title>Patch Submitted via the WebOS-Patches Web Portal!</title>
 </head>
 <body>
-<h2>Patch Submitted via the <a href="http://webos-patches.dbsooner.com/">WebOS-Patches Web Portal</a>!</h2>
+<h2>Patch Submitted via the <a href="http://patches.webos-internals.org/">WebOS-Patches Web Portal</a>!</h2>
 <p>Thank you for submitting <?php echo iif($emailtype=="submit_update", "an update to the", "a new"); ?> patch entitled <?php echo '<b>'.$patch['category'].':</b> '.$patch['title']; ?>.</p>
 <p>You will receive another email once the patch is either approved or denied.<br/>
 If you did not submit this patch and are receiving this email, it is more than likely because your email is still listed as the primary contact for this patch. If you would like your email removed, please reply to this email requesting so.</p>
-<p>-Daniel (dBsooner) and WebOS-Internals<br/><a href="http://webos-patches.dbsooner.com/">http://webos-patches.dbsooner.com/</a></p>
+<p>-Daniel (dBsooner) and WebOS-Internals<br/><a href="http://patches.webos-internals.org/">http://patches.webos-internals.org/</a></p>
 </body>
 </html>
 <?php
@@ -241,7 +246,7 @@ If you did not submit this patch and are receiving this email, it is more than l
   <title>Patch <?php echo ucfirst($emailtype); ?> at the WebOS-Patches Web Portal!</title>
 </head>
 <body>
-<h2>Patch <?php echo ucfirst($emailtype); ?> at the <a href="http://webos-patches.dbsooner.com/">WebOS-Patches Web Portal</a>!</h2>
+<h2>Patch <?php echo ucfirst($emailtype); ?> at the <a href="http://patches.webos-internals.org/">WebOS-Patches Web Portal</a>!</h2>
 <p>Thank you for submitting <?php echo iif($patch['update_pid']>="1", "an update to the", "a new"); ?> patch entitled <?php echo '<b>'.$patch['category'].':</b> '.$patch['title']; ?>.</p>
 <p>This email is to inform you the patch has been <?php echo $emailtype; ?>!<br/>
 <br/>
@@ -254,13 +259,13 @@ If you did not submit this patch and are receiving this email, it is more than l
 ?><br/>
 <br/>
 If you did not submit this patch and are receiving this email, it is more than likely because your email is still listed as the primary contact for this patch. If you would like your email removed, please reply to this email requesting so.</p>
-<p>-Daniel (dBsooner) and WebOS-Internals<br/><a href="http://webos-patches.dbsooner.com/">http://webos-patches.dbsooner.com/</a></p>
+<p>-Daniel (dBsooner) and WebOS-Internals<br/><a href="http://patches.webos-internals.org/">http://patches.webos-internals.org/</a></p>
 </body>
 </html>
 <?php
 	}
 	$message = ob_get_clean();
-	if(!@mail( $to, $subject, $message, $headers )) {
+	if(!@mail( $to, $subject, $message, $headers, "-rwebOS-Patches@dbsooner.com -fwebOS-Patches@dbsooner.com" )) {
 		mail($admin_email['value'], "WebOS-Patches Web Portal Email Error", "There was an error in sending the email to the developer.", "From: webOS-Patches@dbsooner.com");
 	}
 
