@@ -542,8 +542,7 @@ function HandleForm($pid) {
 <br/>You should receive an email at the email address you provided confirming the successful submitting of this patch. You will also receive an email when it is approved or denied. Please add "WebOS-Patches@dBsooner.com" to your safe sender list.<br/>
 <br/>Please note you will not be able to submit another patch for 5 minutes. Do not use your browser\'s back button and try to submit again, it will not let you. Instead, <a href="webospatchupload.php">click here</a> and refresh that page. It will let you know when you can submit again.<br/>
 <br/>If there are any questions, please contact <a href="mailto:webOS-Patches@dbsooner.com">webOS-Patches@dbsooner.com</a>.</td>
-			</tr>
-			</table>';
+			</tr>';
 	SendEmail(iif($update=="1", "submit_update", "submit_new"), $pid);
 	PreventSpam(GetRemoteAddress());
 }
