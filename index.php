@@ -209,9 +209,9 @@ function BrowsePatches($webosver, $category, $order, $desc) {
 				<td>'.$patch[title].'</td>
 				<td align="justify">'.$patch[description].'</td>
 				<td align="center">'.$patch[category].'</td>
-				<td align="center">'.iif(strlen($patch[screenshot_1])>=1, "<a href=\"".$patch[screenshot_1]."\" target=\"SS_OUT\">Show</a>", "&nbsp;").'</td>
-				<td align="center">'.iif(strlen($patch[screenshot_2])>=1, "<a href=\"".$patch[screenshot_2]."\" target=\"SS_OUT\">Show</a>", "&nbsp;").'</td>
-				<td align="center">'.iif(strlen($patch[screenshot_3])>=1, "<a href=\"".$patch[screenshot_3]."\" target=\"SS_OUT\">Show</a>", "&nbsp;").'</td>
+				<td align="center">'.iif(strlen($patch[screenshot_1])>=1, "<a href=\"".$patch[screenshot_1]."\" onclick=\"window.open(this.href, 'SS_OUT', 'width=340,height=500,fullscreen=no,toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,directories=no,location=no'); return false;\">Show</a>", "&nbsp;").'</td>
+				<td align="center">'.iif(strlen($patch[screenshot_2])>=1, "<a href=\"".$patch[screenshot_2]."\" onclick=\"window.open(this.href, 'SS_OUT', 'width=340,height=500,fullscreen=no,toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,directories=no,location=no'); return false;\">Show</a>", "&nbsp;").'</td>
+				<td align="center">'.iif(strlen($patch[screenshot_3])>=1, "<a href=\"".$patch[screenshot_3]."\" onclick=\"window.open(this.href, 'SS_OUT', 'width=340,height=500,fullscreen=no,toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,directories=no,location=no'); return false;\">Show</a>", "&nbsp;").'</td>
 				<td align="center">'.$maintainer_out.'</td>
 				<td align="center">'.iif(strlen($patch[homepage])>=1, "<a href=\"".$patch[homepage]."\" target=\"homepage\">Link</a>", "&nbsp;").'</td>
 				<td align="center">'.str_replace(" ", "<br/>", $versions_out).iif(strlen($patch[changelog])>=1, "<br/><br/><a href=\"?do=get_changelog&pid=".$patch[pid]."\" target=\"changelog\">Changelog</a>", "").'</td>
@@ -392,7 +392,7 @@ function HandleForm($pid) {
 		if(!in_array($patchext, $allowedpatchext)) {
 			$errors[] = 'Only patch files are allowed.';
 		} else {
-			if($patch['size'] > 250000) {
+			if($patch['size'] > 1048576) {
 				$errors[] = 'Patch cannot be larger than 250KB.';
 			}
 		}
@@ -561,7 +561,7 @@ function SpamWait() {
 
 function MainFooter() {
 	echo '	  <tr>
-		<td colspan="11" align="center" class="copyright">&copy; 2009 - 2010 Daniel Beames (dBsooner) and webOS-Internals Group<br/><a href="http://donate.dbsooner.com/">Donations greatly appreciated!</a></center></td>
+		<td colspan="11" align="center" class="copyright">&copy; 2009 - 2010 Daniel Beames (dBsooner) and webOS-Internals Group<br/><a href="http://donate.dbsooner.com/" target="_blank"><img src="https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif" border="0"></img></a><br/>Donations help offset hosting costs and fund future development.</center></td>
 	  </tr>
 	  </table>
 	  </body>

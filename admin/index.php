@@ -260,17 +260,17 @@ function BrowsePatches($do, $webosver, $category, $order, $desc) {
 				<td>'.iif($do!="browse", '<a href="?do=build_form&pid='.$patch[pid].'">'.$patch[title].'</a>', $patch[title]).'</td>
 				<td align="justify">'.$patch[description].'</td>';
 			if($do != "browse") {
-				echo '<td align="center"><a href="?do=get_patch&pid='.$patch[pid].'">Show</a><br/><br/><a href="?do=testpatch&pid='.$patch[pid].'">Test</a></td>';
+				echo '<td align="center"><a href="?do=show_patch&pid='.$patch[pid].'">Show</a><br/><br/><a href="?do=get_patch&pid='.$patch[pid].'">Get</a><br/><br/><a href="?do=testpatch&pid='.$patch[pid].'">Test</a></td>';
 			}
 			echo '<td align="center">'.$patch[category].'</td>';
 			if($do == "browse") {
-				echo '<td align="center">'.iif(strlen($patch[screenshot_1])>=1, "<a href=\"".$patch[screenshot_1]."\" target=\"SS_OUT\">Show</a>", "&nbsp;").'</td>
-				<td align="center">'.iif(strlen($patch[screenshot_2])>=1, "<a href=\"".$patch[screenshot_2]."\" target=\"SS_OUT\">Show</a>", "&nbsp;").'</td>
-				<td align="center">'.iif(strlen($patch[screenshot_3])>=1, "<a href=\"".$patch[screenshot_3]."\" target=\"SS_OUT\">Show</a>", "&nbsp;").'</td>';
+				echo '<td align="center">'.iif(strlen($patch[screenshot_1])>=1, "<a href=\"".$patch[screenshot_1]."\" onclick=\"window.open(this.href, 'SS_OUT', 'width=340,height=500,fullscreen=no,toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,directories=no,location=no'); return false;\">Show</a>", "&nbsp;").'</td>
+				<td align="center">'.iif(strlen($patch[screenshot_2])>=1, "<a href=\"".$patch[screenshot_2]."\" onclick=\"window.open(this.href, 'SS_OUT', 'width=340,height=500,fullscreen=no,toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,directories=no,location=no'); return false;\">Show</a>", "&nbsp;").'</td>
+				<td align="center">'.iif(strlen($patch[screenshot_3])>=1, "<a href=\"".$patch[screenshot_3]."\" onclick=\"window.open(this.href, 'SS_OUT', 'width=340,height=500,fullscreen=no,toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,directories=no,location=no'); return false;\">Show</a>", "&nbsp;").'</td>';
 			} else {
-				echo '<td align="center">'.iif(strlen($patch[screenshot_1_type])>=1, "<a href=\"?do=get_image&ss=1&pid=$patch[pid]\">Show</a>", "&nbsp;").'</td>
-				<td align="center">'.iif(strlen($patch[screenshot_2_type])>=1, "<a href=\"?do=get_image&ss=2&pid=$patch[pid]\">Show</a>", "&nbsp;").'</td>
-				<td align="center">'.iif(strlen($patch[screenshot_3_type])>=1, "<a href=\"?do=get_image&ss=3&pid=$patch[pid]\">Show</a>", "&nbsp;").'</td>';
+				echo '<td align="center">'.iif(strlen($patch[screenshot_1_type])>=1, "<a href=\"?do=get_image&ss=1&pid=$patch[pid]\" onclick=\"window.open(this.href, 'SS_OUT', 'width=340,height=500,fullscreen=no,toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,directories=no,location=no'); return false;\">Show</a>", "&nbsp;").'</td>
+				<td align="center">'.iif(strlen($patch[screenshot_2_type])>=1, "<a href=\"?do=get_image&ss=2&pid=$patch[pid]\" onclick=\"window.open(this.href, 'SS_OUT', 'width=340,height=500,fullscreen=no,toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,directories=no,location=no'); return false;\">Show</a>", "&nbsp;").'</td>
+				<td align="center">'.iif(strlen($patch[screenshot_3_type])>=1, "<a href=\"?do=get_image&ss=3&pid=$patch[pid]\" onclick=\"window.open(this.href, 'SS_OUT', 'width=340,height=500,fullscreen=no,toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,directories=no,location=no'); return false;\">Show</a>", "&nbsp;").'</td>';
 			}
 			echo '<td align="center">'.$maintainer_out.'</td>
 				<td align="center">'.iif(strlen($patch[homepage])>=1, "<a href=$patch[homepage]>Link</a>", "None").'</td>';
@@ -1003,10 +1003,13 @@ switch($do) {
 		MainFooter();
 		break;
 	case 'get_patch':
-		GetPatch($_GET['pid']);
+		GetPatch($_GET['pid'], 1);
+		break;
+	case 'show_patch':
+		GetPatch($_GET['pid'], 0);
 		break;
 	case 'get_image':
-		GetImage($_GET['pid'], $_GET['ss']);
+		GetImage($_GET['pid'], $_GET['ss'], $_GET['src']);
 		break;
 	case 'get_changelog':
 		MainHeader($_GET['do'],'');
@@ -1034,7 +1037,7 @@ switch($do) {
 		break;
 	case 'temp':
 		$patch_file = file_get_contents("/tmp/tmp.patch", FILE_BINARY);
-		$DB->query("UPDATE patches_patches SET patch_file = '".mysql_real_escape_string($patch_file)."' WHERE pid = '271'");
+		$DB->query("UPDATE patches_patches SET patch_file = '".mysql_real_escape_string($patch_file)."' WHERE pid = '459'");
 		break;
 	default:
 		MainHeader($_GET['do'],'');

@@ -76,7 +76,7 @@ $icon_array = array(	"App Catalog"		=>"http://www.webos-internals.org/images/0/0
 			"Other"			=>"http://www.webos-internals.org/images/f/f9/Icon_WebOSInternals_Patch.png"
 		);
 
-function GetPatch($pid) {
+function GetPatch($pid, $dl) {
 	global $DB;
 	$getpatch = $DB->query_first("SELECT title,category,patch_file FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
 	$title = strtolower($getpatch['title']);
@@ -87,12 +87,16 @@ function GetPatch($pid) {
 	$category = strtolower($getpatch['category']);
 	$category = str_replace(" ", "-", $category);
 	$name = $category.'-'.$title.'.patch';
-	header('Content-type: application/octet-stream');
-	header('Content-Disposition: attachment; filename="'.$name.'"');
+	if($dl == "1") {
+		header('Content-type: text/x-diff');
+		header('Content-Disposition: attachment; filename="'.$name.'"');
+	} else {
+		header('Content-type: text/plain');
+	}
 	echo $getpatch['patch_file'];
 }
 
-function GetImage($pid, $ss) {
+function GetImage($pid, $ss, $src) {
 	global $DB;
 
 	switch($ss) {
@@ -128,9 +132,13 @@ function GetImage($pid, $ss) {
 	$image_type = $getpatch[$sstype];
 	$ext = $known_image_types[$image_type];
 	$name = $category.'-'.$title.'-'.$ss.'.'.$ext;
-	header('Content-type: '.$getpatch[$sstype]);
-	header('Content-Disposition: attachment; filename="'.$name.'"');
-	echo $getpatch[$ssblob];
+	if(!$src) {
+		echo '<html><head><title>'.$name.'</title></head><body><center><img src="?do=get_image&ss='.$ss.'&pid='.$pid.'&src=1" border="0"></img></center></body></html>';
+	} else {
+		header('Content-type: '.$getpatch[$sstype]);
+		header('Content-Disposition: attachment; filename="'.$name.'"');
+		echo $getpatch[$ssblob];
+	}
 }
 
 function GetChangelog($pid) {
@@ -208,7 +216,8 @@ function UploadImage($pid, $ss, $title) {
 
 function SendEmail($emailtype, $pid) {
 	global $DB;
-	$admin_email = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'admin_emails'");
+// I am tired of getting emails. :)
+//	$admin_email = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'admin_emails'");
 	$patch = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
 	$to = $patch['email'];
 	$from = 'WebOS-Patches Web Portal <webOS-Patches@dbsooner.com>';
@@ -216,7 +225,8 @@ function SendEmail($emailtype, $pid) {
 	$headers = "From: ".$from."\r\n";
 	$headers .= "Return-Path: ".$from."\r\n";
 	$headers .= "Reply-To: ".$from."\r\n";
-	$headers .= "Bcc: ".$admin_email['value']."\r\n";
+// I am tired of getting emails. :)
+//	$headers .= "Bcc: ".$admin_email['value']."\r\n";
 	$headers .= "MIME-Version: 1.0\r\n";
 	$headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
 	if($emailtype == "submit_update" || $emailtype == "submit_new") {
