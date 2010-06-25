@@ -34,24 +34,6 @@ if(!get_magic_quotes_gpc()) {  // add slashes if gpc is off
 } // else add slashes has been performed automatically
 
 
-// ########################## ENABLE REGISTERGLOBALS ##########################
-
-if(function_exists('ini_get')) {
-	$globalsoption = ini_get('register_globals');
-} else {
-	$globalsoption = get_cfg_var('register_globals');
-}
-
-if($globalsoption != 1) {
-	@extract($_POST,    EXTR_SKIP);
-	@extract($_GET,     EXTR_SKIP);
-	@extract($_SERVER,  EXTR_SKIP);
-	@extract($_FILES,   EXTR_SKIP);
-	@extract($_ENV,     EXTR_SKIP);
-	@extract($_COOKIE,  EXTR_SKIP);
-	@extract($_SESSION, EXTR_SKIP);
-}
-
 // ########################## INCLUDE CONFIG ##########################
 
 if(is_file($rootpath . 'includes/config.php')) {
