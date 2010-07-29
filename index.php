@@ -38,20 +38,19 @@ $_COOKIE = PreClean($_COOKIE);
 // ############################ MAIN OUTPUT #################################
 
 function MainHeader() {
-	$do = $_GET['do'];
 echo '<html>
 	  <head>
-	  <title>dBsooner\'s webOS-Patches Web Portal</title>
+	  <title>webOS-Patches Web Portal</title>
 	  <link rel="stylesheet" href="styles.css" />
 	  <link rel="shortcut icon" href="favicon.ico" />
 	  <meta http-equiv="expires" content="0" />
 	  <meta http-equiv="Pragma" content="no-cache" />
 	  </head>
 	  <body>
-	  <table width="100%" border="'.iif($do=="browse", "1", "0").'" cellpadding="5" cellspacing="0">
+	  <table width="100%" border="'.iif($_GET['do']=="browse", "1", "0").'" cellpadding="5" cellspacing="0">
 	  <tr>
-		<td colspan="11" align="center" class="header">WebsOS-Patches Web Portal<br/>
-		<a href="/">Home</a> | <a href="?do=submit_new">Submit New Patch</a> | <a href="?do=submit_update">Submit Update</a> | '.iif($do=="browse", "Browse Patches", '<a href="?do=browse">Browse Patches</a>').'</td>
+		<td colspan="11" align="center" class="header">WebOS-Patches Web Portal<br/>
+		<a href="/">Home</a> | <a href="?do=submit_new">Submit New Patch</a> | <a href="?do=submit_update">Submit Update</a> | '.iif($_GET['do']=="browse", "Browse Patches", '<a href="?do=browse">Browse Patches</a>').'</td>
 	  </tr>';
 }
 
@@ -309,7 +308,7 @@ function BuildForm($errors, $pid) {
 		<tr>
 			<td width="15%" class="cell3" valign="top">Maintainer: (*)</td>
 			<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="maintainer" value="'.FormatForForm($patch[maintainer]).'" size="50" maxlength="50"><br/>
-			<b>Note:</b> Use your PreCentral.net or webOS-Internals.org username if you do not<br/>
+			<b>Note:</b> Use your PreCentral.net or WebOS-Internals.org username if you do not<br/>
 			want to give your real name. This information is published in the package\'s<br/>
 			meta-data. It will be viewable by the public.</td>
 		</tr>
@@ -329,7 +328,7 @@ function BuildForm($errors, $pid) {
 			<b>Note:</b> This information is published in the package\'s meta-data. It will be<br/>
 			viewable by the public. Remember you, as the developer of the patch, are<br/>
 			responisble for support. Giving a URL to the patch\'s thread on PreCentral.net<br/>
-			or wiki page on webOS-Internals.org makes it easier for a user to request support.</td>
+			or wiki page on WebOS-Internals.org makes it easier for a user to request support.</td>
 		</tr>';
 	if($pid) {
 		echo '<tr>
@@ -539,9 +538,9 @@ function HandleForm($pid) {
 			</tr>
 			<tr>
 				<td colspan="2" class="header2" align="center">Thank you for submitting a patch! Look for it very soon in the webOS-Patches feed in Preware (and other programs that use the webOS-Patches feed)!<br/>
-<br/>You should receive an email at the email address you provided confirming the successful submitting of this patch. You will also receive an email when it is approved or denied. Please add "WebOS-Patches@dBsooner.com" to your safe sender list.<br/>
+<br/>You should receive an email at the email address you provided confirming the successful submitting of this patch. You will also receive an email when it is approved or denied. Please add "support@webos-internals.org" to your safe sender list.<br/>
 <br/>Please note you will not be able to submit another patch for 5 minutes. Do not use your browser\'s back button and try to submit again, it will not let you. Instead, <a href="webospatchupload.php">click here</a> and refresh that page. It will let you know when you can submit again.<br/>
-<br/>If there are any questions, please contact <a href="mailto:webOS-Patches@dbsooner.com">webOS-Patches@dbsooner.com</a>.</td>
+<br/>If there are any questions, please contact <a href="mailto:support@webos-internals.org">support@webos-internals.org</a>.</td>
 			</tr>';
 	SendEmail(iif($update=="1", "submit_update", "submit_new"), $pid);
 	PreventSpam(GetRemoteAddress());
@@ -561,7 +560,7 @@ function SpamWait() {
 
 function MainFooter() {
 	echo '	  <tr>
-		<td colspan="11" align="center" class="copyright">&copy; 2009 - 2010 Daniel Beames (dBsooner) and webOS-Internals Group<br/><a href="http://donate.dbsooner.com/" target="_blank"><img src="https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif" border="0"></img></a><br/>Donations help offset hosting costs and fund future development.</center></td>
+		<td colspan="11" align="center" class="copyright">&copy; 2009 - 2010 Daniel Beames (dBsooner) and WebOS Internals<br/><a href="http://www.webos-internals.org/wiki/WebOS_Internals:Site_support" target="_blank"><img src="https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif" border="0"></img></a><br/>Donations help offset hosting costs and fund future development.</center></td>
 	  </tr>
 	  </table>
 	  </body>
@@ -570,7 +569,7 @@ function MainFooter() {
 
 // LET'S BUILD THE PAGE!
 
-switch($do) {
+switch($_GET['do']) {
 	case 'browse':
 		MainHeader();
 		BrowsePatches($_GET['webosver'], $_GET['category'], $_GET['order'], $_GET['desc']);
@@ -642,12 +641,13 @@ switch($do) {
 				Developers: If you are submitting an update to an existing patch (one that is available in the feed already), please click the <a href="?do=submit_update">Submit Update</a> link above. You will be presented with a drop down list of all patches in the feed. Select the one you are updating and click next. This will bring you to the submission form with most values already filled in.<br/>
 				If you are submitting a new patch, please click <a href="?do=submit_new">Submit New Patch</a> above. Fill out the form with as much detail as possible.<br/>
 				<br/>
-				<a href="http://donate.dbsooner.com/">Donations</a> are greatly appreciated and go towards operating costs of the servers I maintain as well as further development for WebOS.<br/>
+				<a href="http://www.webos-internals.org/wiki/WebOS_Internals:Site_support">Donations</a> are greatly appreciated and go towards operating costs of the servers we maintain as well as further development for WebOS.<br/>
 				<br/>
 				Thank you for visiting the WebOS-Patches Web Portal!<br/>
 				<br/>
-				--Daniel Beames (dBsooner) and the <a href="http://www.webos-internals.org/">WebOS-Internals Group</a></td>
+				--Daniel Beames (dBsooner) and <a href="http://www.webos-internals.org/">WebOS Internals</a></td>
 			</tr>';
 		MainFooter();
 }
 ?>
+

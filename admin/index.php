@@ -51,7 +51,7 @@ function MainHeader($do, $switch) {
 	}
 	echo '<html>
 	  <head>
-	  <title>dBsooner\'s webOS-Patches Admin Area</title>
+	  <title>webOS-Patches Admin Area</title>
 	  <link rel="stylesheet" href="/styles.css" />
 	  <link rel="shortcut icon" href="/favicon.ico" />
 	  <meta http-equiv="expires" content="0" />
@@ -60,7 +60,7 @@ function MainHeader($do, $switch) {
 	  <body>
 	  <table width="100%" border="1" cellpadding="5" cellspacing="0">
 	  <tr>
-		<td colspan="12" align="center" class="header">WebsOS-Patches Admin<br/>
+		<td colspan="12" align="center" class="header">WebOS-Patches Admin<br/>
 		<a href="/admin/">Home</a> | ';
 	if($do != "new") {
 		echo '<a href="?do=new">'.iif($new_count[num_new]>=1, "<b>", "").'New Submissions ('.$new_count[num_new].')'.iif($new_count[num_new]>=1, "</b>", "").'</a>';
@@ -388,7 +388,7 @@ function BuildForm($errors, $pid) {
 			<td width="15%" class="cell3" valign="top">Maintainer: (*)</td>
 			<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="maintainer" value="'.FormatForForm($patch[maintainer]).'" size="50" maxlength="50"><br/>
 			'.iif($updateform==1, '<b>Original:</b> '.$original[maintainer].'<br/>', '').'
-			<b>Note:</b> Use your PreCentral.net or webOS-Internals.org username if you do not<br/>
+			<b>Note:</b> Use your PreCentral.net or WebOS-Internals.org username if you do not<br/>
 			want to give your real name. This information is published in the package\'s<br/>
 			meta-data. It will be viewable by the public.</td>
 		</tr>
@@ -410,7 +410,7 @@ function BuildForm($errors, $pid) {
 			<b>Note:</b> This information is published in the package\'s meta-data. It will be<br/>
 			viewable by the public. Remember you, as the developer of the patch, are<br/>
 			responisble for support. Giving a URL to the patch\'s thread on PreCentral.net<br/>
-			or wiki page on webOS-Internals.org makes it easier for a user to request support.</td>
+			or wiki page on WebOS-Internals.org makes it easier for a user to request support.</td>
 		</tr>';
 	if($patch['update_pid'] != NULL) {
 		echo '<tr>
@@ -550,7 +550,7 @@ function HandleForm($pid) {
 
 	foreach($webos_versions as $key => $webos_version) {
 		$get_sub_version = array();
-		exec('cd ../../git/modifications/v'.$webos_version.' ; /usr/bin/git tag | grep '.$webos_version.' | cut -d- -f2', $get_sub_version);
+		exec('cd ../../../patches/modifications/v'.$webos_version.' ; /usr/bin/git tag | grep '.$webos_version.' | cut -d- -f2', $get_sub_version);
 		$sub_version = max($get_sub_version);
 		$sub_version++;
 		$new_versions[] = $webos_version.'-'.$sub_version;
@@ -640,13 +640,13 @@ function HandleForm($pid) {
 	foreach($webos_versions as $key => $webos_version) {
 		echo 'v'.$webos_version.' patch file: ... Please Wait ... ';
 		ob_flush();
-		$new_patch_file = `cd ../../git/StockWebOS/v$webos_version/ ; /usr/bin/patch -p1 --no-backup-if-mismatch -i /tmp/$patchname.patch >> /dev/null 2>&1 ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached`;
+		$new_patch_file = `cd ../../../patches/rootfs/v$webos_version/ ; /usr/bin/patch -p1 --no-backup-if-mismatch -i /tmp/$patchname.patch >> /dev/null 2>&1 ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached`;
 #		$new_patch_file = $patch_file_contents;
-		system('cd ../../git/StockWebOS/v'.$webos_version.'/ ; /usr/bin/git checkout -f HEAD >> /dev/null ; /usr/bin/git clean -f -d -x >> /dev/null');
-		if(!is_dir($dir = '../../git/modifications/v'.$webos_version.'/'.$category2.'/')) {
+		system('cd ../../../patches/rootfs/v'.$webos_version.'/ ; /usr/bin/git checkout -f HEAD >> /dev/null ; /usr/bin/git clean -f -d -x >> /dev/null');
+		if(!is_dir($dir = '../../../patches/modifications/v'.$webos_version.'/'.$category2.'/')) {
 			mkdir($dir);
 		}
-		file_put_contents('../../git/modifications/v'.$webos_version.'/'.$category2.'/'.$patchname.'.patch', $new_patch_file);
+		file_put_contents('../../../patches/modifications/v'.$webos_version.'/'.$category2.'/'.$patchname.'.patch', $new_patch_file);
 		echo '<b>Regenerated!</b><br/>';
 		ob_flush();
 	}
@@ -705,10 +705,10 @@ include ../modifications.mk
 MAINTAINER =$maintainer_out
 HOMEPAGE =$homepage2";
 
-	if(!is_dir($dir = '../../git/build/autopatch/'.$patchname.'/')) {
+	if(!is_dir($dir = '../../../patches/build/autopatch/'.$patchname.'/')) {
 		mkdir($dir);
 	}
-	file_put_contents('../../git/build/autopatch/'.$patchname.'/Makefile', $makefile_content);
+	file_put_contents('../../../patches/build/autopatch/'.$patchname.'/Makefile', $makefile_content);
 	echo 'Makefile: <b>Generated!</b><br/>';
 	ob_flush();
 
@@ -733,41 +733,41 @@ function GitExec($cmd) {
 	switch($cmd) {
 		case 'pull':
 			echo '<b>Preware/build.git:</b><br/><pre>';
-			echo "cd ../../git/build/ ; /usr/bin/git pull 2>&1\n";
+			echo "cd ../../../patches/build/ ; /usr/bin/git pull 2>&1\n";
 			ob_flush();
-			echo `cd ../../git/build/ ; /usr/bin/git pull 2>&1`;
+			echo `cd ../../../patches/build/ ; /usr/bin/git pull 2>&1`;
 			echo '</pre>';
 			ob_flush();
 			foreach($webos_versions_array as $key=>$version) {
 				echo '<hr><b>modifications.git/webos-'.$version.':</b><pre>';
-				echo "cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1\n";
+				echo "cd ../../../patches/modifications/v$version ; /usr/bin/git pull 2>&1\n";
 				ob_flush();
-				echo `cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1`;
+				echo `cd ../../../patches/modifications/v$version ; /usr/bin/git pull 2>&1`;
 				echo '</pre>';
 				ob_flush();
 			}
 			break;			
 		case 'status':
 			echo '<b>Preware/build.git:</b><br/><pre>';
-			echo "cd ../../git/build/ ; /usr/bin/git status 2>&1\n";
+			echo "cd ../../../patches/build/ ; /usr/bin/git status 2>&1\n";
 			ob_flush();
-			echo `cd ../../git/build/ ; /usr/bin/git status 2>&1`;
+			echo `cd ../../../patches/build/ ; /usr/bin/git status 2>&1`;
 			echo '</pre>';
 			ob_flush();
 			foreach($webos_versions_array as $key=>$version) {
 				echo '<hr><b>modifications.git/webos-'.$version.':</b><pre>';
-				echo "cd ../../git/modifications/v$version ; /usr/bin/git status 2>&1\n";
+				echo "cd ../../../patches/modifications/v$version ; /usr/bin/git status 2>&1\n";
 				ob_flush();
-				echo `cd ../../git/modifications/v$version ; /usr/bin/git status 2>&1`;
+				echo `cd ../../../patches/modifications/v$version ; /usr/bin/git status 2>&1`;
 				echo '</pre>';
 				ob_flush();
 			}
 			break;
 		case 'add':
 			echo '<b>Preware/build.git:</b><pre>';
-			echo "cd ../../git/build/autopatch ; /usr/bin/git add . 2>&1\n";
+			echo "cd ../../../patches/build/autopatch ; /usr/bin/git add . 2>&1\n";
 			ob_flush();
-			echo `cd ../../git/build/autopatch ; /usr/bin/git add . 2>&1`;
+			echo `cd ../../../patches/build/autopatch ; /usr/bin/git add . 2>&1`;
 			echo "</pre>";
 			ob_flush();
 			foreach($webos_versions_array as $key=>$version) {
@@ -776,9 +776,9 @@ function GitExec($cmd) {
 					echo ' No Add Necessary.';
 					ob_flush();
 				} else {
-					echo "<pre>cd ../../git/modifications/v$version ; /usr/bin/git all . 2>&1\n";
+					echo "<pre>cd ../../../patches/modifications/v$version ; /usr/bin/git all . 2>&1\n";
 					ob_flush();
-					echo `cd ../../git/modifications/v$version ; /usr/bin/git add . 2>&1`;
+					echo `cd ../../../patches/modifications/v$version ; /usr/bin/git add . 2>&1`;
 					echo "</pre>";
 					ob_flush();
 				}
@@ -787,9 +787,9 @@ function GitExec($cmd) {
 		case 'commit':
 			if($_POST['submitaction'] == '1') {
 				echo '<b>Preware/build.git:</b> ';
-				echo "<pre>cd ../../git/build/autopatch ; /usr/bin/git commit -m \"".$_POST['commit_message']."\" 2>&1\n";
+				echo "<pre>cd ../../../patches/build/autopatch ; /usr/bin/git commit -m \"".$_POST['commit_message']."\" 2>&1\n";
 				ob_flush();
-				echo `cd ../../git/build/autopatch ; /usr/bin/git commit -m "$_POST[commit_message]" 2>&1`;
+				echo `cd ../../../patches/build/autopatch ; /usr/bin/git commit -m "$_POST[commit_message]" 2>&1`;
 				echo "</pre>";
 				ob_flush();
 				foreach($webos_versions_array as $key=>$version) {
@@ -798,9 +798,9 @@ function GitExec($cmd) {
 						echo ' No Commit Necessary.';
 						ob_flush();
 					} else {
-						echo "<pre>cd ../../git/modifications/v$version ; /usr/bin/git commit -m \"$_POST[commit_message]\" 2>&1\n";
+						echo "<pre>cd ../../../patches/modifications/v$version ; /usr/bin/git commit -m \"$_POST[commit_message]\" 2>&1\n";
 						ob_flush();
-						echo `cd ../../git/modifications/v$version ; /usr/bin/git commit -m "$_POST[commit_message]" 2>&1`;
+						echo `cd ../../../patches/modifications/v$version ; /usr/bin/git commit -m "$_POST[commit_message]" 2>&1`;
 						echo "</pre>";
 						ob_flush();
 					}
@@ -822,13 +822,13 @@ function GitExec($cmd) {
 					echo ' No Push Necessary.';
 					ob_flush();
 				} else {
-					echo "<pre>cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1\n";
+					echo "<pre>cd ../../../patches/modifications/v$version ; /usr/bin/git pull 2>&1\n";
 					ob_flush();
-					echo `cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1`;
+					echo `cd ../../../patches/modifications/v$version ; /usr/bin/git pull 2>&1`;
 					ob_flush();
-					echo "<pre>cd ../../git/modifications/v$version ; /usr/bin/git push 2>&1\n";
+					echo "<pre>cd ../../../patches/modifications/v$version ; /usr/bin/git push 2>&1\n";
 					ob_flush();
-					echo `cd ../../git/modifications/v$version ; /usr/bin/git push 2>&1`;
+					echo `cd ../../../patches/modifications/v$version ; /usr/bin/git push 2>&1`;
 					echo "</pre>";
 					ob_flush();
 				}
@@ -843,17 +843,17 @@ function GitExec($cmd) {
 					echo ' No Tag Necessary.';
 					ob_flush();
 				} else {
-					echo "<pre>cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1\n";
+					echo "<pre>cd ../../../patches/modifications/v$version ; /usr/bin/git pull 2>&1\n";
 					ob_flush();
-					echo `cd ../../git/modifications/v$version ; /usr/bin/git pull 2>&1`;
+					echo `cd ../../../patches/modifications/v$version ; /usr/bin/git pull 2>&1`;
 					ob_flush();
-					echo "cd ../../git/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version] 2>&1\n";
+					echo "cd ../../../patches/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version] 2>&1\n";
 					ob_flush();
-					echo `cd ../../git/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version] 2>&1`;
+					echo `cd ../../../patches/modifications/v$version ; /usr/bin/git tag v$version-$gitversions_main[$version] 2>&1`;
 					ob_flush();
-					echo "\ncd ../../git/modifications/v$version ; /usr/bin/git push --tags 2>&1\n";
+					echo "\ncd ../../../patches/modifications/v$version ; /usr/bin/git push --tags 2>&1\n";
 					ob_flush();
-					echo `cd ../../git/modifications/v$version ; /usr/bin/git push --tags 2>&1`;
+					echo `cd ../../../patches/modifications/v$version ; /usr/bin/git push --tags 2>&1`;
 					echo '</pre>';
 					unset($gitversions_main[$version]);
 					ob_flush();
@@ -875,13 +875,13 @@ function GitExec($cmd) {
 			break;
 		case 'push_build':
 			echo '<b>Preware/build.git:</b><pre>';
-			echo "cd ../../git/build/autopatch ; /usr/bin/git pull 2>&1\n";
+			echo "cd ../../../patches/build/autopatch ; /usr/bin/git pull 2>&1\n";
 			ob_flush();
-			echo `cd ../../git/build/autopatch ; /usr/bin/git pull 2>&1`;
+			echo `cd ../../../patches/build/autopatch ; /usr/bin/git pull 2>&1`;
 			ob_flush();
-			echo "cd ../../git/build/autopatch ; /usr/bin/git push 2>&1\n";
+			echo "cd ../../../patches/build/autopatch ; /usr/bin/git push 2>&1\n";
 			ob_flush();
-			echo `cd ../../git/build/autopatch ; /usr/bin/git push 2>&1`;
+			echo `cd ../../../patches/build/autopatch ; /usr/bin/git push 2>&1`;
 			echo '</pre>';
 			ob_flush();
 			break;
@@ -905,25 +905,25 @@ function TestPatch($pid) {
 	foreach($versions as $key=>$version) {
 		if(in_array($version, $webos_versions_array)) {
 			echo "<tr>
-					<td>Testing ".$version.":<br/><pre>/usr/bin/patch -p1 --dry-run --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ < /tmp/tmp.patch 2<&1\n";
+					<td>Testing ".$version.":<br/><pre>/usr/bin/patch -p1 --dry-run --no-backup-if-mismatch -d ../../../patches/rootfs/v".$version."/ < /tmp/tmp.patch 2<&1\n";
 			ob_flush();
-			exec("/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1", $rdata = array(), $rval);
-			echo `/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1`;
+			exec("/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../../patches/rootfs/v$version/ < /tmp/tmp.patch 2<&1", $rdata = array(), $rval);
+			echo `/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../../patches/rootfs/v$version/ < /tmp/tmp.patch 2<&1`;
 			if($rval == "0") {
-				echo "\nPatch applies successfully. Now applying patch to test regeneration and -R:\n\n/usr/bin/patch -p1 --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ < /tmp/tmp.patch 2<&1\n";
-				echo `/usr/bin/patch -p1 --no-backup-if-mismatch -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1`;
-				echo "\ncd ../../git/StockWebOS/v".$version."/ ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached\n";
-				$new_patch_file = `cd ../../git/StockWebOS/v$version/ ; /usr/bin/patch -p1 --no-backup-if-mismatch -i /tmp/$tmp.patch >> /dev/null 2>&1 ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached`;
+				echo "\nPatch applies successfully. Now applying patch to test regeneration and -R:\n\n/usr/bin/patch -p1 --no-backup-if-mismatch -d ../../../patches/rootfs/v".$version."/ < /tmp/tmp.patch 2<&1\n";
+				echo `/usr/bin/patch -p1 --no-backup-if-mismatch -d ../../../patches/rootfs/v$version/ < /tmp/tmp.patch 2<&1`;
+				echo "\ncd ../../../patches/rootfs/v".$version."/ ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached\n";
+				$new_patch_file = `cd ../../../patches/rootfs/v$version/ ; /usr/bin/patch -p1 --no-backup-if-mismatch -i /tmp/$tmp.patch >> /dev/null 2>&1 ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached`;
 				file_put_contents('/tmp/tmp-new.patch', $new_patch_file);
-				echo "\nPatch file regenerated. Testing -R...\n\n/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ -i /tmp/tmp-new.patch 2<&1\n";
-				exec("/usr/bin/patch -p1 -R --dry-run --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ -i /tmp/tmp-new.patch 2<&1", $rdata2 = array(), $rval2);
-				echo `/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../git/StockWebOS/v$version/ -i /tmp/tmp-new.patch 2<&1`;
+				echo "\nPatch file regenerated. Testing -R...\n\n/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../../patches/rootfs/v".$version."/ -i /tmp/tmp-new.patch 2<&1\n";
+				exec("/usr/bin/patch -p1 -R --dry-run --no-backup-if-mismatch -d ../../../patches/rootfs/v".$version."/ -i /tmp/tmp-new.patch 2<&1", $rdata2 = array(), $rval2);
+				echo `/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../../patches/rootfs/v$version/ -i /tmp/tmp-new.patch 2<&1`;
 				if($rval2 == "0") {
 					echo "\r\n-R completes successfully! Patch can be regenerated properly.";
 				} else {
 					echo "\r\n-R FAILS! Patch CAN NOT be regenerated properly!";
 				}
-			system('cd ../../git/StockWebOS/v'.$version.'/ ; /usr/bin/git checkout -f HEAD >> /dev/null ; /usr/bin/git clean -f -d -x >> /dev/null');
+			system('cd ../../../patches/rootfs/v'.$version.'/ ; /usr/bin/git checkout -f HEAD >> /dev/null ; /usr/bin/git clean -f -d -x >> /dev/null');
 			}				
 			echo "</pre></td>
 				</tr>";
@@ -938,25 +938,25 @@ function TestPatch($pid) {
 	foreach($webos_versions_array as $key=>$version) {
 		if(!in_array($version, $versions)) {
 			echo "<tr>
-					<td>Testing ".$version.":<br/><pre>/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../git/StockWebOS/v".$version."/ < /tmp/tmp.patch 2<&1\n";
+					<td>Testing ".$version.":<br/><pre>/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../../patches/rootfs/v".$version."/ < /tmp/tmp.patch 2<&1\n";
 			ob_flush();
-			exec("/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1", $rdata = array(), $rval);
-			echo `/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1`;
+			exec("/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../../patches/rootfs/v$version/ < /tmp/tmp.patch 2<&1", $rdata = array(), $rval);
+			echo `/usr/bin/patch -p1 --no-backup-if-mismatch --dry-run -d ../../../patches/rootfs/v$version/ < /tmp/tmp.patch 2<&1`;
 			if($rval == "0") {
-				echo "\nPatch applies successfully. Now applying patch to test regeneration and -R:\n\n/usr/bin/patch -p1 --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ < /tmp/tmp.patch 2<&1\n";
-				echo `/usr/bin/patch -p1 --no-backup-if-mismatch -d ../../git/StockWebOS/v$version/ < /tmp/tmp.patch 2<&1`;
-				echo "\ncd ../../git/StockWebOS/v".$version."/ ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached\n";
-				$new_patch_file = `cd ../../git/StockWebOS/v$version/ ; /usr/bin/patch -p1 --no-backup-if-mismatch -i /tmp/$tmp.patch >> /dev/null 2>&1 ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached`;
+				echo "\nPatch applies successfully. Now applying patch to test regeneration and -R:\n\n/usr/bin/patch -p1 --no-backup-if-mismatch -d ../../../patches/rootfs/v".$version."/ < /tmp/tmp.patch 2<&1\n";
+				echo `/usr/bin/patch -p1 --no-backup-if-mismatch -d ../../../patches/rootfs/v$version/ < /tmp/tmp.patch 2<&1`;
+				echo "\ncd ../../../patches/rootfs/v".$version."/ ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached\n";
+				$new_patch_file = `cd ../../../patches/rootfs/v$version/ ; /usr/bin/patch -p1 --no-backup-if-mismatch -i /tmp/$tmp.patch >> /dev/null 2>&1 ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached`;
 				file_put_contents('/tmp/tmp-new.patch', $new_patch_file);
-				echo "\nPatch file regenerated. Testing -R...\n\n/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ -i /tmp/tmp-new.patch 2<&1\n";
-				exec("/usr/bin/patch -p1 -R --dry-run --no-backup-if-mismatch -d ../../git/StockWebOS/v".$version."/ -i /tmp/tmp-new.patch 2<&1", $rdata2 = array(), $rval2);
-				echo `/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../git/StockWebOS/v$version/ -i /tmp/tmp-new.patch 2<&1`;
+				echo "\nPatch file regenerated. Testing -R...\n\n/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../../patches/rootfs/v".$version."/ -i /tmp/tmp-new.patch 2<&1\n";
+				exec("/usr/bin/patch -p1 -R --dry-run --no-backup-if-mismatch -d ../../../patches/rootfs/v".$version."/ -i /tmp/tmp-new.patch 2<&1", $rdata2 = array(), $rval2);
+				echo `/usr/bin/patch -p1 -R --no-backup-if-mismatch -d ../../../patches/rootfs/v$version/ -i /tmp/tmp-new.patch 2<&1`;
 				if($rval2 == "0") {
 					echo "\r\n-R completes successfully! Patch can be regenerated properly.";
 				} else {
 					echo "\r\n-R FAILS! Patch CAN NOT be regenerated properly!";
 				}
-			system('cd ../../git/StockWebOS/v'.$version.'/ ; /usr/bin/git checkout -f HEAD >> /dev/null ; /usr/bin/git clean -f -d -x >> /dev/null');
+			system('cd ../../../patches/rootfs/v'.$version.'/ ; /usr/bin/git checkout -f HEAD >> /dev/null ; /usr/bin/git clean -f -d -x >> /dev/null');
 			}				
 			echo "</pre></td>
 				</tr>";
@@ -976,7 +976,7 @@ function TestPatch($pid) {
 
 function MainFooter() {
 	echo '	  <tr>
-		<td colspan="12" width="100%" align="center" class="copyright"><center>&copy; 2009 - 2010 Daniel Beames (dBsooner) and webOS-Internals Group</center></td>
+		<td colspan="12" width="100%" align="center" class="copyright"><center>&copy; 2009 - 2010 Daniel Beames (dBsooner) and WebOS Internals</center></td>
 	  </tr>
 	  </table>
 	  </body>
@@ -986,7 +986,7 @@ function MainFooter() {
 
 // LET'S BUILD THE PAGE!
 
-switch($do) {
+switch($_GET['do']) {
 	case 'new':
 		MainHeader($_GET['do'],'');
 		BrowsePatches($_GET['do'], 'all', 'all', $_GET['order'], $_GET['desc']);
@@ -1044,3 +1044,4 @@ switch($do) {
 		MainFooter();
 }
 ?>
+

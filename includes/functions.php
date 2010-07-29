@@ -220,7 +220,7 @@ function SendEmail($emailtype, $pid) {
 //	$admin_email = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'admin_emails'");
 	$patch = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
 	$to = $patch['email'];
-	$from = 'WebOS-Patches Web Portal <webOS-Patches@dbsooner.com>';
+	$from = 'WebOS-Patches Web Portal <support@webos-internals.org>';
 	$random_hash = md5(date('r', time()));
 	$headers = "From: ".$from."\r\n";
 	$headers .= "Return-Path: ".$from."\r\n";
@@ -242,7 +242,7 @@ function SendEmail($emailtype, $pid) {
 <p>Thank you for submitting <?php echo iif($emailtype=="submit_update", "an update to the", "a new"); ?> patch entitled <?php echo '<b>'.$patch['category'].':</b> '.$patch['title']; ?>.</p>
 <p>You will receive another email once the patch is either approved or denied.<br/>
 If you did not submit this patch and are receiving this email, it is more than likely because your email is still listed as the primary contact for this patch. If you would like your email removed, please reply to this email requesting so.</p>
-<p>-Daniel (dBsooner) and WebOS-Internals<br/><a href="http://patches.webos-internals.org/">http://patches.webos-internals.org/</a></p>
+<p>-Daniel (dBsooner) and WebOS Internals<br/><a href="http://patches.webos-internals.org/">http://patches.webos-internals.org/</a></p>
 </body>
 </html>
 <?php
@@ -269,14 +269,14 @@ If you did not submit this patch and are receiving this email, it is more than l
 ?><br/>
 <br/>
 If you did not submit this patch and are receiving this email, it is more than likely because your email is still listed as the primary contact for this patch. If you would like your email removed, please reply to this email requesting so.</p>
-<p>-Daniel (dBsooner) and WebOS-Internals<br/><a href="http://patches.webos-internals.org/">http://patches.webos-internals.org/</a></p>
+<p>-Daniel (dBsooner) and WebOS Internals<br/><a href="http://patches.webos-internals.org/">http://patches.webos-internals.org/</a></p>
 </body>
 </html>
 <?php
 	}
 	$message = ob_get_clean();
-	if(!@mail( $to, $subject, $message, $headers, "-rwebOS-Patches@dbsooner.com -fwebOS-Patches@dbsooner.com" )) {
-		mail($admin_email['value'], "WebOS-Patches Web Portal Email Error", "There was an error in sending the email to the developer.", "From: webOS-Patches@dbsooner.com");
+	if(!@mail( $to, $subject, $message, $headers, "-rsupport@webos-internals.org -fsupport@webos-internals.org" )) {
+		mail($admin_email['value'], "WebOS-Patches Web Portal Email Error", "There was an error in sending the email to the developer.", "From: support@webos-internals.org");
 	}
 
 }
