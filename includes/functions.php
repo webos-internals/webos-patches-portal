@@ -222,8 +222,7 @@ function UploadImage($pid, $ss, $title) {
 
 function SendEmail($emailtype, $pid) {
 	global $DB;
-// I am tired of getting emails. :)
-//	$admin_email = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'admin_emails'");
+	$admin_email = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'admin_emails'");
 	$patch = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
 	$to = $patch['email'];
 	$from = 'WebOS-Patches Web Portal <support@webos-internals.org>';
@@ -231,8 +230,7 @@ function SendEmail($emailtype, $pid) {
 	$headers = "From: ".$from."\r\n";
 	$headers .= "Return-Path: ".$from."\r\n";
 	$headers .= "Reply-To: ".$from."\r\n";
-// I am tired of getting emails. :)
-//	$headers .= "Bcc: ".$admin_email['value']."\r\n";
+	$headers .= "Bcc: ".$admin_email['value']."\r\n";
 	$headers .= "MIME-Version: 1.0\r\n";
 	$headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
 	if($emailtype == "submit_update" || $emailtype == "submit_new") {
@@ -248,7 +246,7 @@ function SendEmail($emailtype, $pid) {
 <p>Thank you for submitting <?php echo iif($emailtype=="submit_update", "an update to the", "a new"); ?> patch entitled <?php echo '<b>'.$patch['category'].':</b> '.$patch['title']; ?>.</p>
 <p>You will receive another email once the patch is either approved or denied.<br/>
 If you did not submit this patch and are receiving this email, it is more than likely because your email is still listed as the primary contact for this patch. If you would like your email removed, please reply to this email requesting so.</p>
-<p>-Daniel (dBsooner) and WebOS Internals<br/><a href="http://patches.webos-internals.org/">http://patches.webos-internals.org/</a></p>
+<p>-WebOS Internals<br/><a href="http://patches.webos-internals.org/">http://patches.webos-internals.org/</a></p>
 </body>
 </html>
 <?php
@@ -270,12 +268,12 @@ If you did not submit this patch and are receiving this email, it is more than l
 	if($emailtype == "denied") {
 		echo "It was denied for the following reason:<br/><br/>".$patch['denied_reason']."<br/><br/>If you feel this is a mistake, please contact the admins. Otherwise, if applicable, correct the patch and resubmit it.";
 	} else {
-		echo "You should see it in the WebOS-Patches Feed in Preware (and other installers) within the next 15 minutes.";
+		echo "You should see it in the WebOS-Patches Feed in Preware (and other installers) within the next couple of hours.";
 	}
 ?><br/>
 <br/>
 If you did not submit this patch and are receiving this email, it is more than likely because your email is still listed as the primary contact for this patch. If you would like your email removed, please reply to this email requesting so.</p>
-<p>-Daniel (dBsooner) and WebOS Internals<br/><a href="http://patches.webos-internals.org/">http://patches.webos-internals.org/</a></p>
+<p>-WebOS Internals<br/><a href="http://patches.webos-internals.org/">http://patches.webos-internals.org/</a></p>
 </body>
 </html>
 <?php

@@ -197,7 +197,8 @@ function BrowsePatches($webosver, $category, $order, $desc) {
 			$ver_count = 0;
 			$get_webos_versions = explode(' ', $patch['versions']);
 			foreach($get_webos_versions as $key=>$value) {
-				if(!in_array(array_shift(explode('-',$value,2)), $webos_versions_hide_array)) {
+				if((in_array(array_shift(explode('-',$value,2)), $webos_versions_array)) &&
+				   (!in_array(array_shift(explode('-',$value,2)), $webos_versions_hide_array))) {
 					$versions_out .= iif($ver_count==0, '', ' ').$value;
 					$ver_count++;
 				}
