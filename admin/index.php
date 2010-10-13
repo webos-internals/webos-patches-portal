@@ -340,7 +340,7 @@ function BuildForm($errors, $pid) {
 		</tr>
 		<tr>
 			<td width="15%" class="cell3">Patch File: (*)</td>
-			<td width="85%" class="cell4"><a href="?do=get_patch&pid='.$patch[pid].'">View Patch</a></td>
+			<td width="85%" class="cell4"><a href="?do=show_patch&pid='.$patch[pid].'">View Patch</a> - <a href="?do=get_patch&pid='.$patch[pid].'">Get Patch</a> - <a href="?do=testpatch&pid='.$patch[pid].'" target="_blank">Test Patch</a></td>
 		</tr>
 		<tr>
 			<td width="15%" class="cell3">Dependants:</td>
@@ -425,7 +425,15 @@ function BuildForm($errors, $pid) {
 			<b>Note:</b> This will not be published. It is simply a note to the Admins.</td>
 		</tr>
 		<tr>
-			<td colspan="2" align="center" class="cell5"><input type="submit" value="Approve It!"></td>
+			<td colspan="2" align="center" class="cell5"><input type="submit" name="subby" style="font-weight: bold; font-size: 26px; background-color: #0f0;" value="Approve It!"></td>
+		</tr>
+		<tr>
+			<td width="15%" class="cell3" valign="top">Denial Message</td>
+			<td width="85%" class="cell4"><textarea class="uploadpatch" name="denied_reason" cols="50" rows="3"></textarea><br/>
+			<b>Note:</b> Don\'t leave this blank!</td>
+		</tr>
+		<tr>
+			<td colspan="2" align="center" class="cell5"><input type="submit" name="subby" style="font-weight: bold; font-size: 26px; background-color: #f00;" value="DENIED!"></td>
 		</tr>
 		</table>
 		</form>';
@@ -438,257 +446,275 @@ function HandleForm($pid) {
 	foreach($_POST as $key => $value) {
 		$$key = $value;
 	}
-	$errors = NULL;
-	if(strlen($title) < '1') {
-		$errors[] = 'You must enter a title.';
-	} else {
-		if((preg_replace('/^[0-9A-Za-z-\/ ]*$/', '', $title) != "") && (!$update_pid)) {
-			$errors[] = 'Title can only contain letters, numbers and -\'s.';
-		}
-	}
-
-	if(strlen($description) < '10') {
-		$errors[] = 'Please be more descriptive.';
-	}
-	if($category == 'Select...') {
-		$errors[] = 'You must select a category.';
-	}
-	if(!$webos_versions) {
-		$errors[] = 'You must select at least one webOS Version.';
-	}
-	if(!$maintainer) {
-		$errors[] = 'You must enter the maintainer.';
-	}
-	if($email) {
-		if(!validateEmail($email)) {
-			$errors[] = 'Email address is invalid.';
-		}
-	} else {
-		$errors[] = 'You must supply your email address.';
-	}
-	if($homepage) {
-		if(!validateUrlSyntax($homepage, '')) {
-			$errors[] = 'Patch homepage is invalid.';
-		}
-	}
-
-	if($errors) {
+	
+	if ($_REQUEST['subby'] == 'DENIED!')
+	{
 		MainHeader($_GET['do'],'');
-		BuildForm($errors, $_POST['pid']);
-		return;
-	}
-	
-	MainHeader($_GET['do'], iif(strlen($update_pid)>="1", "2", "1"));
-	echo '<tr>
-			<td colspan="2">';
-	ob_flush();
-	if($update_pid) {
-		$updateform = '1';
-		$original = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$update_pid."'");
-	}
-
-	$icon = $icon_array[$category];
-
-	if($screenshot1 == "1") {
-		echo 'Screenshot 1: ... Please Wait ... ';
-		ob_flush();
-		$screenshot1 = UploadImage($pid, "1", $title);
-		echo '<b>Uploaded!</b><br/>';
-		ob_flush();
-	} else {
-		if($update_pid) {
-			$screenshot1 = $original['screenshot_1'];
-		} else {
-			$screenshot1 = NULL;
-		}
-	}
-	if($screenshot2 == "1") {
-		echo 'Screenshot 2: ... Please Wait ... ';
-		ob_flush();
-		$screenshot2 = UploadImage($pid, "2", $title);
-		echo '<b>Uploaded!</b><br/>';
-		ob_flush();
-	} else {
-		if($update_pid) {
-			$screenshot2 = $original['screenshot_2'];
-		} else {
-			$screenshot2 = NULL;
-		}
-	}
-	if($screenshot3 == "1") {
-		echo 'Screenshot 3: ... Please Wait ... ';
-		ob_flush();
-		$screenshot3 = UploadImage($pid, "3", $title);
-		echo '<b>Uploaded!</b><br/>';
-		ob_flush();
-	} else {
-		if($update_pid) {
-			$screenshot3 = $original['screenshot_3'];
-		} else {
-			$screenshot3 = NULL;
-		}
-	}
-	$description2 = mynl2br($description);
-	$description2 = stripslashes(str_replace('"', "'", $description2));
-
-	$changelog2 = mynl2br($changelog);
-	$changelog2 = stripslashes(str_replace('"', "'", $changelog2));
-
-	if(strlen($depends) >= '1') {
-		$depends_array = explode(',', $depends);
-		for($i=0; $i < count($depends_array); $i++) {
-			$depends_array2[] = trim($depends_array[$i]);
-		}
-		$depends = implode(',', $depends_array2);
-	}
-	
-	$maintainer_array = explode(',', $maintainer);
-	for($i=0; $i < count($maintainer_array); $i++) {
-		$maintainer_array2[] = trim($maintainer_array[$i]);
-	}
-	$maintainer = implode(',', $maintainer_array2);
-
-	foreach($webos_versions as $key => $webos_version) {
-		$get_sub_version = array();
-		exec('cd ../../../patches/modifications/v'.$webos_version.' ; /usr/bin/git tag | grep '.$webos_version.' | cut -d- -f2', $get_sub_version);
-		$sub_version = max($get_sub_version);
-		$sub_version++;
-		$new_versions[] = $webos_version.'-'.$sub_version;
-	}
-
-	if($updateform == '1') {
-		$versions_array = explode(' ', $original['versions']);
-		foreach($versions_array as $key=>$version) {
-			$main_ver .= array_shift(explode('-',$version,2));
-			if(!in_array($main_ver, $webos_versions)) {
-				$keep_versions[] = $version;
-			}
-			unset($main_ver);
-		}
-	}
-	foreach($new_versions as $key=>$version) {
-		$keep_versions[] = $version;
-	}
-	sort($keep_versions);
-	$versions2 = implode(' ', $keep_versions);
-	
-	$get_patch_file = $DB->query_first("SELECT patch_file,update_pid FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
-	$patch_file_contents = $get_patch_file['patch_file'];
-
-	// GOING TO NEED TO UPDATE 'UPDATE_PID' AND DELETE PID(?)
-	
-	$DB->query("UPDATE ".TABLE_PREFIX."patches SET title = '".mysql_real_escape_string($title)."',
-											description = '".mysql_real_escape_string($description2)."',
-											patch_file = NULL,
-											category = '$category',
-											depends = '$depends',
-											screenshot_1_blob = NULL,
-											screenshot_1_type = NULL,
-											screenshot_2_blob = NULL,
-											screenshot_2_type = NULL,
-											screenshot_3_blob = NULL,
-											screenshot_3_type = NULL,
-											screenshot_1 = '$screenshot1',
-											screenshot_2 = '$screenshot2',
-											screenshot_2 = '$screenshot2',
-											icon = '$icon',
-											webos_versions = NULL,
-											maintainer = '".mysql_real_escape_string($maintainer)."',
-											email = '$email',
-											private = '$private',
-											homepage = '$homepage',
-											status = '1',
-											versions = '$versions2',
-											note_to_admins = '".mysql_real_escape_string($note_to_admins)."',
-											changelog = '".mysql_real_escape_string($changelog2)."',
-											".iif($updateform!=1, "lastupdated = '".time()."',", "")."
-											".iif($updateform==1, "lastupdated", "dateaccepted")." = '".time()."'
-									WHERE pid = '".iif($updateform==1, $update_pid, $pid)."'");  
-	foreach($new_versions as $key=>$version) {
-		$gitversions = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'gitversions'");
-		$gitversions_array = explode(',',$gitversions['value']);
-		if(!in_array($version, $gitversions_array)) {
-			$gitversions_array[] = $version;
-		}
-		$gitversions_out = implode(',', $gitversions_array);
-		$DB->query("UPDATE ".TABLE_PREFIX."settings SET value = '".$gitversions_out."' WHERE setting = 'gitversions'");
-	}
-
-	//Send Email - Need to send this here because SendEmail relies on the database entry.
-	//             The db entry of an updated patch is deleted in next if statement.
-	SendEmail("approved", $pid);
-
-	echo 'Email: <b>Sent!</b><br/>';
-	ob_flush();
-	
-	if($updateform == '1') {
+		print "<tr><td>";
+		
+		$DB->query("UPDATE ".TABLE_PREFIX."patches SET denied_reason = '".mysql_real_escape_string($denied_reason)."' WHERE pid = '".$pid."'");  
+		
+		SendEmail("denied", $pid);
+		
 		$DB->query("DELETE FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."' LIMIT 1");
-		$pid = $update_pid;
+		
+		print "DENIED!";
+		
+		print "</td></tr>";
 	}
-
-	$patch = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
-	$title2 = strtolower($patch['title']);
-	$title2 = str_replace(" ", "-", $title2);
-	$title2 = str_replace("_", "-", $title2);
-	$title2 = str_replace("/", "-", $title2);
-	$title2 = str_replace("\\", "-", $title2);
-	$category2 = strtolower(str_replace(" ", "-", $patch['category']));
-	$patchname = $category2.'-'.$title2;
-	$DB->query("UPDATE ".TABLE_PREFIX."patches SET app_id = '".$patchname."' WHERE pid = '".$pid."'");
-	$versions = 'VERSIONS = '.$versions2;
-	file_put_contents('/tmp/'.$patchname.'.patch', $patch_file_contents);
-	foreach($webos_versions as $key => $webos_version) {
-		echo 'v'.$webos_version.' patch file: ... Please Wait ... ';
-		ob_flush();
-		$new_patch_file = `cd ../../../patches/rootfs/v$webos_version/ ; /usr/bin/patch -p1 --no-backup-if-mismatch -i /tmp/$patchname.patch >> /dev/null 2>&1 ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached`;
-#		$new_patch_file = $patch_file_contents;
-		system('cd ../../../patches/rootfs/v'.$webos_version.'/ ; /usr/bin/git checkout -f HEAD >> /dev/null ; /usr/bin/git clean -f -d -x >> /dev/null');
-		if(!is_dir($dir = '../../../patches/modifications/v'.$webos_version.'/'.$category2.'/')) {
-			mkdir($dir);
-		}
-		file_put_contents('../../../patches/modifications/v'.$webos_version.'/'.$category2.'/'.$patchname.'.patch', $new_patch_file);
-		echo '<b>Regenerated!</b><br/>';
-		ob_flush();
-	}
-	system('rm -f /tmp/'.$patchname.'.patch');
-
-	$ssout=NULL;
-	$sscount=0;
-	if(strlen($screenshot1) >= 1) {
-		$ssout .= '\"'.$screenshot1.'\"';
-		$sscount++;
-	}
-	if(strlen($screenshot2) >= 1) {
-		$ssout .= iif(strlen($ssout)>=1, ",\\\n", "").'\"'.$screenshot2.'\"';
-		$sscount++;
-	}	
-	if(strlen($screenshot3) >= 1) {
-		$ssout .= iif(strlen($ssout)>=1, ",\\\n", "").'\"'.$screenshot3.'\"';
-		$sscount++;
-	}
-	if($sscount >= "2") {
-		$screenshots2 = "SCREENSHOTS = [\\\n".$ssout." ]";
-	} else if($sscount == "1") {
-		$screenshots2 = "SCREENSHOTS = [ ".$ssout." ]";
-	} else {
-		$screenshots2 = "SCREENSHOTS =";
-	}
-	$maintainer_array = explode(',', $patch['maintainer']);
-	$num_maintainers = count($maintainer_array);
-	for($i=0; $i < $num_maintainers; $i++) {
-		if($patch['email'] && ($patch['private'] != '1') && ($i=="0")) {
-			$maintainer_out .= ' '.trim($maintainer_array[$i]).' <'.$patch[email].'>';
+	if ($_REQUEST['subby'] == 'Approve It!')
+	{
+		$errors = NULL;
+		if(strlen($title) < '1') {
+			$errors[] = 'You must enter a title.';
 		} else {
-			$maintainer_out .= iif($i>=1, ', ', ' ').trim($maintainer_array[$i]);
+			if((preg_replace('/^[0-9A-Za-z-\/ ]*$/', '', $title) != "") && (!$update_pid)) {
+				$errors[] = 'Title can only contain letters, numbers and -\'s.';
+			}
 		}
-	}
-	if(strlen($homepage) > '0') {
-		$homepage2 = ' '.$homepage;
-	} else {
-		$homepage2 = '';
-	}
-
-	$makefile_content = "NAME = \$(shell basename \$(shell pwd))
+	
+		if(strlen($description) < '10') {
+			$errors[] = 'Please be more descriptive.';
+		}
+		if($category == 'Select...') {
+			$errors[] = 'You must select a category.';
+		}
+		if(!$webos_versions) {
+			$errors[] = 'You must select at least one webOS Version.';
+		}
+		if(!$maintainer) {
+			$errors[] = 'You must enter the maintainer.';
+		}
+		if($email) {
+			if(!validateEmail($email)) {
+				$errors[] = 'Email address is invalid.';
+			}
+		} else {
+			$errors[] = 'You must supply your email address.';
+		}
+		if($homepage) {
+			if(!validateUrlSyntax($homepage, '')) {
+				$errors[] = 'Patch homepage is invalid.';
+			}
+		}
+	
+		if($errors) {
+			MainHeader($_GET['do'],'');
+			BuildForm($errors, $_POST['pid']);
+			return;
+		}
+		
+		MainHeader($_GET['do'], iif(strlen($update_pid)>="1", "2", "1"));
+		echo '<tr>
+				<td colspan="2">';
+		flush();
+		if($update_pid) {
+			$updateform = '1';
+			$original = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$update_pid."'");
+		}
+	
+		$icon = $icon_array[$category];
+	
+		if($screenshot1 == "1") {
+			echo 'Screenshot 1: ... Please Wait ... ';
+			flush();
+			$screenshot1 = UploadImage($pid, "1", $title);
+			echo '<b>Uploaded!</b><br/>';
+			flush();
+		} else {
+			if($update_pid) {
+				$screenshot1 = $original['screenshot_1'];
+			} else {
+				$screenshot1 = NULL;
+			}
+		}
+		if($screenshot2 == "1") {
+			echo 'Screenshot 2: ... Please Wait ... ';
+			flush();
+			$screenshot2 = UploadImage($pid, "2", $title);
+			echo '<b>Uploaded!</b><br/>';
+			flush();
+		} else {
+			if($update_pid) {
+				$screenshot2 = $original['screenshot_2'];
+			} else {
+				$screenshot2 = NULL;
+			}
+		}
+		if($screenshot3 == "1") {
+			echo 'Screenshot 3: ... Please Wait ... ';
+			flush();
+			$screenshot3 = UploadImage($pid, "3", $title);
+			echo '<b>Uploaded!</b><br/>';
+			flush();
+		} else {
+			if($update_pid) {
+				$screenshot3 = $original['screenshot_3'];
+			} else {
+				$screenshot3 = NULL;
+			}
+		}
+		$description2 = mynl2br($description);
+		$description2 = stripslashes(str_replace('"', "'", $description2));
+	
+		$changelog2 = mynl2br($changelog);
+		$changelog2 = stripslashes(str_replace('"', "'", $changelog2));
+	
+		if(strlen($depends) >= '1') {
+			$depends_array = explode(',', $depends);
+			for($i=0; $i < count($depends_array); $i++) {
+				$depends_array2[] = trim($depends_array[$i]);
+			}
+			$depends = implode(',', $depends_array2);
+		}
+		
+		$maintainer_array = explode(',', $maintainer);
+		for($i=0; $i < count($maintainer_array); $i++) {
+			$maintainer_array2[] = trim($maintainer_array[$i]);
+		}
+		$maintainer = implode(',', $maintainer_array2);
+	
+		foreach($webos_versions as $key => $webos_version) {
+			$get_sub_version = array();
+			exec('cd ../../../patches/modifications/v'.$webos_version.' ;/ust/bin/git fetch --tags; /usr/bin/git tag | grep '.$webos_version.' | cut -d- -f2', $get_sub_version);
+			$sub_version = max($get_sub_version);
+			$sub_version++;
+			$new_versions[] = $webos_version.'-'.$sub_version;
+		}
+	
+		if($updateform == '1') {
+			$versions_array = explode(' ', $original['versions']);
+			foreach($versions_array as $key=>$version) {
+				$main_ver .= array_shift(explode('-',$version,2));
+				if(!in_array($main_ver, $webos_versions)) {
+					$keep_versions[] = $version;
+				}
+				unset($main_ver);
+			}
+		}
+		foreach($new_versions as $key=>$version) {
+			$keep_versions[] = $version;
+		}
+		sort($keep_versions);
+		$versions2 = implode(' ', $keep_versions);
+		
+		$get_patch_file = $DB->query_first("SELECT patch_file,update_pid FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
+		$patch_file_contents = $get_patch_file['patch_file'];
+	
+		// GOING TO NEED TO UPDATE 'UPDATE_PID' AND DELETE PID(?)
+		
+		$DB->query("UPDATE ".TABLE_PREFIX."patches SET title = '".mysql_real_escape_string($title)."',
+												description = '".mysql_real_escape_string($description2)."',
+												patch_file = NULL,
+												category = '$category',
+												depends = '$depends',
+												screenshot_1_blob = NULL,
+												screenshot_1_type = NULL,
+												screenshot_2_blob = NULL,
+												screenshot_2_type = NULL,
+												screenshot_3_blob = NULL,
+												screenshot_3_type = NULL,
+												screenshot_1 = '$screenshot1',
+												screenshot_2 = '$screenshot2',
+												screenshot_2 = '$screenshot2',
+												icon = '$icon',
+												webos_versions = NULL,
+												maintainer = '".mysql_real_escape_string($maintainer)."',
+												email = '$email',
+												private = '$private',
+												homepage = '$homepage',
+												status = '1',
+												versions = '$versions2',
+												note_to_admins = '".mysql_real_escape_string($note_to_admins)."',
+												changelog = '".mysql_real_escape_string($changelog2)."',
+												".iif($updateform!=1, "lastupdated = '".time()."',", "")."
+												".iif($updateform==1, "lastupdated", "dateaccepted")." = '".time()."'
+										WHERE pid = '".iif($updateform==1, $update_pid, $pid)."'");  
+		foreach($new_versions as $key=>$version) {
+			$gitversions = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'gitversions'");
+			$gitversions_array = explode(',',$gitversions['value']);
+			if(!in_array($version, $gitversions_array)) {
+				$gitversions_array[] = $version;
+			}
+			$gitversions_out = implode(',', $gitversions_array);
+			$DB->query("UPDATE ".TABLE_PREFIX."settings SET value = '".$gitversions_out."' WHERE setting = 'gitversions'");
+		}
+	
+		//Send Email - Need to send this here because SendEmail relies on the database entry.
+		//             The db entry of an updated patch is deleted in next if statement.
+		SendEmail("approved", $pid);
+	
+		echo 'Email: <b>Sent!</b><br/>';
+		flush();
+		
+		if($updateform == '1') {
+			$DB->query("DELETE FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."' LIMIT 1");
+			$pid = $update_pid;
+		}
+	
+		$patch = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
+		$title2 = strtolower($patch['title']);
+		$title2 = str_replace(" ", "-", $title2);
+		$title2 = str_replace("_", "-", $title2);
+		$title2 = str_replace("/", "-", $title2);
+		$title2 = str_replace("\\", "-", $title2);
+		$category2 = strtolower(str_replace(" ", "-", $patch['category']));
+		$patchname = $category2.'-'.$title2;
+		$DB->query("UPDATE ".TABLE_PREFIX."patches SET app_id = '".$patchname."' WHERE pid = '".$pid."'");
+		$versions = 'VERSIONS = '.$versions2;
+		file_put_contents('/tmp/'.$patchname.'.patch', $patch_file_contents);
+		foreach($webos_versions as $key => $webos_version) {
+			echo 'v'.$webos_version.' patch file: ... Please Wait ... ';
+			flush();
+			$new_patch_file = `cd ../../../patches/rootfs/v$webos_version/ ; /usr/bin/patch -p1 --no-backup-if-mismatch -i /tmp/$patchname.patch >> /dev/null 2>&1 ; /usr/bin/git add . >> /dev/null 2>&1 ; /usr/bin/git diff --cached`;
+	#		$new_patch_file = $patch_file_contents;
+			system('cd ../../../patches/rootfs/v'.$webos_version.'/ ; /usr/bin/git checkout -f HEAD >> /dev/null ; /usr/bin/git clean -f -d -x >> /dev/null');
+			if(!is_dir($dir = '../../../patches/modifications/v'.$webos_version.'/'.$category2.'/')) {
+				mkdir($dir);
+			}
+			file_put_contents('../../../patches/modifications/v'.$webos_version.'/'.$category2.'/'.$patchname.'.patch', $new_patch_file);
+			echo '<b>Regenerated!</b><br/>';
+			flush();
+		}
+		system('rm -f /tmp/'.$patchname.'.patch');
+	
+		$ssout=NULL;
+		$sscount=0;
+		if(strlen($screenshot1) >= 1) {
+			$ssout .= '\"'.$screenshot1.'\"';
+			$sscount++;
+		}
+		if(strlen($screenshot2) >= 1) {
+			$ssout .= iif(strlen($ssout)>=1, ",\\\n", "").'\"'.$screenshot2.'\"';
+			$sscount++;
+		}	
+		if(strlen($screenshot3) >= 1) {
+			$ssout .= iif(strlen($ssout)>=1, ",\\\n", "").'\"'.$screenshot3.'\"';
+			$sscount++;
+		}
+		if($sscount >= "2") {
+			$screenshots2 = "SCREENSHOTS = [\\\n".$ssout." ]";
+		} else if($sscount == "1") {
+			$screenshots2 = "SCREENSHOTS = [ ".$ssout." ]";
+		} else {
+			$screenshots2 = "SCREENSHOTS =";
+		}
+		$maintainer_array = explode(',', $patch['maintainer']);
+		$num_maintainers = count($maintainer_array);
+		for($i=0; $i < $num_maintainers; $i++) {
+			if($patch['email'] && ($patch['private'] != '1') && ($i=="0")) {
+				$maintainer_out .= ' '.trim($maintainer_array[$i]).' <'.$patch[email].'>';
+			} else {
+				$maintainer_out .= iif($i>=1, ', ', ' ').trim($maintainer_array[$i]);
+			}
+		}
+		if(strlen($homepage) > '0') {
+			$homepage2 = ' '.$homepage;
+		} else {
+			$homepage2 = '';
+		}
+	
+		$makefile_content = "NAME = \$(shell basename \$(shell pwd))
 PATCH = $category2/\${NAME}.patch
 TITLE = $patch[title]
 DESCRIPTION = $description2
@@ -705,19 +731,20 @@ include ../modifications.mk
 MAINTAINER =$maintainer_out
 HOMEPAGE =$homepage2";
 
-	if(!is_dir($dir = '../../../patches/build/autopatch/'.$patchname.'/')) {
-		mkdir($dir);
+		if(!is_dir($dir = '../../../patches/build/autopatch/'.$patchname.'/')) {
+			mkdir($dir);
+		}
+		file_put_contents('../../../patches/build/autopatch/'.$patchname.'/Makefile', $makefile_content);
+		echo 'Makefile: <b>Generated!</b><br/>';
+		flush();
+	
+		//Let the user know the outcome
+		echo '</td>
+			</tr>
+			<tr>
+				<td colspan="2" align="center">The patch has been accepted! Thank you!</td>
+			</tr>';
 	}
-	file_put_contents('../../../patches/build/autopatch/'.$patchname.'/Makefile', $makefile_content);
-	echo 'Makefile: <b>Generated!</b><br/>';
-	ob_flush();
-
-	//Let the user know the outcome
-	echo '</td>
-		</tr>
-		<tr>
-			<td colspan="2" align="center">The patch has been accepted! Thank you!</td>
-		</tr>';
 }
 
 function GitExec($cmd) {
