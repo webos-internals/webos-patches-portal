@@ -61,7 +61,7 @@ function MainHeader($do, $switch) {
 	  <table width="100%" border="1" cellpadding="5" cellspacing="0">
 	  <tr>
 		<td colspan="12" align="center" class="header">WebOS-Patches Admin<br/>
-		<a href="/admin/">Home</a> | ';
+		<a href="/admin/">Home</a> | <a href="?do=git&cmd=pull">Git Pull</a> | ';
 	if($do != "new") {
 		echo '<a href="?do=new">'.iif($new_count[num_new]>=1, "<b>", "").'New Submissions ('.$new_count[num_new].')'.iif($new_count[num_new]>=1, "</b>", "").'</a>';
 	} else {
@@ -72,7 +72,7 @@ function MainHeader($do, $switch) {
 	} else {
 		echo ' | Update Submissions ('.$update_count[num_update].')';
 	}
-echo ' | '.iif($do=="browse", "Browse Patches", '<a href="?do=browse">Browse Patches</a>').' | <a href="?do=git&cmd=pull">Git Pull</a> | <a href="?do=git&cmd=status">Git Status</a> | <a href="?do=git&cmd=add">Add All</a> | <a href="?do=git&cmd=commit">Commit All</a> | <a href="?do=git&cmd=push_mods">Push Mods</a> | <a href="?do=git&cmd=tag">Tag Mods</a> | <a href="?do=git&cmd=push_build">Push Build</a></td>
+echo ' | '.iif($do=="browse", "Browse Patches", '<a href="?do=browse">Browse Patches</a>').' | <a href="?do=git&cmd=status">Git Status</a> | <a href="?do=git&cmd=add">Add All</a> | <a href="?do=git&cmd=commit">Commit All</a> | <a href="?do=git&cmd=push_mods">Push Mods</a> | <a href="?do=git&cmd=tag">Tag Mods</a> | <a href="?do=git&cmd=push_build">Push Build</a></td>
 	  </tr>';
 }
 
@@ -441,7 +441,7 @@ function BuildForm($errors, $pid) {
 }
 
 function HandleForm($pid) {
-	global $DB, $icon_array;
+	global $DB, $webos_versions_array, $icon_array;
 
 	foreach($_POST as $key => $value) {
 		$$key = $value;
@@ -586,7 +586,7 @@ function HandleForm($pid) {
 			$versions_array = explode(' ', $original['versions']);
 			foreach($versions_array as $key=>$version) {
 				$main_ver .= array_shift(explode('-',$version,2));
-				if(!in_array($main_ver, $webos_versions)) {
+				if(in_array($main_ver, $webos_versions_array) && !in_array($main_ver, $webos_versions)) {
 					$keep_versions[] = $version;
 				}
 				unset($main_ver);
