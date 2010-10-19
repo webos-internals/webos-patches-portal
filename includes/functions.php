@@ -212,7 +212,7 @@ function UploadImage($pid, $ss, $title) {
 	$browser->setFieldById('wpIgnoreWarning', 'true');
 	$page = $browser->clickSubmitByName('wpUpload');
 	system('rm -f /tmp/'.$name);
-	preg_match('/img alt="Image:'.$name.'" src=(.*)/', $page, $matches);
+	preg_match('/img alt="File:'.$name.'" src=(.*)/', $page, $matches);
 	$start_pos = strpos($matches[0], "=", 10)+2;
 	$temp_url = substr($matches[0], $start_pos);
 	$stop_pos = strpos($temp_url, '"');
