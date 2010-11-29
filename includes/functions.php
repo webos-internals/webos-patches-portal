@@ -302,7 +302,7 @@ function mynl2br($string) {
 
 function SpamCheck($ip) {
 	global $DB;
-	$wait = (60*5);
+	$wait = (60);
 	$get_safe_ip_list = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'safe_ip_list'");
 	$safe_ip_list = explode(',', $get_safe_ip_list['value']);
 	if(!in_array($ip, $safe_ip_list)) {
