@@ -1,0 +1,6 @@
+Node modules which will be used:
+Express
+Underscore
+
+Unknown modules:
+	mysql	(to orm or to not orm?)
