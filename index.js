@@ -9,10 +9,14 @@ var gitWrapper=new wrapper.client({"path":"/Users/halfhalo/src/modifications"},f
 	}
 	else
 	{
-		//console.log("Success!")
-
 	}
 });
 gitWrapper.getBranches(function(branches,err){
 	console.log(branches)
+})
+gitWrapper.getTags(function(tags,err){
+	console.log(tags)
+})
+gitWrapper.getTree(null,null,function(tags,err){
+	console.log(tags)
 })
