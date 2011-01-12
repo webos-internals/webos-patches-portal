@@ -12,11 +12,14 @@ var gitWrapper=new wrapper.client({"path":"/Users/halfhalo/src/modifications"},f
 	}
 });
 gitWrapper.getBranches(function(branches,err){
-	console.log(branches)
-})
+	//console.log(branches)
+},true)
 gitWrapper.getTags(function(tags,err){
-	console.log(tags)
+	//console.log(tags)
 })
 gitWrapper.getTree(null,null,function(tags,err){
-	console.log(tags)
+	//console.log(tags)
+})
+gitWrapper.getLog(null,null,function(log){
+	console.log(log)
 })
