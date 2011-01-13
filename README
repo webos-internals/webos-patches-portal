@@ -4,3 +4,14 @@ Underscore
 
 Unknown modules:
 	mysql	(to orm or to not orm?)
+	
+	
+Layout:
+	Top Layer (Frontend):
+		View templates, sessions, cookies, and related
+	Middle Layer:
+		Unified API between top and bottom layers
+	Bottom Layer (Backend):
+		For git, mysql, user authentication, and related
+		
+	Top and Bottom layers should NEVER talk to each other directly.  All talk goes through middle layer to allow for changes in the top and bottom layers with no affect on other layers.
