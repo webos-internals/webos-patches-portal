@@ -1,4 +1,6 @@
 var express=require('express');
+var patches=require("./lib/patch");
+var patch=new patches.patch()
 var app = express.createServer();
 app.get('/', function(req, res){
     res.send('Hello World');

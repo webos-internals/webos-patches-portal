@@ -15,3 +15,13 @@ Layout:
 		For git, mysql, user authentication, and related
 		
 	Top and Bottom layers should NEVER talk to each other directly.  All talk goes through middle layer to allow for changes in the top and bottom layers with no affect on other layers.
+	
+Pages:
+	Login
+	Logout
+	Register
+
+
+
+Stuff to figure out how to do:
+	File Uploads (for images/parsing uploaded patch files)
