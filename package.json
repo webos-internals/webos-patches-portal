@@ -1,0 +1,19 @@
+{
+  "name": "webos-patches",
+  "description": "Patches Portal for webos-internals",
+  "version": "0.5.0",
+  "homepage": "redmine.webos-internals.org/projects/webos-patches",
+  "repository": "git@git.webos-internals.org:/www/webos-patches.git",
+  "author": "Patrick Roberts <patrick@silentbluesystems.com>",
+  "directories": {
+    "lib": "lib"
+  },
+	"dependencies":{
+		"underscore":"*",
+		"express":"*",
+		"coloured-log":"*"
+	},
+  "engines": {
+    "node": ">= v0.3.5"
+  }
+}
