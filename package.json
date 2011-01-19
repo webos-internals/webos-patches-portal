@@ -11,7 +11,9 @@
 	"dependencies":{
 		"underscore":"*",
 		"express":"*",
-		"coloured-log":"*"
+		"coloured-log":"*",
+		"jade":"*",
+		"mongoose":"*"
 	},
   "engines": {
     "node": ">= v0.3.5"

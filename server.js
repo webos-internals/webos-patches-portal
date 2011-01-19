@@ -12,7 +12,12 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express.staticProvider(__dirname + '/public'));
 app.get("/",function(req,res){
-		res.render("index",{locals:{nav:"",pageTitle:"Test Page",userBox:""}})
+		res.send("Index")
 })
-log.info("Starting Express Server on port 3000")
-app.listen(3000)
+try{
+	log.info("Starting Express Server on port 3000")
+	app.listen(3000)
+}catch(e)
+{
+	log.error("Could not start server due to error: "+e)
+}
