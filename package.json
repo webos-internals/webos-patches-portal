@@ -13,7 +13,8 @@
 		"express":"*",
 		"coloured-log":"*",
 		"jade":"*",
-		"mongoose":"*"
+		"mongoose":"*",
+		"argsparser":"*"
 	},
   "engines": {
     "node": ">= v0.3.5"
