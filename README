@@ -1,27 +1,58 @@
-Node modules which will be used:
-Express
-Underscore
-
-Unknown modules:
-	mysql	(to orm or to not orm?)
+Patch Object:
+	patch_id
+	patch_name
+	patch_revision (equivalent to git tag?)
+	patch_contents
+	category
+	webos_versions []
+		version_number
+	device []
+		device_name
+	screenshots []
+		url
+		device?			#Do we want to be able to sort screenshots by device
+		webos?			#What about by webos version?
+		date?				#Do we want to record when the sc is added?
+	maintainers []
+		name
+		email
+	modified_files []?	#Do we want to be able to sort by modified files either now or down the line?  
+		filename
+	comments []	#Instead of just having one space for an admin comment, it makes sense to at least have the flexibility to have multiple comments
+		from
+		message
+		public
+	submission []			#object holding submission information including date, user info, status, and message
+	name		#If user is logged in, it is set to that
+	email		#If user is logged in, it is set to that
+	user		#if user is logged in and has this preference set, it is set to that
+	status	#Status of the submission.  Can be Accepted, Denied, or Pending
+	message	#Optional reason that the patch was denied, if it was denied
 	
-	
-Layout:
-	Top Layer (Frontend):
-		View templates, sessions, cookies, and related
-	Middle Layer:
-		Unified API between top and bottom layers
-	Bottom Layer (Backend):
-		For git, mysql, user authentication, and related
-		
-	Top and Bottom layers should NEVER talk to each other directly.  All talk goes through middle layer to allow for changes in the top and bottom layers with no affect on other layers.
+User Object:
+	username
+	full_name
+	password
+	salt
+	reg_date
+	last_log_in
+	admin
 	
 Pages:
-	Login
-	Logout
-	Register
-
-
-
-Stuff to figure out how to do:
-	File Uploads (for images/parsing uploaded patch files)
+	Patch
+		index
+		browse
+		single_patch
+		single_revision
+		update
+		comment
+	User
+		register
+		sign_in
+		update
+		sign_out
+	Admin
+		pending_list
+		user_list
+		user_update
+		
