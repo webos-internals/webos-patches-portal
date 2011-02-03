@@ -62,4 +62,5 @@ Pages:
 	All single string data entries will default to using a dropdown box, while all arrays will default to using checkbox's.  However, there will be an array of valid fields to allow searching by (at least via the searchbar) in order to not clog up the system (since searching by something like screenshots makes no sense at all)
 	There are data entries for modified files that will eventually be used to create a list of compatible patch's (and will be a special case for the searchbar, where there can be multiple "Compatible With" entries with a value chosen by dropdown)
 	
-		
+	Mockups:
+		Mockups of the pages are located in the mockup directory of the git repo.
