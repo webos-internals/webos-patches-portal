@@ -24,6 +24,9 @@ Patch Object:
 		public
 	equivilant_to [] #Lets two different patch revisions show up as one in the patch view (So -9 and -10 would be shown as a single version, usefull for submitting slightly different patch's for different devices/webos versions)
 		revision
+	change_log [] #Array of changes to the Revision between this one and the last one
+		date
+		change
 	submission []			#object holding submission information including date, user info, status, and message
 	name		#If user is logged in, it is set to that
 	email		#If user is logged in, it is set to that
@@ -64,3 +67,52 @@ Pages:
 	
 	Mockups:
 		Mockups of the pages are located in the mockup directory of the git repo.
+		
+		
+		
+		
+	UI Elements:		#Here is a list of the different UI elements and what data params is needed for each one
+		Global:
+		Header:
+			Page Title
+			Nav Links:
+				title
+				link
+				active
+				first
+				class
+			User Links:
+				title
+				link
+				active
+				first
+				class
+				
+				
+				
+				
+				
+			Sidebar:
+				SearchBar:
+					SingleSelect:
+						field
+						options:
+							name
+							value
+							selected
+					MultiSelect:
+						field
+						options:
+							name
+							value
+							selected
+					Proposed Patches:
+						patches
+							title
+							category
+							date
+					Recent Patches:
+						patches
+							title
+							category
+							date
