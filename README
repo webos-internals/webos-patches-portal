@@ -4,6 +4,7 @@ Patch Object:
 	patch_revision (equivalent to git tag?)
 	patch_contents
 	category
+	icon
 	webos_versions []
 		version_number
 	device []
