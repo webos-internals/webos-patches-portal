@@ -10,10 +10,20 @@
   <script>
 	$(document).ready(function() {
    // do stuff when DOM is ready
-	$(".searchRemove").click(function(foo){
+	$(".searchRemove").click(function(){
 		$(this).parent().parent().parent().slideUp(function(){
 			$(this).remove()
 		})
+	})
+	$(".searchAdd").click(function(){
+		$.ajax({
+		  url: "/api/search/new",
+		  context: document.body,
+		  success: function(data){
+		    console.log(data)
+		  }
+		});
+		console.log($(this).parent().parent())
 	})
  	});
   </script>
