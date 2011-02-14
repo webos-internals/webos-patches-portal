@@ -16,16 +16,39 @@
 		})
 	})
 	$(".searchAdd").click(function(){
-		$.ajax({
-		  url: "/api/search/new",
-		  context: document.body,
-		  success: function(data){
-		    console.log(data)
-		  }
-		});
-		console.log($(this).parent().parent())
+		if($(".sn").get().length==0)
+		{
+
+		
+	//	{}
+	//	else
+	//	{
+		var str="<div style='display:none' class='sn'><p><b>Add: </b><select  class='searchNew'><option value='none'>Select Parameter</option>";
+		var arr=[{"name":"category","title":"Category"}];
+		for(var i=0;i<arr.length;i++)
+		{
+			str+="<option value='"+arr[i]['name']+"'>"+arr[i]['title']+"</option>";
+		}
+		str+="</p></div>";
+		$("#searchHolder").append(str);
+		
+		$(".sn").slideDown(function(){
+			$(".searchNew").change(function(){
+				if($(this).val()!="none")
+				{
+					$(".sn").slideUp(function(){
+						$(".sn").remove();
+					})
+				}
+			})
+		})
+	}
+	
 	})
+
+
  	});
+	
   </script>
 
 </head> 
