@@ -43,6 +43,7 @@ app.get("/old",function(req,res){
 					})
 					page.searchList("WebOS Version","webos",[{"title":"Option Numero Uno","value":"uno"}])
 					page.searchCheck("Device","device",[{"title":"1.4.5","value":"1.4.5"},{"title":"1.4.6","value":"1.4.6"},{"title":"1.4.7","value":"1.4.7"}])
+					page.search=true
 					page.contentBlock("Test Block","This is a test block thingie.  It is made of unicorns and fairy dust.")
 					page.sidebarBlock("Test Sidebar","This is a test sidebar thingie.  Weeee!",null,true);
 					page.sidebarList("Test List",[{"title":"blah","class":"red","link":"#"}])
