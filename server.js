@@ -68,6 +68,11 @@ app.get("/old",function(req,res){
 	})
 		
 })
+app.get(/(.*)/,function(req,res){
+	//console.log(res)
+	log.info(req.method+" "+req.socket.remoteAddress+" 404 "+req.url)
+	res.send(404)
+})
 try{
 	config.get("server","port",function(val){
 		log.info("Starting Express Server on port "+val)
