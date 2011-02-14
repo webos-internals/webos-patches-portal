@@ -24,6 +24,11 @@ app.get("/",function(req,res){
 		res.send(page)
 	})
 });
+app.get("/patches/new",function(req,res){
+	template.patchNew(function(page){
+		res.send(page)
+	})
+});
 app.get("/old",function(req,res){
 	template.page(function(page){
 		page.header(null,function(){
