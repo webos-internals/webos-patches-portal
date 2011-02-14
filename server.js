@@ -1,16 +1,20 @@
 var express=require("express");
+var form = require('connect-form');
 var Log = require('coloured-log'); log = new Log(Log.DEBUG)
 var patches=require("./lib/patches");patches = new patches.patch();
-var app = express.createServer();
+var app = express.createServer(form({ keepExtensions: true }));
 var config=require("./lib/config"); config=new config.config();
-var template=require('./lib/template'); template= new template.t({},null,null,config,log);
+var users=require("./lib/users"); users=new users.u({},config,log);
+var template=require('./lib/template'); template= new template.t({},null,users,config,log);
 var formMaster=require("./lib/template/form");
 var os=require('os');
 app.configure(function(){
   //app.use(app.router);
   app.use(express.cookieDecoder());
-  app.use(express.session({"secret":"oilsucks"}));
+  app.use(express.session({"secret":"cheeseburger"}));
+	
   app.use(express.staticProvider(__dirname + '/public'));
+app.use(express.bodyDecoder());
 });
 //app.use(express.staticProvider(__dirname + '/public'));
 
@@ -28,6 +32,15 @@ app.get("/patches/new",function(req,res){
 	template.patchNew(req,res,function(page){
 		res.send(page)
 	})
+});
+app.post("/patches/new",function(req,res){
+	req.form.complete(function(err, fields, files){
+		template.fourOhFour(function(page){
+					res.send(page)
+		})
+
+	});
+
 });
 app.get("/old",function(req,res){
 	template.page(function(page){
@@ -70,8 +83,11 @@ app.get("/old",function(req,res){
 })
 app.get(/(.*)/,function(req,res){
 	//console.log(res)
+
 	log.info(req.method+" "+req.socket.remoteAddress+" 404 "+req.url)
-	res.send(404)
+	template.fourOhFour(function(page){
+				res.send(page)
+	})
 })
 try{
 	config.get("server","port",function(val){
