@@ -1,6 +1,6 @@
 var express=require("express");
 var Log = require('coloured-log'); log = new Log(Log.DEBUG)
-var patches=require("./lib/patch");patches = new patches.patch();
+var patches=require("./lib/patches");patches = new patches.patch();
 var app = express.createServer();
 var config=require("./lib/config"); config=new config.config();
 var template=require('./lib/template'); template= new template.t({},null,null,config,log);
@@ -9,7 +9,7 @@ var os=require('os');
 app.configure(function(){
   //app.use(app.router);
   app.use(express.cookieDecoder());
-  app.use(express.session());
+  app.use(express.session({"secret":"oilsucks"}));
   app.use(express.staticProvider(__dirname + '/public'));
 });
 //app.use(express.staticProvider(__dirname + '/public'));

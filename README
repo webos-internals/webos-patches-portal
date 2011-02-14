@@ -1,4 +1,4 @@
-Patch Object:
+Patch Object: (Composed of many Different Revision Objects)
 	patch_id
 	patch_name
 	patch_revision (equivalent to git tag?)
@@ -23,26 +23,91 @@ Patch Object:
 		from
 		message
 		public
-	equivilant_to [] #Lets two different patch revisions show up as one in the patch view (So -9 and -10 would be shown as a single version, usefull for submitting slightly different patch's for different devices/webos versions)
+	equivilant_to [] #Lets two different patch revisions show up as one in the patch view (So -9 and -10 would be shown as a single version, useful for submitting slightly different patch's for different devices/webos versions)
 		revision
 	change_log [] #Array of changes to the Revision between this one and the last one
 		date
 		change
 	submission []			#object holding submission information including date, user info, status, and message
-	name		#If user is logged in, it is set to that
-	email		#If user is logged in, it is set to that
-	user		#if user is logged in and has this preference set, it is set to that
-	status	#Status of the submission.  Can be Accepted, Denied, or Pending
-	message	#Optional reason that the patch was denied, if it was denied
+		name		#If user is logged in, it is set to that
+		show_email
+		email		#If user is logged in, it is set to that
+		user		#if user is logged in and has this preference set, it is set to that
+		status	#Status of the submission.  Can be Accepted, Denied, or Pending
+		message	#Optional reason that the patch was denied, if it was denied
+	
+	
+Clean Patch Object: (Built From Revision Objects.)
+	patch_id	#Patch ID
+	patch_name	#Patch Name
+	patch_revision_id {}	#The Revision ID plus equivalent Revision ID's
+	patch_revisions []		#By Default, only returns the last 10 revisions
+		revision {}				#Revision informational object
+			revision_id				#Revision ID 
+			equivalent[]			#Array of Equivalent Revision ID's
+			date					#Date Revision Approved		
+	patch_contents			#Not Given By Default
+	patch_category			#Patch Category
+	patch_icon				#Patch Icon (If any, else if there is a category icon use that, else use a stock icon)
+	patch_webos []			#By Default, only contains the 5 most recent webos Versions
+		webOS_version {}
+			version
+			revisions []
+	patch_device []			#By Default, only contains the 5 most recent Device's
+		device {}
+			device
+			revisions []
+	patch_screenshots []	#By Default, only contains the screenshots from the most recent revision(s)
+		screenshot {}
+			url
+			revisions []
+	patch_maintainers []	#By Default, only contains the maintainers from the most recent revision(s)
+		maintainer {}
+			name
+			email
+			revisions []
+	patch_modified_files []	#By Default, only contains the modified files from the most recent revision(s)
+		file {}
+			path
+			revisions []
+	patch_comments  []		#By Default, only contains the comments from the most recent revision(s)
+		comment {}
+			from
+			message
+			public
+	patch_equivalent []		#By Default, only contains an array of equivilant revision info from the most recent revision(s)
+	patch_change_log  []	#By Default, only contains the change log from the most recent revision(s)
+		change {}
+			date
+			subject
+			content
+	patch_submission []		#By Default, only contains the submission info from the most recent revision(s)
+		submission {}
+			name
+			user
+			email
+			show_email
+			status
+			message
+	
+	
+	
 	
 User Object:
 	username
 	full_name
+	email
 	password
 	salt
 	reg_date
 	last_log_in
-	admin
+	permissions
+		id
+		value
+		
+Permissions Object
+	id
+	Name
 	
 Pages:
 	Patch
