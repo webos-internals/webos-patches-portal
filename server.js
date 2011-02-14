@@ -25,7 +25,7 @@ app.get("/",function(req,res){
 	})
 });
 app.get("/patches/new",function(req,res){
-	template.patchNew(function(page){
+	template.patchNew(req,res,function(page){
 		res.send(page)
 	})
 });
