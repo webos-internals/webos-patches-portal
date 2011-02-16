@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en"> 
 <head> 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
-  <title>#{header.title}</title> 
+  <title><% if (local.header && local.header.title) { %><%= local.header.title %><% } else { %>Patches Portal<% } %></title> 
   <link rel="stylesheet" href="http://pilu.github.com/web-app-theme/stylesheets/base.css" type="text/css" media="screen" /> 
   <link rel="stylesheet" id="current-theme" href="http://pilu.github.com/web-app-theme/stylesheets/themes/default/style.css" type="text/css" media="screen" /> 
   <script type="text/javascript" charset="utf-8" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
@@ -18,11 +18,6 @@
 	$(".searchAdd").click(function(){
 		if($(".sn").get().length==0)
 		{
-
-		
-	//	{}
-	//	else
-	//	{
 		var str="<div style='display:none' class='sn'><p><b>Add: </b><select  class='searchNew'><option value='none'>Select Parameter</option>";
 		var arr=[{"name":"category","title":"Category"}];
 		for(var i=0;i<arr.length;i++)
@@ -55,35 +50,44 @@
 <body> 
   <div id="container"> 
     <div id="header"> 
-      <h1><a href="/">#{header.title}</a></h1> 
+      <h1><a href="/"><% if (local.header && local.header.title) { %><%= local.header.title %><% } else { %>Patches Portal<% } %></a></h1> 
       <div id="user-navigation"> 
         <ul class="wat-cf">
-	 				#{header.userLinks}
+	 							  <% if (local.header && local.header.userLinks) { %>
+								    <%- local.header.userLinks %>
+								<% } %>
         </ul> 
       </div> 
       <div id="main-navigation"> 
         <ul class="wat-cf"> 
-	
-					#{header.mainLinks}
+					  <% if (local.header && local.header.mainLinks) { %>
+					    <%- local.header.mainLinks %>
+					<% } %>
         </ul> 
       </div> 
     </div> 
     <div id="wrapper" class="wat-cf"> 
       <div id="main">
-	      
-				#{content}
+	      <% if (local.content) { %>
+		    <%- local.content %>
+		<% } %>
+		<% if (local.footer) { %>		
         <div id="footer"> 
           <div class="block"> 
-            <p>#{footer}</p> 
+            <p><%- local.footer %></p> 
           </div> 
         </div> 
+		<% } %>
       </div> 
-      <div id="sidebar"> 
-				#{sidebar}
+	<% if (local.sidebar || local.search) { %> 
+      <div id="sidebar">
+				<%- local.search %>
+				<%- local.sidebar %>
+		
       </div> 
+	<% } %>
     </div> 
-    <div id="box"> 
-    </div> 
+ 
   </div> 
 </body> 
 </html> 

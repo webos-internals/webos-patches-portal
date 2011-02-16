@@ -15,7 +15,8 @@
 		"jade":"*",
 		"mongoose":"*",
 		"argsparser":"*",
-		"async":"*"
+		"async":"*",
+		"kyuri":"8"
 	},
   "engines": {
     "node": ">= v0.3.5"

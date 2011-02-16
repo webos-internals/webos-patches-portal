@@ -5,7 +5,8 @@ var patches=require("./lib/patches");patches = new patches.patch();
 var app = express.createServer(form({ keepExtensions: true }));
 var config=require("./lib/config"); config=new config.config();
 var users=require("./lib/users"); users=new users.u({},config,log);
-var template=require('./lib/template'); template= new template.t({},null,users,config,log);
+var render=require("./lib/render"); render=new render.r({},config,log);
+var template=require('./lib/template'); template= new template.t({},null,users,config,log,render);
 var formMaster=require("./lib/template/form");
 var os=require('os');
 app.configure(function(){
@@ -42,7 +43,7 @@ app.post("/patches/new",function(req,res){
 	});
 
 });
-app.get("/old",function(req,res){
+/*app.get("/old",function(req,res){
 	template.page(function(page){
 		page.header(null,function(){
 				page.userNav("Link!","#",true)
@@ -80,14 +81,15 @@ app.get("/old",function(req,res){
 		})
 	})
 		
-})
+})*/
 app.get(/(.*)/,function(req,res){
 	//console.log(res)
 
 	log.info(req.method+" "+req.socket.remoteAddress+" 404 "+req.url)
-	template.fourOhFour(function(page){
-				res.send(page)
-	})
+//	template.fourOhFour(function(page){
+//				res.send(page)
+//	})
+	res.send(201)
 })
 try{
 	config.get("server","port",function(val){

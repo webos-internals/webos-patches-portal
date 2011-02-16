@@ -4,10 +4,14 @@
 	</div>
 	<div class="content">
 		<h2 class="title">
-			#{title}
+			  <% if (local.title) { %>
+			    <%= local.title %>
+			<% } %>
 		</h2>
 		<div class="inner">
-			#{content}
+			  <% if (local.content) { %>
+			    <%= local.content %>
+			<% } %>
 		</div>
 	</div>
 </div>
