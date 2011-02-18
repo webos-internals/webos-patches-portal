@@ -17,15 +17,11 @@ app.configure(function(){
   app.use(express.staticProvider(__dirname + '/public'));
 app.use(express.bodyDecoder());
 });
-//app.use(express.staticProvider(__dirname + '/public'));
-
-app.get("/favicon.ico",function(req,res){
-		
+app.get("/favicon.ico",function(req,res){	
 	res.send(404)
-		
 })
 app.get("/",function(req,res){
-	template.index(function(page){
+	template.index(req,res,function(page){
 		res.send(page)
 	})
 });
@@ -34,14 +30,12 @@ app.get("/patches/new",function(req,res){
 		res.send(page)
 	})
 });
-app.post("/patches/new",function(req,res){
-	req.form.complete(function(err, fields, files){
-		template.fourOhFour(function(page){
+app.get(/(.*)/,function(req,res){
+//	req.form.complete(function(err, fields, files){
+		template.fourOhFour(req,res,function(page){
 					res.send(page)
 		})
-
-	});
-
+//	});
 });
 /*app.get("/old",function(req,res){
 	template.page(function(page){
@@ -82,23 +76,15 @@ app.post("/patches/new",function(req,res){
 	})
 		
 })*/
-app.get(/(.*)/,function(req,res){
-	//console.log(res)
 
-	log.info(req.method+" "+req.socket.remoteAddress+" 404 "+req.url)
-//	template.fourOhFour(function(page){
-//				res.send(page)
-//	})
-	res.send(201)
-})
 try{
 	config.get("server","port",function(val){
-		log.info("Starting Express Server on port "+val)
+		log.info("(Express) Starting server on port: "+val)
 		app.listen(val)
 	},"3000");
 	
 	
 }catch(e)
 {
-	log.error("Could not start server due to error: "+e)
+	log.error("(Express) Could not start server: "+e)
 }

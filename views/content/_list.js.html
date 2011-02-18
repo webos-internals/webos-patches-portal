@@ -2,10 +2,10 @@
   <div class="secondary-navigation"> 
   </div> 
   <div class="content"> 
-    <h2 class="title">#{title}</h2> 
+    <h2 class="title"><% if (local.title) { %><%- local.title %><% } %></h2> 
     <div class="inner"> 
       <ul class="list"> 
-				#{list}
+				<% if (local.list) { %><%- local.list %><% } %>
       </ul> 
     </div> 
   </div> 

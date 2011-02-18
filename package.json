@@ -16,9 +16,11 @@
 		"mongoose":"*",
 		"argsparser":"*",
 		"async":"*",
-		"kyuri":"8"
+		"kyuri":"*",
+		"connect-form":"*",
+		"ejs":"*"
 	},
   "engines": {
-    "node": ">= v0.3.5"
+    "node": ">= v0.4.0"
   }
 }
