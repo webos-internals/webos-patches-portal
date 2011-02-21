@@ -21,6 +21,7 @@ app.get("/favicon.ico",function(req,res){
 	res.send(404)
 })
 app.get("/",function(req,res){
+	console.log(req)
 	template.index(req,res,function(page){
 		res.send(page)
 	})
