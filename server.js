@@ -31,6 +31,24 @@ app.get("/patches/new",function(req,res){
 		res.send(page)
 	})
 });
+app.get("/login",function(req,res){
+	template.login(req,res,function(page){
+		res.send(page)
+	})
+});
+app.get("/register",function(req,res){
+	template.register(req,res,function(page){
+		res.send(page)
+	})
+});
+app.post("/login",function(req,res){
+	//Check if the fields are There
+
+	template.loginPost(req,res,function(page){
+		res.send(page)
+	})
+	//console.log(res)
+});
 app.get(/(.*)/,function(req,res){
 //	req.form.complete(function(err, fields, files){
 		template.fourOhFour(req,res,function(page){

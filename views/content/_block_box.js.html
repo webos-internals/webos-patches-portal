@@ -1,0 +1,12 @@
+<div class="block" > 
+        <h2><% if (local.title) { %><%- local.title %><% } %></h2> 
+        <div class="content "> 
+          <div class="flash"> 
+            <div class="message"> 
+            </div> 
+          </div> 
+          	  <% if (local.content) { %>
+			    <%- local.content %>
+			<% } %>
+        </div> 
+      </div>
