@@ -25,6 +25,7 @@ $categories = array(	"Select...",
 			"Clock",
 			"Contacts",
 			"Dangerous",
+			"Device Info",
 			"Email",
 			"Google Maps",
 			"Messaging",
@@ -58,6 +59,7 @@ $icon_array = array(	"App Catalog"		=>"http://www.webos-internals.org/images/0/0
 			"Clock"			=>"http://www.webos-internals.org/images/8/8d/Icon_WebOSInternals_Patches_Clock.png",
 			"Contacts"		=>"http://www.webos-internals.org/images/c/ca/Icon_WebOSInternals_Patches_Contacts.png",
 			"Dangerous"		=>"http://www.webos-internals.org/images/c/c6/Icon_Patch_Dangerous.png",
+			"Device Info"		=>"http://www.webos-internals.org/images/f/f9/Icon_WebOSInternals_Patch.png",
 			"Email"			=>"http://www.webos-internals.org/images/2/29/Icon_WebOSInternals_Patches_Email.png",
 			"Google Maps"	=>"http://www.webos-internals.org/images/c/c3/Icon_WebOSInternals_Patches_SprintNav.png",
 			"Messaging"		=>"http://www.webos-internals.org/images/2/24/Icon_WebOSInternals_Patches_Messaging.png",
@@ -341,7 +343,7 @@ function PreventSpam($ip) {
 
 function GetRemoteAddress() {
 	$remote_address = $_SERVER['REMOTE_ADDR'];
-
+			
 	// If HTTP_X_FORWARDED_FOR is set, we try to grab the first non-LAN IP
 	if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
 	{
