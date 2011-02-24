@@ -41,6 +41,11 @@ app.get("/register",function(req,res){
 		res.send(page)
 	})
 });
+app.post("/register",function(req,res){
+	template.registerPost(req,res,function(page){
+		res.send(page)
+	})
+});
 app.post("/login",function(req,res){
 	//Check if the fields are There
 
