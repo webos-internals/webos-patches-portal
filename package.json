@@ -16,7 +16,7 @@
 		"mongoose":"*",
 		"argsparser":"*",
 		"async":"*",
-		"kyuri":"*",
+		"cucumis":"*",
 		"connect-form":"*",
 		"ejs":"*"
 	},
