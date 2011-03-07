@@ -11,11 +11,11 @@ var formMaster=require("./lib/template/form");
 var os=require('os');
 app.configure(function(){
   //app.use(app.router);
-  app.use(express.cookieDecoder());
+  app.use(express.cookieParser());
   app.use(express.session({"secret":"cheeseburger"}));
 	
-  app.use(express.staticProvider(__dirname + '/public'));
-app.use(express.bodyDecoder());
+  app.use(express.static(__dirname + '/public'));
+app.use(express.bodyParser());
 });
 app.get("/favicon.ico",function(req,res){	
 	res.send(404)

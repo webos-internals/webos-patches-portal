@@ -1,0 +1,33 @@
+Git
+	Pull
+	Push
+	Status
+	New Branch
+	Switch Branch
+	Delete Branch
+	New Tag
+	Get Tag
+	New Commit
+	Get Commit
+	Get Tree
+	New File
+	New Folder
+	Update File
+	Remove File
+	Remove Folder
+	
+Git Wrapper
+	New Patch
+	Get Patch
+	Update Patch
+	Remove Patch
+	
+	
+	(Internal Git Objects)
+		Branch
+			Commit
+				Tag
+				
+				Tree
+					Folders
+					Files

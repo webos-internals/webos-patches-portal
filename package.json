@@ -9,18 +9,19 @@
     "lib": "lib"
   },
 	"dependencies":{
-		"underscore":"*",
-		"express":"*",
-		"coloured-log":"*",
+		"underscore":"1.1.4",
+		"express":"2.0.0beta2",
+		"connect":"1.0.3",
+		"coloured-log":"0.9.4",
 		"jade":"*",
-		"mongoose":"*",
-		"argsparser":"*",
+		"mongoose":"1.1.3",
+		"argsparser":"0.0.3",
 		"async":"*",
-		"cucumis":"*",
+		"cucumis":"1.0.17",
 		"connect-form":"*",
-		"ejs":"*"
+		"ejs":"0.3.1"
 	},
   "engines": {
-    "node": ">= v0.4.0"
+    "node": "v0.4.2"
   }
 }
