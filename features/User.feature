@@ -37,3 +37,24 @@ Feature: User
 		And I know that I have access to that permission
 		When I press check user permission
 		Then the result should be true on the screen
+		
+	Scenario: Add New User To Database
+		Given context
+		When event
+		Then outcome
+	Scenario: Get User From Database
+		Given context
+		When event
+		Then outcome
+	Scenario: Remove User From Database
+		Given context
+		When event
+		Then outcome
+	Scenario: Find Users In Database
+		Given context
+		When event
+		Then outcome
+	Scenario: Save User To Database
+		Given context
+		When event
+		Then outcome
