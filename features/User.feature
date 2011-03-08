@@ -1,11 +1,10 @@
 Feature: User
 	In order to have a centralized user system
 	As a node script
-	I want to be able to manipulate users from a central module
-
+	I want to be able to manipulate users from a central node script
+	
 	Background:
-		Given I have a mongodb database
-
+		Given I have a mongodb connection
 	Scenario: User Login
 		Given I have entered a username "testuser"
 		And I have entered a password "testpassword"
@@ -38,23 +37,19 @@ Feature: User
 		When I press check user permission
 		Then the result should be true on the screen
 		
-	Scenario: Add New User To Database
-		Given context
-		When event
-		Then outcome
-	Scenario: Get User From Database
-		Given context
-		When event
-		Then outcome
-	Scenario: Remove User From Database
-		Given context
-		When event
-		Then outcome
-	Scenario: Find Users In Database
-		Given context
-		When event
-		Then outcome
-	Scenario: Save User To Database
-		Given context
-		When event
-		Then outcome
+	Scenario: Create New User Object
+		Given I want to create a new user object
+		When I ask for one
+		Then the result should be an empty user object
+		
+	Scenario: Save User Object
+		Given I have a user object
+		And I have all the required field for the user object
+		And all the fields for the user object pass validation
+		When I click save
+		Then the result should be true
+		
+	Scenario: Find Users
+		Given I have a username
+		When I click find
+		Then the result should be an array with one entry with the username

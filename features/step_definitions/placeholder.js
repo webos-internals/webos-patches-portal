@@ -1,20 +1,25 @@
 var Steps = require('cucumis').Steps;
-var pl;
 Steps.Given(/^I have placeholders$/, function (ctx) {
 	ctx.done();
 });
 
-Steps.Given(/^I have a placeholder scenario which will be "([^"]*?)"$/, function (ctx, arg1) {
-	pl=arg1
+Steps.Given(/^I have a placeholder scenario which will be true$/, function (ctx) {
 	ctx.done();
 });
 
-Steps.When(/^I run this scenario$/, function (ctx) {
+Steps.When(/^I run this placeholder test$/, function (ctx) {
 	ctx.done();
 });
 
-Steps.Then(/^the placeholder result should be "([^"]*?)" on the screen$/, function (ctx, arg1) {
-	pl.should.eql(arg1);
+Steps.Then(/^the placeholder result should be true on the screen$/, function (ctx) {
+	ctx.done();
+});
+
+Steps.Given(/^I have a placeholder scenario which will be false$/, function (ctx) {
+	ctx.done();
+});
+
+Steps.Then(/^the placeholder result should be false on the screen$/, function (ctx) {
 	ctx.done();
 });
 

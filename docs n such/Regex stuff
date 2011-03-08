@@ -13,3 +13,9 @@ Regex
 	Match
 	Test
 	Name
+	
+Types
+	Newline
+	All
+	Space
+	Decimal
