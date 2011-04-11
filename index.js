@@ -5,7 +5,6 @@ var app = express.createServer();
 
 app.get('/', function(req, res){
   res.send('Hello World');
-	console.log("Hi")
 });
 
 cluster(app)

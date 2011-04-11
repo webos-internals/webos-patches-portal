@@ -4,92 +4,32 @@ Unfinished Building Blocks:
 	Patch File Parser
 	Database Wrapper
 
-User Object:
-	username
-	full_name
-	email
-	password
-	salt
-	reg_date
-	last_log_in
-	permissions
-		id
-		value
-		
-Permissions Object
-	id
-	Name
-	
-Pages:
+List of Screens:
 	Patch
-		index
-		browse
-		single_patch
-		single_revision
-		update
-		comment
+		Index
+		Browse
+		Search
+		View
+		New
+		Update
+		Revision
+		Remove
+		Approve
+		Deny
 	User
-		register
-		sign_in
-		update
-		sign_out
+		Login
+		Register
+		Update
+		Remove
+		Promote
+		Demote
 	Admin
-		pending_list
-		user_list
-		user_update
-		
-		
-	All single string data entries will default to using a dropdown box, while all arrays will default to using checkbox's.  However, there will be an array of valid fields to allow searching by (at least via the searchbar) in order to not clog up the system (since searching by something like screenshots makes no sense at all)
-	There are data entries for modified files that will eventually be used to create a list of compatible patch's (and will be a special case for the searchbar, where there can be multiple "Compatible With" entries with a value chosen by dropdown)
-	
-	Mockups:
-		Mockups of the pages are located in the mockup directory of the git repo.
-		
-		
-		
-		
-	UI Elements:		#Here is a list of the different UI elements and what data params is needed for each one
-		Global:
-		Header:
-			Page Title
-			Nav Links:
-				title
-				link
-				active
-				first
-				class
-			User Links:
-				title
-				link
-				active
-				first
-				class
-				
-				
-				
-				
-				
-			Sidebar:
-				SearchBar:
-					SingleSelect:
-						field
-						options:
-							name
-							value
-							selected
-					MultiSelect:
-						field
-						options:
-							name
-							value
-							selected
-					Proposed Patches:
-						patches
-							title
-							category
-							date
-					Recent Patches:
-						patches
-							title
-							category
-							date
+		New Patches
+		New Users
+		Pending Patches
+	Git
+		Status
+		Push
+		Pull
+Object Format:
+	The Patch Object will just be a skeleton object with the patch id and name, and then have all the revisions linked to it.  The Revision object can link itself to a single older revision to show them as "equal" in terms of weight.  The Latest revision will always be the one used if there are any conflicts at all.  Revisions are inherently linear, and as such the older ones will be considered less important.  Each Revision and its aliases should at most have a single git tag between them.  Revisions should also not be seen by users, they should only be seen by power developers and people who want a much deeper understanding of how patches work.  Each Revision must have a patch file associated for it as well.
