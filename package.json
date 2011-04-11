@@ -9,6 +9,12 @@
     "lib": "lib"
   },
 	"dependencies":{
+		"underscore":"1.1.4",
+		"express":">= 2.2.1",
+		"connect":">=1.3.0",
+		"coloured-log":"0.9.4",
+		"cluster":">= 0.5.5",
+		"persistencejs":"*"
 	},
   "engines": {
     "node": ">= v0.4.5"
