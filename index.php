@@ -1,7 +1,8 @@
 <?php
 
-/* COPYRIGHT 2009-2010 Daniel Beames and WebOS-Internals			*/
-/* Redistribute only with explicit permission in writing from original author. 	*/
+/* COPYRIGHT 2009-2011 WebOS Internals						*/
+/* COPYRIGHT 2009-2010 Daniel Beames						*/
+/* Redistribute only with explicit permission in writing from original authors.	*/
 
 session_start();
 header("Cache-control: private");
@@ -561,7 +562,7 @@ function SpamWait() {
 
 function MainFooter() {
 	echo '	  <tr>
-		<td colspan="11" align="center" class="copyright">&copy; 2009 - 2010 Daniel Beames (dBsooner) and WebOS Internals<br/><a href="http://www.webos-internals.org/wiki/WebOS_Internals:Site_support" target="_blank"><img src="https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif" border="0"></img></a><br/>Donations help offset hosting costs and fund future development.</center></td>
+		<td colspan="11" align="center" class="copyright">&copy; 2009-2011 WebOS Internals<br/><a href="http://donate.webos-internals.org/" target="_blank"><img src="https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif" border="0"></img></a><br/>Donations help offset hosting costs and fund future development.</center></td>
 	  </tr>
 	  </table>
 	  </body>
@@ -646,7 +647,7 @@ switch($_GET['do']) {
 				<br/>
 				Thank you for visiting the WebOS-Patches Web Portal!<br/>
 				<br/>
-				--Daniel Beames (dBsooner) and <a href="http://www.webos-internals.org/">WebOS Internals</a></td>
+				-- <a href="http://www.webos-internals.org/">WebOS Internals</a></td>
 			</tr>';
 		MainFooter();
 }
