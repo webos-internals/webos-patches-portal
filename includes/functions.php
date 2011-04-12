@@ -207,7 +207,7 @@ function UploadImage($pid, $ss, $title) {
 	$browser->get('http://www.webos-internals.org/wiki/Special:Userlogin');
 	$browser->setFieldById('wpName1', $wikiun);
 	$browser->setFieldById('wpPassword1', $wikipw);
-	$browser->clickSubmitById('wpLoginattempt');
+	$browser->clickSubmitById('wpLoginAttempt');
 	$browser->get('http://www.webos-internals.org/wiki/Special:Upload');
 	$browser->setFieldById('wpUploadFile', '/tmp/'.$name);
 	$browser->setFieldById('wpDestFile', $name);
