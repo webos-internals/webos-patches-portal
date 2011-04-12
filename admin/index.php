@@ -762,25 +762,36 @@ function GitExec($cmd) {
 			echo '<b>Preware/build.git:</b><br/><pre>';
 			echo "cd ../../../patches/build/ ; /usr/bin/git pull 2>&1\n";
 			ob_flush();
+			flush();
 			echo `cd ../../../patches/build/ ; /usr/bin/git pull 2>&1`;
 			ob_flush();
+			flush();
 			echo "cd ../../../patches/build/ ; /usr/bin/git fetch --tags 2>&1\n";
 			ob_flush();
+			flush();
 			echo `cd ../../../patches/build/ ; /usr/bin/git fetch --tags 2>&1`;
 			echo '</pre>';
 			ob_flush();
+			flush();
 			foreach($webos_versions_array as $key=>$version) {
 				echo '<hr><b>modifications.git/webos-'.$version.':</b><pre>';
+				ob_flush();
+				flush();
 				echo "cd ../../../patches/modifications/v$version ; /usr/bin/git pull 2>&1\n";
 				ob_flush();
+				flush();
 				echo `cd ../../../patches/modifications/v$version ; /usr/bin/git pull 2>&1`;
 				ob_flush();
+				flush();
 				echo "cd ../../../patches/modifications/v$version ; /usr/bin/git fetch --tags 2>&1\n";
 				ob_flush();
+				flush();
 				echo `cd ../../../patches/modifications/v$version ; /usr/bin/git fetch --tags 2>&1`;
 				echo '</pre>';
 				ob_flush();
+				flush();
 			}
+			echo '<hr><b>All Pulls Complete!</b>';
 			break;			
 		case 'status':
 			echo '<b>Preware/build.git:</b><br/><pre>';
@@ -1020,7 +1031,6 @@ function MainFooter() {
 }
 
 // LET'S BUILD THE PAGE!
-
 switch($_GET['do']) {
 	case 'new':
 		MainHeader($_GET['do'],'');
