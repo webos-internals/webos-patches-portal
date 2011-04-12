@@ -339,6 +339,10 @@ function BuildForm($errors, $pid) {
 			<td width="85%" class="cell4"><a href="?do=show_patch&pid='.$patch[pid].'">View Patch</a> - <a href="?do=get_patch&pid='.$patch[pid].'">Get Patch</a> - <a href="?do=testpatch&pid='.$patch[pid].'" target="_blank">Test Patch</a></td>
 		</tr>
 		<tr>
+			<td width="15%" class="cell3">Tweaks File:</td>
+			<td width="85%" class="cell4"><a href="?do=show_tweaks&pid='.$patch[pid].'">View Tweaks</a> - <a href="?do=get_tweaks&pid='.$patch[pid].'">Get Tweaks</a></td>
+		</tr>
+		<tr>
 			<td width="15%" class="cell3">Dependants:</td>
 			<td width="85%" class="cell4"><input type="text" class="uploadpatch" name="depends" value="'.FormatForForm($patch[depends]).'" size="50" maxlength="512"><br/>
 			'.iif($updateform==1, "<b>Original:</b> ".$original[depends]."<br/>", "").'<b>Note:</b> Enter the packageid of all packages this patch is dependant on. Seperate packages with a comma. Example: org.webosinternals.patches.univseral-search-command-line</td>
@@ -597,11 +601,15 @@ function HandleForm($pid) {
 		$get_patch_file = $DB->query_first("SELECT patch_file,update_pid FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
 		$patch_file_contents = $get_patch_file['patch_file'];
 	
+		$get_tweaks_file = $DB->query_first("SELECT tweaks_file,update_pid FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
+		$tweaks_file_contents = $get_tweaks_file['tweaks_file'];
+	
 		// GOING TO NEED TO UPDATE 'UPDATE_PID' AND DELETE PID(?)
 		
 		$DB->query("UPDATE ".TABLE_PREFIX."patches SET title = '".mysql_real_escape_string($title)."',
 												description = '".mysql_real_escape_string($description2)."',
 												patch_file = NULL,
+												tweaks_file = NULL,
 												category = '$category',
 												depends = '$depends',
 												screenshot_1_blob = NULL,
@@ -674,6 +682,10 @@ function HandleForm($pid) {
 		}
 		system('rm -f /tmp/'.$patchname.'.patch');
 	
+		if(strlen($tweaks_file_contents) >= 1) {
+			file_put_contents('../../../patches/modifications/v'.$webos_version.'/'.$category2.'/'.$patchname.'.json', $tweaks_file_contents);
+		}
+
 		$ssout=NULL;
 		$sscount=0;
 		if(strlen($screenshot1) >= 1) {

@@ -276,6 +276,10 @@ function BuildForm($errors, $pid) {
 			<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="patch"></td>
 		</tr>
 		<tr>
+			<td width="15%" class="cell3">Tweaks File:<br/>(not yet suppported)</td>
+			<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="tweaks"></td>
+		</tr>
+		<tr>
 			<td width="15%" class="cell3" valign="top">Screenshot 1:'.iif(strlen($patch[screenshot_1])>=1, "<br/><a href=\"".$patch[screenshot_1]."\">Current Image</a><input type=\"hidden\" name=\"screenshot_1\" value=\"".$patch[screenshot_1]."\">", "").'</td>
 		  	<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="screenshot1"><br/>
 			<b>Note:</b> Screenshots should be 320x480. They should not contain any other<br/>
@@ -345,10 +349,6 @@ function BuildForm($errors, $pid) {
 			<b>Note:</b> This will not be published. It is simply a note to the Admins.</td>
 		</tr>
 		<tr>
-			<td width="15%" class="cell3">Tweaks File:<br/>(not yet suppported)</td>
-			<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="tweaks"></td>
-		</tr>
-		<tr>
 			<td colspan="2" align="center" class="cell5"><input type="submit" value="Send it Off!">
 			<hr class="bodysep"><center>By submitting this form, you, the submitter, explicitly agree you are either the original author of the patch or have the right to submit the patch under the <b>MIT Open Source
 			License</b>. Further, you agree the patch will be licensed under the <b>MIT Open Source License</b>. This is to allow Palm to use the
@@ -381,6 +381,10 @@ function HandleForm($pid) {
 
    	$patchext = strrchr(strtolower($patch['name']),'.');
 
+	$allowedtweaksext = array(".json");
+
+   	$tweaksext = strrchr(strtolower($tweaks['name']),'.');
+
 	if(strlen($title) < '1') {
 		$errors[] = 'You must enter a title.';
 	} else {
@@ -403,6 +407,16 @@ function HandleForm($pid) {
 		}
 	} else {
 		$errors[] = 'You must include a patch file.';
+	}
+
+	if($tweaks['size']) {
+		if(!in_array($tweaksext, $allowedtweaksext)) {
+			$errors[] = 'Only JSON files are allowed.';
+		} else {
+			if($tweaks['size'] > 1048576) {
+				$errors[] = 'Tweaks cannot be larger than 1MB.';
+			}
+		}
 	}
 
 	if(($screenshot1['size']) && !$known_image_types[$screenshot1['type']]) {
@@ -497,6 +511,8 @@ function HandleForm($pid) {
 
 	$patch_file_contents = file_get_contents($patch['tmp_name'], FILE_BINARY);
 	
+	$tweaks_file_contents = file_get_contents($tweaks['tmp_name'], FILE_BINARY);
+	
 	$maintainer_array = explode(',', $maintainer);
 	for($i=0; $i < count($maintainer_array); $i++) {
 		$maintainer_array2[] = trim($maintainer_array[$i]);
@@ -510,13 +526,14 @@ function HandleForm($pid) {
 		$update = "1";
 	}
 
-	$DB->query("INSERT INTO ".TABLE_PREFIX."patches (pid, title, description, patch_file, category, screenshot_1_blob, 
+	$DB->query("INSERT INTO ".TABLE_PREFIX."patches (pid, title, description, patch_file, tweaks_file, category, screenshot_1_blob, 
 				screenshot_1_type, screenshot_2_blob, screenshot_2_type, screenshot_3_blob, screenshot_3_type, icon, 
 				webos_versions, maintainer, email, private, homepage, changelog, note_to_admins, status, datesubmitted".$extra.")
 				VALUES ('',
 						'".mysql_real_escape_string($title)."',
 						'".mysql_real_escape_string($description2)."',
 						'".mysql_real_escape_string($patch_file_contents)."',
+						'".mysql_real_escape_string($tweaks_file_contents)."',
 						'$category',
 						'".mysql_real_escape_string($screenshot_1_blob)."',
 						'$screenshot_1_type',
