@@ -61,7 +61,7 @@ $icon_array = array(	"App Catalog"		=>"http://www.webos-internals.org/images/0/0
 			"Dangerous"		=>"http://www.webos-internals.org/images/c/c6/Icon_Patch_Dangerous.png",
 			"Device Info"		=>"http://www.webos-internals.org/images/f/f9/Icon_WebOSInternals_Patch.png",
 			"Email"			=>"http://www.webos-internals.org/images/2/29/Icon_WebOSInternals_Patches_Email.png",
-			"Google Maps"	=>"http://www.webos-internals.org/images/c/c3/Icon_WebOSInternals_Patches_SprintNav.png",
+			"Google Maps"		=>"http://www.webos-internals.org/images/c/c3/Icon_WebOSInternals_Patches_SprintNav.png",
 			"Messaging"		=>"http://www.webos-internals.org/images/2/24/Icon_WebOSInternals_Patches_Messaging.png",
 			"Misc"			=>"http://www.webos-internals.org/images/f/f9/Icon_WebOSInternals_Patch.png",
 			"Mojo"			=>"http://www.webos-internals.org/images/f/f9/Icon_WebOSInternals_Patch.png",
@@ -82,6 +82,40 @@ $icon_array = array(	"App Catalog"		=>"http://www.webos-internals.org/images/0/0
 			"Video Player"		=>"http://www.webos-internals.org/images/f/ff/Icon_WebOSInternals_Patches_Videoplayer.png",
 			"YouTube"		=>"http://www.webos-internals.org/images/8/8b/Icon_WebOSInternals_Patches_Youtube.png",
 			"Other"			=>"http://www.webos-internals.org/images/f/f9/Icon_WebOSInternals_Patch.png"
+		);
+
+$tweaks_icon_array = array(
+		   	"App Catalog"		=>"http://www.webos-internals.org/images/4/45/Icon_WebOSInternals_Patches_Plus_Findapps.png",
+			"App Launcher"		=>"http://www.webos-internals.org/images/b/b4/Icon_WebOSInternals_Patches_Plus_Applauncher.png",
+			"Browser"		=>"http://www.webos-internals.org/images/3/37/Icon_WebOSInternals_Patches_Plus_Browser.png",
+			"Calculator"		=>"http://www.webos-internals.org/images/5/5e/Icon_WebOSInternals_Patches_Plus_Calculator.png",
+			"Camera"		=>"http://www.webos-internals.org/images/2/2f/Icon_WebOSInternals_Patches_Plus_Camera.png",
+			"Clock"			=>"http://www.webos-internals.org/images/9/9a/Icon_WebOSInternals_Patches_Plus_Clock.png",
+			"Contacts"		=>"http://www.webos-internals.org/images/a/a5/Icon_WebOSInternals_Patches_Plus_Calendar.png",
+			"Dangerous"		=>"http://www.webos-internals.org/images/f/f1/Icon_WebOSInternals_Patch_Plus.png",
+			"Device Info"		=>"http://www.webos-internals.org/images/f/f1/Icon_WebOSInternals_Patch_Plus.png",
+			"Email"			=>"http://www.webos-internals.org/images/e/ee/Icon_WebOSInternals_Patches_Plus_Email.png",
+			"Google Maps"		=>"http://www.webos-internals.org/images/f/f1/Icon_WebOSInternals_Patch_Plus.png",
+			"Messaging"		=>"http://www.webos-internals.org/images/0/04/Icon_WebOSInternals_Patches_Plus_Messaging.png",
+			"Misc"			=>"http://www.webos-internals.org/images/f/f1/Icon_WebOSInternals_Patch_Plus.png",
+			"Mojo"			=>"http://www.webos-internals.org/images/f/f1/Icon_WebOSInternals_Patch_Plus.png",
+			"Music Player"		=>"http://www.webos-internals.org/images/8/86/Icon_WebOSInternals_Patches_Plus_Musicplayer.png",
+			"Navigation"		=>"http://www.webos-internals.org/images/f/f1/Icon_WebOSInternals_Patch_Plus.png",
+			"Notifications"		=>"http://www.webos-internals.org/images/f/f1/Icon_WebOSInternals_Patch_Plus.png",
+			"Pandora"		=>"http://www.webos-internals.org/images/8/86/Icon_WebOSInternals_Patches_Plus_Musicplayer.png",
+			"PDF Viewer"		=>"http://www.webos-internals.org/images/0/0c/Icon_WebOSInternals_Patches_Plus_Pdfviewer.png",
+			"Phone"			=>"http://www.webos-internals.org/images/1/1b/Icon_WebOSInternals_Patches_Plus_Phone.png",
+			"Photos"		=>"http://www.webos-internals.org/images/1/1c/Icon_WebOSInternals_Patches_Plus_Photos.png",
+			"Screen Lock"		=>"http://www.webos-internals.org/images/b/be/Icon_WebOSInternals_Patches_Plus_Screenlock.png",
+			"Sounds and Alerts"	=>"http://www.webos-internals.org/images/8/80/Icon_WebOSInternals_Patches_Plus_Soundalerts.png",
+			"SprintNav"		=>"http://www.webos-internals.org/images/f/f1/Icon_WebOSInternals_Patch_Plus.png",
+			"System"		=>"http://www.webos-internals.org/images/f/f1/Icon_WebOSInternals_Patch_Plus.png",
+			"Tasks"			=>"http://www.webos-internals.org/images/4/4f/Icon_WebOSInternals_Patches_Plus_Tasks.png",
+			"Top Bar"		=>"http://www.webos-internals.org/images/f/f1/Icon_WebOSInternals_Patch_Plus.png",
+			"Universal Search"	=>"http://www.webos-internals.org/images/f/f1/Icon_WebOSInternals_Patch_Plus.png",
+			"Video Player"		=>"http://www.webos-internals.org/images/5/5b/Icon_WebOSInternals_Patches_Plus_Videoplayer.png",
+			"YouTube"		=>"http://www.webos-internals.org/images/8/82/Icon_WebOSInternals_Patches_Plus_Youtube.png",
+			"Other"			=>"http://www.webos-internals.org/images/f/f1/Icon_WebOSInternals_Patch_Plus.png"
 		);
 
 function GetPatch($pid, $dl) {

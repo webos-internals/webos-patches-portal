@@ -361,7 +361,7 @@ function BuildForm($errors, $pid) {
 
 function HandleForm($pid) {
 
-	global $DB, $icon_array	;
+	global $DB, $icon_array, $tweaks_icon_array	;
 
 	foreach($_POST as $key => $value) {
 		$$key = $value;
@@ -476,8 +476,6 @@ function HandleForm($pid) {
 		$ver_count++;
 	}
 
-	$icon = $icon_array[$category];
-
 	$screenshots = '0';
 	if($screenshot1['size']) {
 		$screenshots++;
@@ -513,6 +511,12 @@ function HandleForm($pid) {
 	
 	$tweaks_file_contents = file_get_contents($tweaks['tmp_name'], FILE_BINARY);
 	
+	$icon = $icon_array[$category];
+
+	if(strlen($tweaks_file_contents) >= 1) {
+		$icon = $tweaks_icon_array[$category];
+	}
+
 	$maintainer_array = explode(',', $maintainer);
 	for($i=0; $i < count($maintainer_array); $i++) {
 		$maintainer_array2[] = trim($maintainer_array[$i]);

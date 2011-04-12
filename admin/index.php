@@ -441,7 +441,7 @@ function BuildForm($errors, $pid) {
 }
 
 function HandleForm($pid) {
-	global $DB, $webos_versions_array, $icon_array;
+	global $DB, $webos_versions_array, $icon_array, $tweaks_icon_array;
 
 	foreach($_POST as $key => $value) {
 		$$key = $value;
@@ -512,8 +512,6 @@ function HandleForm($pid) {
 			$updateform = '1';
 			$original = $DB->query_first("SELECT * FROM ".TABLE_PREFIX."patches WHERE pid = '".$update_pid."'");
 		}
-	
-		$icon = $icon_array[$category];
 	
 		if($screenshot1 == "1") {
 			echo 'Screenshot 1: ... Please Wait ... ';
@@ -604,6 +602,12 @@ function HandleForm($pid) {
 		$get_tweaks_file = $DB->query_first("SELECT tweaks_file,update_pid FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
 		$tweaks_file_contents = $get_tweaks_file['tweaks_file'];
 	
+		$icon = $icon_array[$category];
+	
+		if(strlen($tweaks_file_contents) >= 1) {
+			$icon = $tweaks_icon_array[$category];
+		}
+
 		// GOING TO NEED TO UPDATE 'UPDATE_PID' AND DELETE PID(?)
 		
 		$DB->query("UPDATE ".TABLE_PREFIX."patches SET title = '".mysql_real_escape_string($title)."',
@@ -684,6 +688,10 @@ function HandleForm($pid) {
 	
 		if(strlen($tweaks_file_contents) >= 1) {
 			file_put_contents('../../../patches/modifications/v'.$webos_version.'/'.$category2.'/'.$patchname.'.json', $tweaks_file_contents);
+			$tweaks2 = "TWEAKS = ".$category2.'/'."\${NAME}.json";
+		}
+		else {
+			$tweaks2 = "TWEAKS =";
 		}
 
 		$ssout=NULL;
@@ -724,6 +732,7 @@ function HandleForm($pid) {
 	
 		$makefile_content = "NAME = \$(shell basename \$(shell pwd))
 PATCH = $category2/\${NAME}.patch
+$tweaks2
 TITLE = $patch[title]
 DESCRIPTION = $description2
 CATEGORY = $patch[category]
