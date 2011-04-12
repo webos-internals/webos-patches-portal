@@ -104,6 +104,26 @@ function GetPatch($pid, $dl) {
 	echo $getpatch['patch_file'];
 }
 
+function GetTweaks($pid, $dl) {
+	global $DB;
+	$getpatch = $DB->query_first("SELECT title,category,tweaks_file FROM ".TABLE_PREFIX."patches WHERE pid = '".$pid."'");
+	$title = strtolower($getpatch['title']);
+	$title = str_replace(" ", "-", $title);
+	$title = str_replace("_", "-", $title);
+	$title = str_replace("/", "-", $title);
+	$title = str_replace("\\", "-", $title);
+	$category = strtolower($getpatch['category']);
+	$category = str_replace(" ", "-", $category);
+	$name = $category.'-'.$title.'.json';
+	if($dl == "1") {
+		header('Content-type: application/json');
+		header('Content-Disposition: attachment; filename="'.$name.'"');
+	} else {
+		header('Content-type: text/plain');
+	}
+	echo $getpatch['tweaks_file'];
+}
+
 function GetImage($pid, $ss, $src) {
 	global $DB;
 

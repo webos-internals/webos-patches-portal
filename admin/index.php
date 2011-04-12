@@ -60,7 +60,7 @@ function MainHeader($do, $switch) {
 	  <body>
 	  <table width="100%" border="1" cellpadding="5" cellspacing="0">
 	  <tr>
-		<td colspan="12" align="center" class="header">WebOS-Patches Admin<br/>
+		<td colspan="13" align="center" class="header">WebOS-Patches Admin<br/>
 		<a href="/admin/">Home</a> | <a href="?do=git&cmd=pull">Git Pull</a> | ';
 	if($do != "new") {
 		echo '<a href="?do=new">'.iif($new_count[num_new]>=1, "<b>", "").'New Submissions ('.$new_count[num_new].')'.iif($new_count[num_new]>=1, "</b>", "").'</a>';
@@ -80,7 +80,7 @@ function BrowsePatches($do, $webosver, $category, $order, $desc) {
 	global $DB, $webos_versions_array, $categories;
 	if($do == "browse") {
 		echo '<tr>
-				<td colspan="12" class="header2" align="center">';
+				<td colspan="13" class="header2" align="center">';
 		foreach($webos_versions_array as $key=>$webos_version) {
 			$count = $DB->query_first("SELECT count(pid) as num FROM ".TABLE_PREFIX."patches WHERE versions LIKE '%".$webos_version."%'");
 			if($count['num'] > '0') {
@@ -96,7 +96,7 @@ function BrowsePatches($do, $webosver, $category, $order, $desc) {
 			</tr>';
 		if($webosver) {
 			echo '<tr>
-					<td colspan="12" class="header2" align="center">';
+					<td colspan="13" class="header2" align="center">';
 			foreach($categories as $key=>$category1) {
 				if($webosver == "all") {
 					$count = $DB->query_first("SELECT count(pid) as num FROM ".TABLE_PREFIX."patches WHERE category = '".$category1."'");
@@ -181,7 +181,7 @@ function BrowsePatches($do, $webosver, $category, $order, $desc) {
 		}
 		$numpatches = $DB->get_num_rows($getpatches);
 		echo '<tr>
-				<td colspan="12" align="center" class="header2">Displaying '.$numpatches.' Patches</td>
+				<td colspan="13" align="center" class="header2">Displaying '.$numpatches.' Patches</td>
 			</tr>
 			<tr>
 				<td width="64px">&nbsp;</td>
@@ -190,17 +190,12 @@ function BrowsePatches($do, $webosver, $category, $order, $desc) {
 			echo "&desc=1";
 		}
 		echo '" '.iif($order=="title", $imageurl, "").'>Title</a> '.iif($order=="title", $image, "").'</b></td>
-				<td width="220px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order=description';
-		if($order=="description" && $desc!="1") {
-			echo "&desc=1";
-		}
-		echo '" '.iif($order=="description", $imageurl, "").'>Description</a> '.iif($order=="description", $image, "").'</b></td>';
+				<td width="220px" align="center">Description</td>';
 		if($do == "new" || $do == "updates") {
-			echo '<td width="25px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order=patch_file';
-			if($order=="patch_file" && $desc!="1") {
-				echo "&desc=1";
-			}
-			echo '" '.iif($order=="patch_file", $imageurl, "").'>Patch</a> '.iif($order=="patch_file", $image, "").'</b></td>';
+			echo '<td width="25px" align="center">Patch</td>';
+		}
+		if($do == "new" || $do == "updates") {
+			echo '<td width="25px" align="center">Tweaks</td>';
 		}
 		echo '	<td width="80px" align="center"><b><a href="?do='.$do.'&webosver='.$webosver.'&category='.$category.'&order=category';
 		if($order=="category" && $desc!="1") {
@@ -261,6 +256,7 @@ function BrowsePatches($do, $webosver, $category, $order, $desc) {
 				<td align="justify">'.$patch[description].'</td>';
 			if($do != "browse") {
 				echo '<td align="center"><a href="?do=show_patch&pid='.$patch[pid].'">Show</a><br/><br/><a href="?do=get_patch&pid='.$patch[pid].'">Get</a><br/><br/><a href="?do=testpatch&pid='.$patch[pid].'">Test</a></td>';
+				echo '<td align="center"><a href="?do=show_tweaks&pid='.$patch[pid].'">Show</a><br/><br/><a href="?do=get_tweaks&pid='.$patch[pid].'">Get</a></td>';
 			}
 			echo '<td align="center">'.$patch[category].'</td>';
 			if($do == "browse") {
@@ -1022,7 +1018,7 @@ function TestPatch($pid) {
 
 function MainFooter() {
 	echo '	  <tr>
-		<td colspan="12" width="100%" align="center" class="copyright"><center>&copy; 2009 - 2010 Daniel Beames (dBsooner) and WebOS Internals</center></td>
+		<td colspan="13" width="100%" align="center" class="copyright"><center>&copy; 2009 - 2010 Daniel Beames (dBsooner) and WebOS Internals</center></td>
 	  </tr>
 	  </table>
 	  </body>
@@ -1052,6 +1048,12 @@ switch($_GET['do']) {
 		break;
 	case 'show_patch':
 		GetPatch($_GET['pid'], 0);
+		break;
+	case 'get_tweaks':
+		GetTweaks($_GET['pid'], 1);
+		break;
+	case 'show_tweaks':
+		GetTweaks($_GET['pid'], 0);
 		break;
 	case 'get_image':
 		GetImage($_GET['pid'], $_GET['ss'], $_GET['src']);
