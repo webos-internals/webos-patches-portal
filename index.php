@@ -345,7 +345,7 @@ function BuildForm($errors, $pid) {
 			<b>Note:</b> This will not be published. It is simply a note to the Admins.</td>
 		</tr>
 		<tr>
-			<td width="15%" class="cell3">Tweaks File:<br\>(not yet suppported)</td>
+			<td width="15%" class="cell3">Tweaks File:<br/>(not yet suppported)</td>
 			<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="tweaks"></td>
 		</tr>
 		<tr>
