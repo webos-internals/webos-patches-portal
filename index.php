@@ -276,7 +276,7 @@ function BuildForm($errors, $pid) {
 			<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="patch"></td>
 		</tr>
 		<tr>
-			<td width="15%" class="cell3">Tweaks File:<br/>(not yet suppported)</td>
+			<td width="15%" class="cell3">Tweaks File:</td>
 			<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="tweaks"></td>
 		</tr>
 		<tr>
