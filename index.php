@@ -276,10 +276,6 @@ function BuildForm($errors, $pid) {
 			<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="patch"></td>
 		</tr>
 		<tr>
-			<td width="15%" class="cell3">Tweaks File: (not yet suppported)</td>
-			<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="tweaks"></td>
-		</tr>
-		<tr>
 			<td width="15%" class="cell3" valign="top">Screenshot 1:'.iif(strlen($patch[screenshot_1])>=1, "<br/><a href=\"".$patch[screenshot_1]."\">Current Image</a><input type=\"hidden\" name=\"screenshot_1\" value=\"".$patch[screenshot_1]."\">", "").'</td>
 		  	<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="screenshot1"><br/>
 			<b>Note:</b> Screenshots should be 320x480. They should not contain any other<br/>
@@ -347,6 +343,10 @@ function BuildForm($errors, $pid) {
 			<td width="15%" class="cell3" valign="top">Note to Admins:</td>
 			<td width="85%" class="cell4"><textarea class="uploadpatch" name="note_to_admins" cols="50" rows="3">'.FormatForForm($patch[note_to_admins]).'</textarea><br/>
 			<b>Note:</b> This will not be published. It is simply a note to the Admins.</td>
+		</tr>
+		<tr>
+			<td width="15%" class="cell3">Tweaks File:<br\>(not yet suppported)</td>
+			<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="tweaks"></td>
 		</tr>
 		<tr>
 			<td colspan="2" align="center" class="cell5"><input type="submit" value="Send it Off!">
