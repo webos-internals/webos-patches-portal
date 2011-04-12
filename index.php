@@ -260,10 +260,6 @@ function BuildForm($errors, $pid) {
 			<td width="85%" class="cell4"><TEXTAREA class="uploadpatch" name="description" cols="50" rows="3">'.FormatForForm($patch[description]).'</TEXTAREA></td>
 		</tr>
 		<tr>
-			<td width="15%" class="cell3">Patch File: (*)</td>
-			<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="patch"></td>
-		</tr>
-		<tr>
 			<td width="15%" class="cell3">Category: (*)</td>
 			<td width="85%" class="cell4"><SELECT name="category" class="uploadpatch" '.iif(strlen($pid)>=1, "disabled", "").'>';
 	foreach($categories as $key => $category) {
@@ -274,6 +270,14 @@ function BuildForm($errors, $pid) {
 		echo '>'.$category.'</OPTION>';
 	}
 	echo '			</SELECT>'.iif(strlen($pid)>=1, "<input type=\"hidden\" name=\"category\" value=\"".$patch[category]."\">", "").'</td>
+		</tr>
+		<tr>
+			<td width="15%" class="cell3">Patch File: (*)</td>
+			<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="patch"></td>
+		</tr>
+		<tr>
+			<td width="15%" class="cell3">Tweaks File: (not yet suppported)</td>
+			<td width="85%" class="cell4"><input type="file" class="uploadpatch" name="tweaks"></td>
 		</tr>
 		<tr>
 			<td width="15%" class="cell3" valign="top">Screenshot 1:'.iif(strlen($patch[screenshot_1])>=1, "<br/><a href=\"".$patch[screenshot_1]."\">Current Image</a><input type=\"hidden\" name=\"screenshot_1\" value=\"".$patch[screenshot_1]."\">", "").'</td>
