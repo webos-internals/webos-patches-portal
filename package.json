@@ -14,7 +14,8 @@
 		"connect":">=1.3.0",
 		"coloured-log":"0.9.4",
 		"cluster":">= 0.5.5",
-		"sequelize":"*"
+		"sequelize":"*",
+		"ejs":"*"
 	},
   "engines": {
     "node": ">= v0.4.5"
