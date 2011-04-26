@@ -1,0 +1,45 @@
+<div class="block" id="block-login"> 
+        <h2>Login Box</h2> 
+        <div class="content login"> 
+          <div class="flash">
+			<% if (local && local.flash) { %>
+				<% for(var i=0;i < local.flash.length;i++) { %>
+					<div class="message <%- local.flash[i].type %>">
+						<p><%= local.flash[i].message %></p>
+						</div>
+				<% } %>
+			<% } %>
+          </div>
+ 			
+          <form action="/login" method="post" class="form login"> 
+            <div class="group wat-cf"> 
+              <div class="left"> 
+                <label class="label right">Login</label> 
+              </div> 
+              <div class="right"> 
+                <input type="text" class="text_field" name="username" /> 
+              </div> 
+            </div> 
+            <div class="group wat-cf"> 
+              <div class="left"> 
+                <label class="label right">Password</label> 
+              </div> 
+              <div class="right"> 
+                <input type="password" class="text_field" name="password" /> 
+              </div> 
+            </div> 
+            <div class="group navform wat-cf"> 
+              <div class="right"> 
+                <button class="button" type="submit"> 
+                  <img src="images/icons/key.png" alt="Save" /> Login
+                </button>
+				<a href="/register" style="text-decoration: none">
+              	<button class="button" type="submit"> 
+                	<img src="images/icons/tick.png" alt="Save" /> Signup
+              	</button> 
+				</a>
+              </div> 
+            </div> 
+          </form> 
+        </div> 
+      </div>

@@ -1,0 +1,67 @@
+<div class="block" id="block-signup"> 
+        <h2>Sign up</h2> 
+        <div class="content">
+	      <div class="flash">
+			<% if (local && local.flash) { %>
+				<% for(var i=0;i < local.flash.length;i++) { %>
+					<div class="message <%- local.flash[i].type %>">
+						<p><%= local.flash[i].message %></p>
+						</div>
+				<% } %>
+			<% } %>
+          </div>
+<%- local.form.render %> 
+          <form action="/register" method="post" class="form"> 
+            <div class="group wat-cf"> 
+              <div class="left"> 
+                <label class="label">Username</label> 
+              </div> 
+              <div class="right"> 
+                <input type="text" class="text_field" name="username"/> 
+                <span class="description">Unique Username on the system</span> 
+              </div> 
+            </div>
+            <div class="group wat-cf"> 
+              <div class="left"> 
+                <label class="label">Real Name</label> 
+              </div> 
+              <div class="right"> 
+                <input type="text" class="text_field" name="real_name"/> 
+                <span class="description">(Optional) Real name</span> 
+              </div> 
+            </div>
+            <div class="group wat-cf"> 
+              <div class="left"> 
+                <label class="label">Email</label> 
+              </div> 
+              <div class="right"> 
+                <input type="text" class="text_field" name="email"/> 
+                <span class="description">Valid Email Address</span> 
+              </div> 
+            </div> 
+            <div class="group wat-cf"> 
+              <div class="left"> 
+                <label class="label">Password</label> 
+              </div> 
+              <div class="right"> 
+                <input type="password" class="text_field" name="password"/> 
+                <span class="description">Must be greater than 6 characters</span> 
+              </div> 
+            </div> 
+            <div class="group wat-cf"> 
+              <div class="left"> 
+                <label class="label">Password</label> 
+              </div> 
+              <div class="right"> 
+                <input type="password" class="text_field" name="password_confirmation"/> 
+                <span class="description">Password Confirmation</span> 
+              </div> 
+            </div>
+            <div class="group navform wat-cf"> 
+              <button class="button" type="submit"> 
+                <img src="images/icons/tick.png" alt="Save" /> Signup
+              </button> 
+            </div> 
+          </form> 
+        </div> 
+      </div>

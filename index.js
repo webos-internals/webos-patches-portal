@@ -9,6 +9,18 @@ app.resource('users', require('./controllers/User'));
 app.get("/login",function(req,res){
 	require("./controllers/User").loginGet(req,res)
 })
+app.post("/login",function(req,res){
+	require("./controllers/User").loginPost(req,res)
+})
+app.get("/register",function(req,res){
+	require("./controllers/User").registerGet(req,res)
+})
+app.post("/register",function(req,res){
+	require("./controllers/User").registerPost(req,res)
+})
+app.get("/",function(req,res){
+	require("./controllers/User").loginGet(req,res)
+})
 //cluster(app)
 //  .set('workers', 1)
 //	.use(cluster.pidfiles())

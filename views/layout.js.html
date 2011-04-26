@@ -87,7 +87,12 @@
           </div> 
         </div> 
 		<% } %>
+      </div>
+ 	<% if (local.box || local.box) { %> 
+      <div id="box">
+				<%- local.box %>
       </div> 
+	<% } %>
 	<% if (local.sidebar || local.search) { %> 
       <div id="sidebar">
 				<%- local.search %>
