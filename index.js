@@ -1,21 +1,14 @@
 require.paths.unshift('./node_modules')
 var cluster=require('cluster'), express = require('express'), http = require('http');
-var render=require('./lib/Render');render=new render.r();
-
-var database=require('./lib/Database');database=new database.database({});
+var Resource=require('express-resource');
+var namespace=require('express-namespace');
 var app = express.createServer();
-database.load(function(){
-	
+app.use(express.cookieParser());
+app.use(express.session({ secret: "keyboard cat" }));
+app.resource('users', require('./controllers/User'));
+app.get("/login",function(req,res){
+	require("./controllers/User").loginGet(req,res)
 })
-var users=require("./lib/Users");users=new users.users({});
-app.get('/', function(req, res){
-	users.getLogin(req,res,function(obj){
-		render.renderPage(obj.page,obj.options,function(file){
-			res.send(file);
-		},obj.layout)
-	})
-});
-
 //cluster(app)
 //  .set('workers', 1)
 //	.use(cluster.pidfiles())

@@ -1,0 +1,90 @@
+[Wed, 20 Apr 2011 19:01:56 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:01:57 GMT] INFO master started
+[Wed, 20 Apr 2011 19:01:57 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:02:53 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:02:53 GMT] WARNING sent kill(SIGKILL) to all workers
+[Wed, 20 Apr 2011 19:02:54 GMT] INFO master started
+[Wed, 20 Apr 2011 19:02:54 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:03:13 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:03:15 GMT] INFO master started
+[Wed, 20 Apr 2011 19:03:15 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:03:16 GMT] ERROR worker 0 uncaught exception object is not a function
+[Wed, 20 Apr 2011 19:03:16 GMT] ERROR worker 0 died
+[Wed, 20 Apr 2011 19:03:16 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:03:18 GMT] ERROR worker 0 uncaught exception object is not a function
+[Wed, 20 Apr 2011 19:03:18 GMT] ERROR worker 0 died
+[Wed, 20 Apr 2011 19:03:18 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:03:42 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:03:43 GMT] INFO master started
+[Wed, 20 Apr 2011 19:03:43 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:03:44 GMT] ERROR worker 0 uncaught exception object is not a function
+[Wed, 20 Apr 2011 19:03:44 GMT] ERROR worker 0 died
+[Wed, 20 Apr 2011 19:03:44 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:03:46 GMT] ERROR worker 0 uncaught exception object is not a function
+[Wed, 20 Apr 2011 19:03:46 GMT] ERROR worker 0 died
+[Wed, 20 Apr 2011 19:03:46 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:04:32 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:04:32 GMT] WARNING sent kill(SIGKILL) to all workers
+[Wed, 20 Apr 2011 19:04:34 GMT] INFO master started
+[Wed, 20 Apr 2011 19:04:34 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:04:35 GMT] ERROR worker 0 uncaught exception object is not a function
+[Wed, 20 Apr 2011 19:04:35 GMT] ERROR worker 0 died
+[Wed, 20 Apr 2011 19:04:35 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:05:46 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:05:47 GMT] INFO master started
+[Wed, 20 Apr 2011 19:05:47 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:05:49 GMT] ERROR worker 0 uncaught exception object is not a function
+[Wed, 20 Apr 2011 19:05:49 GMT] ERROR worker 0 died
+[Wed, 20 Apr 2011 19:05:49 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:06:43 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:06:45 GMT] INFO master started
+[Wed, 20 Apr 2011 19:06:45 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:06:46 GMT] ERROR worker 0 uncaught exception object is not a function
+[Wed, 20 Apr 2011 19:06:46 GMT] ERROR worker 0 died
+[Wed, 20 Apr 2011 19:06:46 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:08:32 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:08:33 GMT] INFO master started
+[Wed, 20 Apr 2011 19:08:33 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:08:34 GMT] ERROR worker 0 uncaught exception object is not a function
+[Wed, 20 Apr 2011 19:08:34 GMT] ERROR worker 0 died
+[Wed, 20 Apr 2011 19:08:34 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:09:06 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:09:06 GMT] WARNING sent kill(SIGKILL) to all workers
+[Wed, 20 Apr 2011 19:09:10 GMT] INFO master started
+[Wed, 20 Apr 2011 19:09:10 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:14:01 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:14:01 GMT] WARNING sent kill(SIGKILL) to all workers
+[Wed, 20 Apr 2011 19:14:01 GMT] INFO master started
+[Wed, 20 Apr 2011 19:14:01 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:19:48 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:19:48 GMT] WARNING sent kill(SIGKILL) to all workers
+[Wed, 20 Apr 2011 19:19:49 GMT] INFO master started
+[Wed, 20 Apr 2011 19:19:49 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:21:45 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:21:45 GMT] WARNING sent kill(SIGKILL) to all workers
+[Wed, 20 Apr 2011 19:21:46 GMT] INFO master started
+[Wed, 20 Apr 2011 19:21:46 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:22:27 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:22:28 GMT] INFO master started
+[Wed, 20 Apr 2011 19:22:28 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:23:03 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:23:04 GMT] INFO master started
+[Wed, 20 Apr 2011 19:23:04 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:25:25 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:25:25 GMT] WARNING sent kill(SIGKILL) to all workers
+[Wed, 20 Apr 2011 19:25:27 GMT] INFO master started
+[Wed, 20 Apr 2011 19:25:27 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:26:53 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:26:54 GMT] INFO master started
+[Wed, 20 Apr 2011 19:26:54 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:27:27 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:27:29 GMT] INFO master started
+[Wed, 20 Apr 2011 19:27:29 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 19:28:03 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 19:28:03 GMT] WARNING sent kill(SIGKILL) to all workers
+[Wed, 20 Apr 2011 19:28:03 GMT] INFO shutdown complete
+[Wed, 20 Apr 2011 19:28:03 GMT] INFO master started
+[Wed, 20 Apr 2011 19:28:03 GMT] INFO spawned worker 0
+[Wed, 20 Apr 2011 21:16:02 GMT] WARNING shutting down master
+[Wed, 20 Apr 2011 21:16:02 GMT] WARNING sent kill(SIGKILL) to all workers
+[Wed, 20 Apr 2011 21:16:02 GMT] ERROR worker 0 died

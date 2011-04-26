@@ -1,0 +1,87 @@
+TypeError: object is not a function
+    at Object.CALL_NON_FUNCTION (native)
+    at /Users/halfhalo/src/webos-patches/lib/Render.js:54:4
+    at [object Object].fileExists (/Users/halfhalo/src/webos-patches/lib/Render.js:66:3)
+    at [object Object].loadFile (/Users/halfhalo/src/webos-patches/lib/Render.js:42:7)
+    at [object Object].renderPage (/Users/halfhalo/src/webos-patches/lib/Render.js:17:7)
+    at Object.<anonymous> (/Users/halfhalo/src/webos-patches/index.js:10:9)
+    at param (/Users/halfhalo/src/webos-patches/node_modules/express/node_modules/connect/lib/middleware/router.js:148:21)
+    at pass (/Users/halfhalo/src/webos-patches/node_modules/express/node_modules/connect/lib/middleware/router.js:164:10)
+    at Object.router [as handle] (/Users/halfhalo/src/webos-patches/node_modules/express/node_modules/connect/lib/middleware/router.js:170:6)
+    at next (/Users/halfhalo/src/webos-patches/node_modules/express/node_modules/connect/lib/http.js:204:15)
+TypeError: object is not a function
+    at Object.CALL_NON_FUNCTION (native)
+    at /Users/halfhalo/src/webos-patches/lib/Render.js:54:4
+    at [object Object].fileExists (/Users/halfhalo/src/webos-patches/lib/Render.js:66:3)
+    at [object Object].loadFile (/Users/halfhalo/src/webos-patches/lib/Render.js:42:7)
+    at [object Object].renderPage (/Users/halfhalo/src/webos-patches/lib/Render.js:17:7)
+    at Object.<anonymous> (/Users/halfhalo/src/webos-patches/index.js:10:9)
+    at param (/Users/halfhalo/src/webos-patches/node_modules/express/node_modules/connect/lib/middleware/router.js:148:21)
+    at pass (/Users/halfhalo/src/webos-patches/node_modules/express/node_modules/connect/lib/middleware/router.js:164:10)
+    at Object.router [as handle] (/Users/halfhalo/src/webos-patches/node_modules/express/node_modules/connect/lib/middleware/router.js:170:6)
+    at next (/Users/halfhalo/src/webos-patches/node_modules/express/node_modules/connect/lib/http.js:204:15)
+TypeError: object is not a function
+    at Object.CALL_NON_FUNCTION (native)
+    at /Users/halfhalo/src/webos-patches/lib/Render.js:54:4
+    at [object Object].fileExists (/Users/halfhalo/src/webos-patches/lib/Render.js:67:3)
+    at [object Object].loadFile (/Users/halfhalo/src/webos-patches/lib/Render.js:42:7)
+    at [object Object].renderPage (/Users/halfhalo/src/webos-patches/lib/Render.js:17:7)
+    at Object.<anonymous> (/Users/halfhalo/src/webos-patches/index.js:10:9)
+    at param (/Users/halfhalo/src/webos-patches/node_modules/express/node_modules/connect/lib/middleware/router.js:148:21)
+    at pass (/Users/halfhalo/src/webos-patches/node_modules/express/node_modules/connect/lib/middleware/router.js:164:10)
+    at Object.router [as handle] (/Users/halfhalo/src/webos-patches/node_modules/express/node_modules/connect/lib/middleware/router.js:170:6)
+    at next (/Users/halfhalo/src/webos-patches/node_modules/express/node_modules/connect/lib/http.js:204:15)
+TypeError: object is not a function
+    at Object.CALL_NON_FUNCTION (native)
+    at /Users/halfhalo/src/webos-patches/lib/Render.js:47:5
+    at [object Object].<anonymous> (fs.js:80:5)
+    at [object Object].emit (events.js:64:17)
+    at fs.js:858:12
+TypeError: object is not a function
+    at Object.CALL_NON_FUNCTION (native)
+    at /Users/halfhalo/src/webos-patches/lib/Render.js:47:5
+    at [object Object].<anonymous> (fs.js:80:5)
+    at [object Object].emit (events.js:64:17)
+    at fs.js:858:12
+TypeError: object is not a function
+    at Object.CALL_NON_FUNCTION (native)
+    at /Users/halfhalo/src/webos-patches/lib/Render.js:49:5
+    at [object Object].<anonymous> (fs.js:107:5)
+    at [object Object].emit (events.js:61:17)
+    at afterRead (fs.js:916:12)
+    at wrapper (fs.js:245:17)
+TypeError: object is not a function
+    at Object.CALL_NON_FUNCTION (native)
+    at /Users/halfhalo/src/webos-patches/lib/Render.js:49:5
+    at [object Object].<anonymous> (fs.js:107:5)
+    at [object Object].emit (events.js:61:17)
+    at afterRead (fs.js:916:12)
+    at wrapper (fs.js:245:17)
+TypeError: object is not a function
+    at Object.CALL_NON_FUNCTION (native)
+    at /Users/halfhalo/src/webos-patches/lib/Render.js:50:5
+    at [object Object].<anonymous> (fs.js:107:5)
+    at [object Object].emit (events.js:61:17)
+    at afterRead (fs.js:916:12)
+    at wrapper (fs.js:245:17)
+TypeError: object is not a function
+    at Object.CALL_NON_FUNCTION (native)
+    at /Users/halfhalo/src/webos-patches/lib/Render.js:50:5
+    at [object Object].<anonymous> (fs.js:107:5)
+    at [object Object].emit (events.js:61:17)
+    at afterRead (fs.js:916:12)
+    at wrapper (fs.js:245:17)
+TypeError: object is not a function
+    at Object.CALL_NON_FUNCTION (native)
+    at /Users/halfhalo/src/webos-patches/lib/Render.js:49:5
+    at [object Object].<anonymous> (fs.js:107:5)
+    at [object Object].emit (events.js:61:17)
+    at afterRead (fs.js:916:12)
+    at wrapper (fs.js:245:17)
+TypeError: object is not a function
+    at Object.CALL_NON_FUNCTION (native)
+    at /Users/halfhalo/src/webos-patches/lib/Render.js:50:5
+    at [object Object].<anonymous> (fs.js:107:5)
+    at [object Object].emit (events.js:61:17)
+    at afterRead (fs.js:916:12)
+    at wrapper (fs.js:245:17)
