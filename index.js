@@ -1,5 +1,6 @@
 require.paths.unshift('./node_modules')
 var cluster=require('cluster'), express = require('express'), http = require('http');
+var db=require("./lib/Database");db=new db.database();
 var Resource=require('express-resource');
 var namespace=require('express-namespace');
 var app = express.createServer();
@@ -29,4 +30,7 @@ app.get("/",function(req,res){
 	//.use(cluster.stats({ connections: true, requests: true }))
 //  .use(cluster.logger())
 	//.use(cluster.cli())
-  app.listen(process.env.VMC_APP_PORT||3000);
+	db.start(function(){
+		app.listen(process.env.VMC_APP_PORT||3000);
+	})
+  
