@@ -7,6 +7,7 @@ var app = express.createServer();
 app.use(express.cookieParser());
 app.use(express.session({ secret: "keyboard cat" }));
 app.resource('users', require('./controllers/User'));
+app.resource('patches', require('./controllers/Patch'));
 app.get("/login",function(req,res){
 	require("./controllers/User").loginGet(req,res)
 })
@@ -22,6 +23,10 @@ app.post("/register",function(req,res){
 app.get("/",function(req,res){
 	require("./controllers/User").index(req,res)
 })
+app.get("(.*)",function(req, res){
+	require("./controllers/App").fourOhFour(res,res)
+});
+
 //cluster(app)
 //  .set('workers', 1)
 //	.use(cluster.pidfiles())
