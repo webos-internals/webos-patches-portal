@@ -20,7 +20,7 @@ app.post("/register",function(req,res){
 	require("./controllers/User").registerPost(req,res)
 })
 app.get("/",function(req,res){
-	require("./controllers/User").loginGet(req,res)
+	require("./controllers/User").index(req,res)
 })
 //cluster(app)
 //  .set('workers', 1)

@@ -4,6 +4,7 @@ var crypto = require('crypto');
 var fs=require('fs');
 var formidable = require('formidable');
 exports.index = function(req, res){
+	exports.getUser(req,function(usr){console.log(usr)})
 	render.renderPage(exports.loadPath("index"),{},function(file){res.send(file)})
 };
 exports.new=function(req,res){
@@ -35,7 +36,10 @@ exports.loginPost=function(req,res)
 					{
 						if(user.password==crypto.createHash('sha1').update("nothingtoseehere").update(fields.password).digest("Hex"))
 						{
-							res.send("I hate you.")
+							exports.createSession(req,user.id,function(){
+								res.send("I hate you.")
+							})
+							
 						}
 						else
 						{
@@ -53,9 +57,64 @@ exports.loginPost=function(req,res)
 			}
 		})
 }
+exports.createSession=function(req,id,callback)
+{
+	var res=true;
+	database.load(function(db){
+		db.Session.find({"user_id":id},function(s){
+			if(s)
+			{
+				s.session_id=req.sessionID;
+				s.save(function(){
+					callback(true)
+				})
+			}
+			else
+			{
+				var u = new database.Session({"session_id":req.sessionID,"user_id":id});
+				u.save(function(){
+					callback(true);
+				})
+			}
+		})
+	})
+
+}
 exports.registerGet=function(req,res)
 {
 	render.renderPage(exports.loadPath("register"),{"render_location":"box"},function(file){res.send(file)})
+}
+exports.getUser=function(req,callback){
+	try{
+		if(req.sessionID)
+		{
+			database.load(function(db){
+				db.Session.find({"session_id":req.sessionID},function(session){
+					console.log(session);
+					if(session && session.user_id)
+					{
+						db.User.find(session.user_id,function(user){
+							if(user)
+							{callback(user)}
+							else
+							{callback(null)}
+						})
+					}
+					else
+					{callback(null)}
+				})
+			});
+		}
+		else
+		{
+			callback(null);
+		}
+	}catch(e)
+	{
+		console.log(e)
+		callback(null)
+	}
+
 }
 exports.registerPost=function(req,res)
 {
