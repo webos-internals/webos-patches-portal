@@ -509,12 +509,13 @@ function HandleForm($pid) {
 
 	$patch_file_contents = file_get_contents($patch['tmp_name'], FILE_BINARY);
 	
-	$tweaks_file_contents = file_get_contents($tweaks['tmp_name'], FILE_BINARY);
-	
 	$icon = $icon_array[$category];
 
-	if(strlen($tweaks_file_contents) >= 1) {
-		$icon = $tweaks_icon_array[$category];
+	if ($tweaks['tmp_name']) {
+		$tweaks_file_contents = file_get_contents($tweaks['tmp_name'], FILE_BINARY);
+		if(strlen($tweaks_file_contents) >= 1) {
+			$icon = $tweaks_icon_array[$category];
+		}
 	}
 
 	$maintainer_array = explode(',', $maintainer);
