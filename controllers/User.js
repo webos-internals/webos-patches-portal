@@ -4,9 +4,33 @@ var crypto = require('crypto');
 var fs=require('fs');
 var formidable = require('formidable');
 exports.index = function(req, res){
-	exports.getUser(req,function(usr){console.log(usr)})
+	exports.can("view_index",function(foo){
+		console.log(foo)
+	},req)
 	render.renderPage(exports.loadPath("index"),{},function(file){res.send(file)})
 };
+exports.can=function(method,callback,req,id)
+{
+	try{
+		if(req)
+		{
+			exports.getUser(req,function(user){
+				user.getPermissions(function(perms){
+					if(perms){}
+					console.log(perms)
+					callback(user.admin)
+				})
+			})
+		}
+		else
+		{
+			callback(false)
+		}
+	}catch(e){
+		callback(false)
+	}
+
+}
 exports.new=function(req,res){
 	render.renderPage(exports.loadPath("new"),{},function(file){res.send(file)})
 }
@@ -37,7 +61,8 @@ exports.loginPost=function(req,res)
 						if(user.password==crypto.createHash('sha1').update("nothingtoseehere").update(fields.password).digest("Hex"))
 						{
 							exports.createSession(req,user.id,function(){
-								res.send("I hate you.")
+								console.log("Loggin in: "+user.username)
+								res.redirect("/",303)
 							})
 							
 						}
@@ -90,28 +115,31 @@ exports.getUser=function(req,callback){
 		{
 			database.load(function(db){
 				db.Session.find({"session_id":req.sessionID},function(session){
-					console.log(session);
-					if(session && session.user_id)
+					if(session && session['user_id'])
 					{
-						db.User.find(session.user_id,function(user){
-							if(user)
-							{callback(user)}
-							else
-							{callback(null)}
-						})
+						try{
+							db.User.find(parseInt(session.user_id,10),function(user){
+								callback(user)
+							})
+						}catch(e)
+						{
+							console.log(e.toString())
+							callback(null)
+						}
 					}
 					else
-					{callback(null)}
+					{}
 				})
 			});
 		}
 		else
 		{
+			console.log("No Session!")
 			callback(null);
 		}
 	}catch(e)
 	{
-		console.log(e)
+		console.log(e.toString())
 		callback(null)
 	}
 

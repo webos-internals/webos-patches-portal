@@ -6,6 +6,7 @@ var namespace=require('express-namespace');
 var app = express.createServer();
 app.use(express.cookieParser());
 app.use(express.session({ secret: "keyboard cat" }));
+app.use(express.static(__dirname + '/public'));
 app.resource('users', require('./controllers/User'));
 app.resource('patches', require('./controllers/Patch'));
 app.get("/login",function(req,res){
@@ -23,8 +24,11 @@ app.post("/register",function(req,res){
 app.get("/",function(req,res){
 	require("./controllers/User").index(req,res)
 })
-app.get("(.*)",function(req, res){
-	require("./controllers/App").fourOhFour(res,res)
+app.get("/admin/devices",function(req, res){
+	require("./controllers/Device").index(res,res)
+});
+app.get("/admin/devices/new",function(req, res){
+	require("./controllers/Device").new(res,res)
 });
 
 //cluster(app)

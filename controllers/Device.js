@@ -5,7 +5,7 @@ var fs=require('fs');
 var formidable = require('formidable');
 exports.loadPath=function(method)
 {
-	return fs.realpathSync("views/patches/"+method+".js.html");
+	return fs.realpathSync("views/devices/"+method+".js.html");
 }
 exports.controllers=function(callback)
 {
@@ -28,9 +28,6 @@ exports.controllers=function(callback)
 		}
 	})
 }
-exports.create=function(req,res){
-	res.redirect("/patches/new",303)
-}
 exports.index = function(req, res){
 	exports.controllers(function(c){
 		c.User.getUser(req,function(user){
@@ -39,6 +36,20 @@ exports.index = function(req, res){
 	})
 	
 };
+exports.getDevices=function(callback,public)
+{
+	database.load(function(db){
+		db.Device.findAll(function(devices){
+			callback(devices)
+		})})
+}
 exports.new = function(req, res){
+	//exports.getUser(req,function(usr){console.log(usr)})
+	exports.getDevices()
 	render.renderPage(exports.loadPath("new"),{},function(file){res.send(file)})
 };
+exports.create = function(req,res){
+	var form = new formidable.IncomingForm();
+	form.parse(req, function(err, fields, files) {
+	});
+}

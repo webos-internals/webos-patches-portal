@@ -7,15 +7,24 @@
         </ul>
       </div>
       <div class="content">
+            <div class="flash">
+  			<% if (local && local.flash) { %>
+  				<% for(var i=0;i < local.flash.length;i++) { %>
+  					<div class="message <%- local.flash[i].type %>">
+  						<p><%= local.flash[i].message %></p>
+  						</div>
+  				<% } %>
+  			<% } %>
+            </div>
         <h2 class="title">
           Submit New Patch
         </h2>
         <div class="inner">
-          <form action="#" method="get" class="form">
+          <form action="/patches" method="post" class="form">
             <div class="columns wat-cf">
               <div class="column left">
                 <div class="group">
-                  <label class="label">Patch Name</label> <input type="text" class="text_field"> <span class="description">The Visible Name of the Patch</span>
+                  <label class="label">Patch Name</label> <input type="text" class="text_field" > <span class="description">The Visible Name of the Patch</span>
                 </div>
                 <div class="group">
                   <label class="label">Category</label> <select name="category" class="select_field">
@@ -36,16 +45,17 @@
                 <p>
                   To create a new patch we first need the patch's name and category.  The patch name cannot be already taken in the system as well, they must be unique.
                   </p>
+                  <p>Step 2 is to create a new revision for the patch, which is where all of the magic happens</p>
               </div>
               </div>
             <div class="group navform wat-cf">
-              <button class="button" type="submit"><img src="images/icons/tick.png" alt="Continue"> Continue</button> <a href="#header" class="button"><img src="images/icons/cross.png" alt="Cancel"> Cancel</a>
+              <button class="button" type="submit"><img src="/images/icons/tick.png" alt="Continue"> Continue</button> <a href="#header" class="button"><img src="/images/icons/cross.png" alt="Cancel"> Cancel</a>
             </div>
           </form>
         </div>
       </div>
     </div>
-    
+    <!--
     <div class="block">
       <div class="secondary-navigation">
         <ul class="wat-cf">
@@ -209,4 +219,4 @@
           </form>
         </div>
       </div>
-    </div>
+    </div> -->
