@@ -7,7 +7,8 @@ if(!defined('IN_SCRIPT')) {
   die("Hacking attempt!!!");
 }
 
-set_magic_quotes_runtime(0);  // setting this to zero eliminates the need of stripslashes()
+ini_set("magic_quotes_runtime", 0);
+#set_magic_quotes_runtime(0);  // setting this to zero eliminates the need of stripslashes()
                               // stripslashes() is only required if php.ini contains magic_quotes_runtime = On.
 
 // ################################# FUNCTIONS #################################

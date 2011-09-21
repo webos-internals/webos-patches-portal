@@ -10,9 +10,9 @@ if(!defined('IN_SCRIPT')) {
 global $rootpath;
 
 $get_webos_versions_array = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'webos_versions_array'");
-$webos_versions_array = split(",", $get_webos_versions_array['value']);
+$webos_versions_array = explode(",", $get_webos_versions_array['value']);
 $get_webos_versions_hide_array = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'webos_versions_hide_array'");
-$webos_versions_hide_array = split(",", $get_webos_versions_hide_array['value']);
+$webos_versions_hide_array = explode(",", $get_webos_versions_hide_array['value']);
 
 // GLOBAL VARIABLES
 $categories = array(	"Select...",
@@ -91,6 +91,7 @@ $tweaks_icon_array = array(
 			"App Launcher"		=>"http://www.webos-internals.org/images/b/b4/Icon_WebOSInternals_Patches_Plus_Applauncher.png",
 			"Browser"		=>"http://www.webos-internals.org/images/3/37/Icon_WebOSInternals_Patches_Plus_Browser.png",
 			"Calculator"		=>"http://www.webos-internals.org/images/5/5e/Icon_WebOSInternals_Patches_Plus_Calculator.png",
+			"Calendar"		=>"http://www.webos-internals.org/images/a/a5/Icon_WebOSInternals_Patches_Plus_Calendar.png",
 			"Camera"		=>"http://www.webos-internals.org/images/2/2f/Icon_WebOSInternals_Patches_Plus_Camera.png",
 			"Clock"			=>"http://www.webos-internals.org/images/9/9a/Icon_WebOSInternals_Patches_Plus_Clock.png",
 			"Contacts"		=>"http://www.webos-internals.org/images/a/a5/Icon_WebOSInternals_Patches_Plus_Calendar.png",
@@ -260,7 +261,7 @@ function UploadImage($pid, $ss, $title) {
 	system('rm -f /tmp/'.$name);
 	file_put_contents('/tmp/'.$name, $getpatch[$ssblob]);
 	require_once('simpletest/browser.php');
-	$browser = &new SimpleBrowser();
+	$browser = new SimpleBrowser();
 	$browser->get('http://www.webos-internals.org/wiki/Special:Userlogin');
 	$browser->setFieldById('wpName1', $wikiun);
 	$browser->setFieldById('wpPassword1', $wikipw);
@@ -350,8 +351,9 @@ function FormatForForm($input) {
 }
 
 function br2nl($string){
-  $return=eregi_replace('<br[[:space:]]*/?'.
-    '[[:space:]]*>',chr(13).chr(10),$string);
+  #$return=eregi_replace('<br[[:space:]]*/?'.
+  #  '[[:space:]]*>',chr(13).chr(10),$string);
+  $return=preg_replace('<br />',chr(13).chr(10),$string);
   return $return;
 }
 
@@ -360,6 +362,8 @@ function mynl2br($string) {
 }
 
 function SpamCheck($ip) {
+	// quick hack to disable the spamcheck
+	return 0;
 	global $DB;
 	$wait = (60);
 	$get_safe_ip_list = $DB->query_first("SELECT value FROM ".TABLE_PREFIX."settings WHERE setting = 'safe_ip_list'");

@@ -401,8 +401,8 @@ function HandleForm($pid) {
 		if(!in_array($patchext, $allowedpatchext)) {
 			$errors[] = 'Only patch files are allowed.';
 		} else {
-			if($patch['size'] > 1048576) {
-				$errors[] = 'Patch cannot be larger than 1MB.';
+			if($patch['size'] > 1572864) {
+				$errors[] = 'Patch cannot be larger than 1.5MB.';
 			}
 		}
 	} else {
